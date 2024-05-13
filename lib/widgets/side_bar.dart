@@ -2,7 +2,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:krofile_ai/cubit/homepage_cubit.dart';
+import 'package:krofile_ai/cubit/homepage/homepage_cubit.dart';
+import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
 import 'package:krofile_ai/data/allList.dart';
 
 class SideBar extends StatefulWidget {
@@ -56,15 +57,15 @@ class _SideBarState extends State<SideBar> {
 
     return BlocBuilder<HomepageCubit, HomepageState>(
       builder: (context, state) {
-        return Drawer(
-          key: widget.scaffoldKey,
-          // padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
-          // decoration: const BoxDecoration(
-          //   color: Colors.amber,
-          //   border: Border(
-          //     left: BorderSide(color: Color(0xFFE5E5E5), width: 1),
-          //   ),
-          // ),
+        return Container(
+          // key: widget.scaffoldKey,
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+          decoration: const BoxDecoration(
+            // color: Colors.amber,
+            border: Border(
+              left: BorderSide(color: Color(0xFFE5E5E5), width: 1),
+            ),
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,9 +105,10 @@ class _SideBarState extends State<SideBar> {
                           )),
                           child: Text(selectedList[index])),
                       onTap: () {
+                        context.read<ResponsepageCubit>().handelQuestionType();
                         context
-                            .read<HomepageCubit>()
-                            .getQuestionList(selectedList[index]);
+                            .read<ResponsepageCubit>()
+                            .addQuestionAnswerList(selectedList[index]);
                       },
                     );
                   },

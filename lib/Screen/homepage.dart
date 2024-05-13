@@ -1,27 +1,24 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:krofile_ai/cubit/homepage_cubit.dart';
+import 'package:krofile_ai/cubit/homepage/homepage_cubit.dart';
 import 'package:krofile_ai/widgets/aichatting.dart';
-import 'package:krofile_ai/widgets/response_ui.dart';
 import 'package:krofile_ai/widgets/side_bar.dart';
 
-class NextHomePage extends StatefulWidget {
-  const NextHomePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<NextHomePage> createState() => _NextHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _NextHomePageState extends State<NextHomePage> {
+class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          elevation: 0, // Set the elevation to 0
+          // elevation: 0, // Set the elevation to 0
           // surfaceTintColor: Colors.transparent,
           scrolledUnderElevation: 0,
           shape: const Border(
@@ -103,15 +100,21 @@ class _NextHomePageState extends State<NextHomePage> {
                   flex: 3,
                   child: AiChatting(),
                 ),
+
                 // if (state.isSideBarOpen)
                 //   // ?
                 //   const Expanded(
                 //     flex: 1,
                 //     child: SideBar(),
                 //   )
+                // Expanded(
+                //     flex: 1,
+                //     child: SideBar(
+                //       scaffoldKey: _scaffoldKey,
+                //     )),
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  width: (state.isSideBarOpen) ? 320 : 0,
+                  width: (state.isSideBarOpen) ? 400 : 0,
                   child: SideBar(
                     scaffoldKey: _scaffoldKey,
                   ),
