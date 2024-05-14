@@ -49,7 +49,7 @@ class _ViewFAQState extends State<ViewFAQ> {
                         context
                             .read<ResponsepageCubit>()
                             .toggleQuestionFromFAQ(faqItem);
-                      
+
                         Navigator.of(context).pop();
                       },
                       title: Text(

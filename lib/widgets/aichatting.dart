@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -59,7 +58,7 @@ class _AiChattingState extends State<AiChatting> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Image.asset(
-                                "assets/images/logo.png",
+                                "assets/images/SquareLogo.png",
                                 height: 80,
                                 width: 80,
                               ),

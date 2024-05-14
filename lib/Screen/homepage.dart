@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:krofile_ai/cubit/homepage/homepage_cubit.dart';
+import 'package:krofile_ai/cubit/threedot/threedot_cubit.dart';
 import 'package:krofile_ai/widgets/aichatting.dart';
 import 'package:krofile_ai/widgets/side_bar.dart';
 
@@ -29,7 +30,8 @@ class _HomePageState extends State<HomePage> {
             children: [
               Row(
                 children: [
-                  Image.asset("assets/images/logo.png", width: 50, height: 50),
+                  Image.asset("assets/images/SquareLogo.png",
+                      width: 50, height: 50),
                   const Text("Krofile AI",
                       style: TextStyle(
                           fontSize: 24,
@@ -148,47 +150,55 @@ class ThreeDotMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PopupMenuButton(
-      color: Colors.white,
-      onSelected: (int result) {},
-      itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
-        const PopupMenuItem<int>(
-          value: 1,
-          child: ListTile(
-            title: Text('History '),
-          ),
-        ),
-        const PopupMenuItem<int>(
-          value: 2,
-          child: ListTile(
-            title: Text('Clear All Chat'),
-          ),
-        ),
-        const PopupMenuItem<int>(
-          value: 3,
-          child: ListTile(
-            title: Text('Customize'),
-          ),
-        ),
-        const PopupMenuItem<int>(
-          value: 4,
-          child: ListTile(
-            title: Text('Incognito Mode'),
-          ),
-        ),
-        const PopupMenuItem<int>(
-          value: 5,
-          child: ListTile(
-            title: Text('Delete All Search History'),
-          ),
-        ),
-        const PopupMenuItem<int>(
-          value: 6,
-          child: ListTile(
-            title: Text('Feedback'),
-          ),
-        ),
-      ],
+    return BlocBuilder<ThreedotCubit, ThreedotState>(
+      builder: (context, state) {
+        return PopupMenuButton(
+          color: Colors.white,
+          onSelected: (int result) {
+            if (result == 4) {
+              context.read<ThreedotCubit>().toggleIncognitoMode();
+            }
+          },
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
+            const PopupMenuItem<int>(
+              value: 1,
+              child: ListTile(
+                title: Text('History '),
+              ),
+            ),
+            const PopupMenuItem<int>(
+              value: 2,
+              child: ListTile(
+                title: Text('Clear All Chat'),
+              ),
+            ),
+            const PopupMenuItem<int>(
+              value: 3,
+              child: ListTile(
+                title: Text('Customize'),
+              ),
+            ),
+            const PopupMenuItem<int>(
+              value: 4,
+              child: ListTile(
+                title: Text('Incognito Mode'),
+              ),
+            ),
+            const PopupMenuItem<int>(
+              value: 5,
+              child: ListTile(
+                title: Text('Delete All Search History'),
+              ),
+            ),
+            const PopupMenuItem<int>(
+              value: 6,
+              child: ListTile(
+                title: Text('Feedback'),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

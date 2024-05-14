@@ -33,14 +33,19 @@ class ResponsepageCubit extends Cubit<ResponsepageState> {
     emit(state.copyWith(questionAnswerList: newQuestionAnswerList));
   }
 
+  void addFeedback(int index) {
+    final newQuestionAnswerList = [...state.questionAnswerList];
+    emit(state.copyWith(questionAnswerList: newQuestionAnswerList));
+  }
+
   void regenerateAnswer(int index, String question) {
     final newQuestionAnswerList = [...state.questionAnswerList];
     if (newQuestionAnswerList[index]['question'] == question) {
-      newQuestionAnswerList[index]['answer'] =
-          answerList[newQuestionAnswerList.length % answerList.length + 1];
+      newQuestionAnswerList[index]['answer'] = answerList[1];
     }
     emit(state.copyWith(
         questionAnswerList: newQuestionAnswerList)); // Emit the new state
+    
   }
 
   void addFaq(String question) {
@@ -63,18 +68,5 @@ class ResponsepageCubit extends Cubit<ResponsepageState> {
     String newQuestion = question;
 
     emit(state.copyWith(questionFromFAQ: newQuestion));
-  }
-
-  void toggleDislike(int index) {
-    final newDisLikedIndex = [...state.disLikedIndex];
-
-    newDisLikedIndex.add(index);
-    emit(state.copyWith(isDisliked: true, disLikedIndex: newDisLikedIndex));
-  }
-
-  void closeFeedBack(int index) {
-    final newDisLikedIndex = [...state.disLikedIndex];
-    newDisLikedIndex.remove(index);
-    emit(state.copyWith(isDisliked: false, disLikedIndex: newDisLikedIndex));
   }
 }

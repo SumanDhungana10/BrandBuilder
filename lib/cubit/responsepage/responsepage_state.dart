@@ -6,8 +6,6 @@ class ResponsepageState extends Equatable {
   final List<Map<String, dynamic>> questionAnswerList;
   final List<String> faq;
   final String questionFromFAQ;
-  final bool isDisliked;
-  final List<int> disLikedIndex;
 
   const ResponsepageState({
     this.isQuestionType = false,
@@ -19,8 +17,6 @@ class ResponsepageState extends Equatable {
       "How do I contact support?"
     ],
     this.questionFromFAQ = "",
-    this.isDisliked = false,
-    this.disLikedIndex = const [],
   });
 
   ResponsepageState copyWith(
@@ -33,13 +29,12 @@ class ResponsepageState extends Equatable {
       bool? isDisliked,
       List<int>? disLikedIndex}) {
     return ResponsepageState(
-        isQuestionType: isQuestionType ?? this.isQuestionType,
-        questionList: questionList ?? this.questionList,
-        questionAnswerList: questionAnswerList ?? this.questionAnswerList,
-        faq: faq ?? this.faq,
-        questionFromFAQ: questionFromFAQ ?? this.questionFromFAQ,
-        isDisliked: isDisliked ?? this.isDisliked,
-        disLikedIndex: disLikedIndex ?? this.disLikedIndex);
+      isQuestionType: isQuestionType ?? this.isQuestionType,
+      questionList: questionList ?? this.questionList,
+      questionAnswerList: questionAnswerList ?? this.questionAnswerList,
+      faq: faq ?? this.faq,
+      questionFromFAQ: questionFromFAQ ?? this.questionFromFAQ,
+    );
   }
 
   @override
@@ -49,7 +44,5 @@ class ResponsepageState extends Equatable {
         questionAnswerList,
         faq,
         questionFromFAQ,
-        isDisliked,
-        disLikedIndex
       ];
 }
