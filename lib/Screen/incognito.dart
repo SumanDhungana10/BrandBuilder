@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
 import 'package:krofile_ai/cubit/threedot/threedot_cubit.dart';
+import 'package:krofile_ai/screen/homepage.dart';
 import 'package:krofile_ai/widgets/incognitoalert.dart';
 
 class IncognitoMode extends StatefulWidget {
@@ -59,12 +60,13 @@ class _IncognitoModeState extends State<IncognitoMode> {
     'Generate top five content ideas for my business',
     'Give me 5 subject lines for my email marketing campaign.'
   ];
-  List<Map<String, String>> questionAnswerList = [];
+  List<Map<String, dynamic>> questionAnswerList = [];
 
   void handelQuestionType(String question) {
     setState(() {
       _isQuestion = true;
       questionAnswerList.add({
+        'image': pickedFileBytes,
         'question': question,
         'answer': answerList[questionAnswerList.length % answerList.length],
       });
@@ -101,7 +103,78 @@ class _IncognitoModeState extends State<IncognitoMode> {
                 builder: (context, state) {
                   return ElevatedButton.icon(
                       onPressed: () {
-                        context.read<ThreedotCubit>().toggleIncognitoMode();
+                        showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                  backgroundColor:
+                                      const Color.fromARGB(255, 255, 255, 255),
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10))),
+                                  contentPadding: const EdgeInsets.all(24),
+                                  title: const Row(
+                                    children: [
+                                      Icon(
+                                        Icons.error,
+                                        color: Color(0xFFFF8C22),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        "Click continue to exit incognito mode.",
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            color: Color(0xFF151515),
+                                            fontWeight: FontWeight.w400),
+                                      )
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                        style: TextButton.styleFrom(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              30, 10, 30, 10),
+                                          backgroundColor:
+                                              const Color(0xFFCCCCCC),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(5)),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text("Cancel",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Color(0xFF151515),
+                                                fontWeight: FontWeight.w400))),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    TextButton(
+                                        style: TextButton.styleFrom(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              30, 10, 30, 10),
+                                          backgroundColor:
+                                              const Color(0xFF21201F),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(5)),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const HomePage()));
+                                        },
+                                        child: const Text("Continue",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Color(0xFFFFFFFF),
+                                                fontWeight: FontWeight.w400)))
+                                  ],
+                                ));
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.all(20),
@@ -225,16 +298,21 @@ class _IncognitoModeState extends State<IncognitoMode> {
                                     ), // Replace with your icon (if any
                                     const SizedBox(width: 20),
                                     Flexible(
-                                      child: Text(
-                                        questionAnswerList[updateIndex]
-                                            ['question']!,
-                                        // widget.questionAnswerList[updateIndex]
-                                        //     ['question'],
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: darktheme.colorScheme.primary,
-                                          fontWeight: FontWeight.w400,
-                                        ),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            questionAnswerList[updateIndex]
+                                                ['question']!,
+                                            // widget.questionAnswerList[updateIndex]
+                                            //     ['question'],
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color:
+                                                  darktheme.colorScheme.primary,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],

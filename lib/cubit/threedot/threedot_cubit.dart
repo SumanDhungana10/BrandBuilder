@@ -6,7 +6,7 @@ part 'threedot_state.dart';
 class ThreedotCubit extends Cubit<ThreedotState> {
   ThreedotCubit() : super(const ThreedotState());
 
-  void toggleIncognitoMode() {
-    emit(state.copyWith(isIncognitoMode: !state.isIncognitoMode));
+  void toggleHistory() {
+    emit(state.copyWith(isHistoryOpen: !state.isHistoryOpen));
   }
 }

@@ -1,18 +1,18 @@
 part of 'threedot_cubit.dart';
 
  class ThreedotState extends Equatable {
-final bool isIncognitoMode;
-  const ThreedotState({this.isIncognitoMode = false});
+final bool isHistoryOpen;
+  const ThreedotState({this.isHistoryOpen = false});
 
-  ThreedotState copyWith({bool? isIncognitoMode}) {
+  ThreedotState copyWith({bool? isHistoryOpen,}) {
     return ThreedotState(
-      isIncognitoMode: isIncognitoMode ?? this.isIncognitoMode,
+      isHistoryOpen: isHistoryOpen ?? this.isHistoryOpen,
     );
   }
 
   @override
   List<Object> get props => [
-    isIncognitoMode,
+    isHistoryOpen,
   ];
 }
 

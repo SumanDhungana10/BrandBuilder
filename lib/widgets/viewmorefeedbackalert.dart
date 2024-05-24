@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
 
@@ -68,24 +67,31 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
                   spacing: 10,
                   runSpacing: 20,
                   children: [
-                    for (var item in feedbackOptions)
+                    for (int i = 0; i < feedbackOptions.length; i++)
                       ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          textStyle: const TextStyle(
-                              fontSize: 16,
-                              color: Color(0xFF151515),
-                              fontWeight: FontWeight.w400),
-                          padding: const EdgeInsets.all(24),
-                          foregroundColor: const Color(0xFF151515),
-                          // backgroundColor: Colors.white
-                          side: const BorderSide(
-                              color: Color(0xFFD4D4D4), width: 1),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14)),
-                        ),
-                        child: Text(item),
-                      ),
+                          onPressed: () {
+                           
+                          },
+                          style: ElevatedButton.styleFrom(
+                            textStyle: const TextStyle(
+                                fontSize: 16,
+                                color: Color(0xFF151515),
+                                fontWeight: FontWeight.w400),
+                            padding: const EdgeInsets.all(24),
+                            foregroundColor: const Color(0xFF151515),
+                            // backgroundColor: Colors.white
+                            side: const BorderSide(
+                                color: Color(0xFFD4D4D4), width: 1),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14)),
+                          ),
+                          child: Text(
+                            feedbackOptions[i],
+                            style: const TextStyle(
+                                fontSize: 16,
+                                color: Color(0xFF151515),
+                                fontWeight: FontWeight.w400),
+                          )),
                   ],
                 ),
                 const SizedBox(
@@ -95,13 +101,37 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
                   decoration: InputDecoration(
                     hintText: "(Optional) Feel free to add specific details",
                     hintStyle: const TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFF151515),
-                        fontWeight: FontWeight.w400),
+                      fontSize: 16,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(
+                        width: 1,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    disabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(
+                        width: 1,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(
+                        width: 1,
+                        color: Colors.grey,
+                      ),
+                    ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide:
-                          const BorderSide(color: Color(0xFFD4D4D4), width: 1),
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(
+                        width: 1,
+                        color: Colors.grey,
+                      ),
                     ),
                   ),
                 ),
@@ -112,8 +142,7 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ElevatedButton(
-                        onPressed: () {
-                        },
+                        onPressed: () {},
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF18C554),
                           foregroundColor: Colors.white,

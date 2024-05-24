@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:krofile_ai/cubit/homepage/homepage_cubit.dart';
 import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
+import 'package:krofile_ai/screen/explore_page.dart';
 import 'package:krofile_ai/widgets/response_ui.dart';
 import 'package:krofile_ai/widgets/viewfaqalert.dart';
+import 'package:popover/popover.dart';
 
 class AiChatting extends StatefulWidget {
   const AiChatting({super.key});
@@ -67,52 +69,50 @@ class _AiChattingState extends State<AiChatting> {
                                       fontSize: 30,
                                       color: Color(0xFF151515),
                                       fontWeight: FontWeight.w700)),
-                              Flexible(
-                                child: GridView.builder(
-                                    shrinkWrap: true,
-                                    padding: const EdgeInsets.all(24),
-                                    gridDelegate:
-                                        const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 2,
-                                      crossAxisSpacing: 10,
-                                      mainAxisSpacing: 10,
-                                      mainAxisExtent: 100,
-                                    ),
-                                    itemCount: initialView
-                                        .length, // Replace with your actual item count
-                                    itemBuilder: (context, index) {
-                                      return InkWell(
-                                        onTap: () {
-                                          context
-                                              .read<ResponsepageCubit>()
-                                              .handelQuestionType();
-                                          context
-                                              .read<ResponsepageCubit>()
-                                              .addQuestionAnswerList(
-                                                  initialView[index]);
-                                        },
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: const Color(0xFFE5E5E5)),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                          padding: const EdgeInsets.all(24),
-                                          child: Text(
-                                            initialView[index],
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Color(0xFF151515),
-                                              fontWeight: FontWeight.w400,
-                                            ),
+                              GridView.builder(
+                                  shrinkWrap: true,
+                                  padding: const EdgeInsets.all(24),
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 10,
+                                    mainAxisExtent: 100,
+                                  ),
+                                  itemCount: initialView
+                                      .length, // Replace with your actual item count
+                                  itemBuilder: (context, index) {
+                                    return InkWell(
+                                      onTap: () {
+                                        context
+                                            .read<ResponsepageCubit>()
+                                            .handelQuestionType();
+                                        context
+                                            .read<ResponsepageCubit>()
+                                            .addQuestionAnswerList(
+                                                initialView[index]);
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                              color: const Color(0xFFE5E5E5)),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        padding: const EdgeInsets.all(24),
+                                        child: Text(
+                                          initialView[index],
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            color: Color(0xFF151515),
+                                            fontWeight: FontWeight.w400,
                                           ),
                                         ),
-                                      );
-                                      //   }
-                                      // );
-                                    }),
-                              ),
+                                      ),
+                                    );
+                                    //   }
+                                    // );
+                                  }),
                             ],
                           ),
                         )
@@ -123,20 +123,32 @@ class _AiChattingState extends State<AiChatting> {
           ),
           BlocBuilder<HomepageCubit, HomepageState>(
             builder: (context, state) {
-              return IconButton(
-                style: IconButton.styleFrom(
-                    padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
-                    side: const BorderSide(color: Color(0xFFE5E5E5), width: 1),
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(8),
-                            bottomLeft: Radius.circular(8)))),
-                icon: (state.isSideBarOpen)
-                    ? Image.asset("assets/images/Vectorright.png")
-                    : Image.asset("assets/images/Vectorleft.png"),
-                onPressed: () {
+              return GestureDetector(
+                onTap: () {
                   context.read<HomepageCubit>().toggleSideBar();
                 },
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(8, 22, 8, 22),
+                  decoration: BoxDecoration(
+                    border:
+                        Border.all(color: const Color(0xFFE5E5E5), width: 1),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      bottomLeft: Radius.circular(8),
+                    ),
+                  ),
+                  child: (state.isSideBarOpen)
+                      ? Image.asset(
+                          "assets/images/Vectorright.png",
+                          height: 12,
+                          width: 8,
+                        )
+                      : Image.asset(
+                          "assets/images/Vectorleft.png",
+                          height: 12,
+                          width: 8,
+                        ),
+                ),
               );
             },
           ),
@@ -180,7 +192,55 @@ class _AiChattingState extends State<AiChatting> {
                             "assets/images/arrow-up.svg",
                           ),
                           onPressed: () {
-                            _viewFaq();
+                            if (state.faq.isNotEmpty) {
+                              _viewFaq();
+                            } else {
+                              showPopover(
+                                  context: context,
+                                  barrierColor: Colors.transparent,
+                                  direction: PopoverDirection.top,
+                                  bodyBuilder: (context) {
+                                    return Container(
+                                      padding: const EdgeInsets.all(16),
+                                      width: 450,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.info,
+                                                    color: Colors.green,
+                                                  ),
+                                                  Text("Instructions",
+                                                      style: TextStyle(
+                                                          fontSize: 24,
+                                                          color:
+                                                              Color(0xFF151515),
+                                                          fontWeight:
+                                                              FontWeight.w600)),
+                                                ],
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(Icons.close),
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10),
+                                          const Text(
+                                              "To our FAQ section! To add a question, click on the plus icon (+) next to existing questions. You can add up to 10 questions. Need to find the FAQ? Click the plus icon (+) on the search field. Questions? Reach out to us. Happy FAQ-ing!")
+                                        ],
+                                      ),
+                                    );
+                                  });
+                            }
                           },
                         ),
                       ),
@@ -215,6 +275,7 @@ class _AiChattingState extends State<AiChatting> {
                                       .read<ResponsepageCubit>()
                                       .addQuestionAnswerList(
                                           _inputQuestion.text);
+
                                   _inputQuestion.clear();
                                 }
                               },
@@ -236,6 +297,7 @@ class _AiChattingState extends State<AiChatting> {
                         context
                             .read<ResponsepageCubit>()
                             .addQuestionAnswerList(_inputQuestion.text);
+
                         FocusScope.of(context).requestFocus(_textFocusNode);
 
                         _inputQuestion.clear();
@@ -247,7 +309,12 @@ class _AiChattingState extends State<AiChatting> {
             ),
             const SizedBox(width: 10),
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ExplorePage()));
+              },
               icon: SvgPicture.asset("assets/images/apps.svg"),
             ),
           ],

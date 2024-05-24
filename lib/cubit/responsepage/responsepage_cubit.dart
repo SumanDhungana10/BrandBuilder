@@ -7,7 +7,7 @@ class ResponsepageCubit extends Cubit<ResponsepageState> {
   final List<String> answerList = [
     'Generate strategies to effectively scale my social media marketing efforts.',
     'Generate top five content ideas for my business',
-    'Give me 5 subject lines for my email marketing campaign.'
+    'Give me 5 subject lines for my email marketing campaign.',
   ];
   ResponsepageCubit() : super(const ResponsepageState());
 
@@ -19,39 +19,54 @@ class ResponsepageCubit extends Cubit<ResponsepageState> {
 
   void addQuestionAnswerList(String question) {
     final newQuestionAnswerList = [...state.questionAnswerList];
-
-    newQuestionAnswerList.add({
-      'question': question,
-      'answer': answerList[state.questionList.length % answerList.length],
-    });
-    // newQuestionAnswerList.insert(0, {
-    //   'id': state.questionAnswerList.length + 1,
+    final newQuestionlist = [...state.questionList];
+    final newHistoryList = [...state.historyList];
+    newQuestionlist.add(question);
+    // newQuestionAnswerList.add({
     //   'question': question,
     //   'answer': answerList[state.questionList.length % answerList.length],
     // });
 
-    emit(state.copyWith(questionAnswerList: newQuestionAnswerList));
-  }
+    newQuestionAnswerList.add(QuestionAnswer(
+      question,
+      answerList[state.questionList.length % answerList.length],
+    ));
 
-  void addFeedback(int index) {
-    final newQuestionAnswerList = [...state.questionAnswerList];
-    emit(state.copyWith(questionAnswerList: newQuestionAnswerList));
-  }
+    newHistoryList.add({
+      'question': question,
+      'answer': answerList[state.questionList.length % answerList.length],
+    });
 
-  void regenerateAnswer(int index, String question) {
-    final newQuestionAnswerList = [...state.questionAnswerList];
-    if (newQuestionAnswerList[index]['question'] == question) {
-      newQuestionAnswerList[index]['answer'] = answerList[1];
-    }
     emit(state.copyWith(
-        questionAnswerList: newQuestionAnswerList)); // Emit the new state
-    
+      questionList: newQuestionlist,
+      questionAnswerList: newQuestionAnswerList,
+      historyList: newHistoryList,
+    ));
+  }
+
+  void regenerateAnswer(int index) {
+    final newQuestionAnswerList = [...state.questionAnswerList];
+    final question = state.questionAnswerList[index].question;
+    newQuestionAnswerList[index] = QuestionAnswer(
+      newQuestionAnswerList[index].question,
+      getNewAnswer(question),
+    );
+    emit(state.copyWith(questionAnswerList: newQuestionAnswerList));
+  }
+
+  String getNewAnswer(String question) {
+    return "This is a regenerated answer for: $question";
   }
 
   void addFaq(String question) {
-    final newFaq = [...state.faq];
-    newFaq.add(question);
-    emit(state.copyWith(faq: newFaq));
+    if (state.faq.contains(question)) {
+      return;
+    }
+    if (state.faq.length < 20) {
+      final newFaq = [...state.faq];
+      newFaq.add(question);
+      emit(state.copyWith(faq: newFaq));
+    }
   }
 
   void resetTextFeildController() {
@@ -68,5 +83,18 @@ class ResponsepageCubit extends Cubit<ResponsepageState> {
     String newQuestion = question;
 
     emit(state.copyWith(questionFromFAQ: newQuestion));
+  }
+
+  void showhistoyData(String question, String answer) {
+    final newHistoryList = [...state.questionAnswerList];
+    newHistoryList.add(QuestionAnswer(
+      question,
+      answer,
+    ));
+    emit(state.copyWith(questionAnswerList: newHistoryList));
+  }
+
+  void resetQuestionAnswerList() {
+    emit(state.copyWith(questionAnswerList: [], isQuestionType: false));
   }
 }
