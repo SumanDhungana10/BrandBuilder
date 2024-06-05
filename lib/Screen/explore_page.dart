@@ -331,7 +331,9 @@ class _ExplorePageState extends State<ExplorePage>
                                       ),
                                     ),
                                     icon: const Icon(
-                                        Icons.arrow_forward_ios_rounded),
+                                      Icons.arrow_forward_ios_rounded,
+                                      size: 12,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -349,7 +351,6 @@ class _ExplorePageState extends State<ExplorePage>
                                     )),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  
                                   children: [
                                     Expanded(
                                       flex: 1,
@@ -365,23 +366,67 @@ class _ExplorePageState extends State<ExplorePage>
                                                   .subcategories
                                                   .length,
                                               itemBuilder: (context, index) {
-                                                return ElevatedButton(
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      activeSubCategoryIndex =
-                                                          index;
-                                                    });
-                                                  },
-                                                  child: Text(
-                                                    state
-                                                        .categories[activeIndex]
-                                                        .subcategories[index]
-                                                        .name,
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          bottom: 12),
+                                                  child: ElevatedButton(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      alignment:
+                                                          Alignment.centerLeft,
+                                                      elevation: 0,
+                                                      backgroundColor:
+                                                          (activeSubCategoryIndex ==
+                                                                  index)
+                                                              ? const Color(
+                                                                  0xFF18C554)
+                                                              : const Color(
+                                                                  0xFFFFFFFF),
+                                                      foregroundColor:
+                                                          (activeSubCategoryIndex ==
+                                                                  index)
+                                                              ? const Color(
+                                                                  0xFFFFFFFF)
+                                                              : const Color(
+                                                                  0xFF73767B),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              16),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(14),
+                                                        side: const BorderSide(
+                                                            color: Colors.grey,
+                                                            width: 1.0),
+                                                      ),
+                                                    ),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        activeSubCategoryIndex =
+                                                            index;
+                                                      });
+                                                    },
+                                                    child: Text(
+                                                        state
+                                                            .categories[
+                                                                activeIndex]
+                                                            .subcategories[
+                                                                index]
+                                                            .name,
+                                                        style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        )),
                                                   ),
                                                 );
                                               },
                                             ),
                                     ),
+                                    const SizedBox(width: 34),
                                     Expanded(
                                       flex: 4,
                                       child: state.categories[activeIndex]
@@ -395,26 +440,53 @@ class _ExplorePageState extends State<ExplorePage>
                                           ? const Center(
                                               child: Text("No items"),
                                             )
-                                          : Container(
-                                              color: Colors.blue,
-                                              child: ListView.builder(
-                                                shrinkWrap: true,
-                                                itemCount: state
-                                                    .categories[activeIndex]
-                                                    .subcategories[
-                                                        activeSubCategoryIndex]
-                                                    .items
-                                                    .length,
-                                                itemBuilder: (context, index) {
-                                                  return ListTile(
-                                                    title: Text(state
-                                                        .categories[activeIndex]
-                                                        .subcategories[
-                                                            activeSubCategoryIndex]
-                                                        .items[index]),
-                                                  );
-                                                },
-                                              ),
+                                          : ListView.builder(
+                                              shrinkWrap: true,
+                                              itemCount: state
+                                                  .categories[activeIndex]
+                                                  .subcategories[
+                                                      activeSubCategoryIndex]
+                                                  .items
+                                                  .length,
+                                              itemBuilder: (context, index) {
+                                                return Container(
+                                                  decoration: const BoxDecoration(
+                                                      border: Border(
+                                                          bottom: BorderSide(
+                                                              color: Color(
+                                                                  0xFFE5E5E5),
+                                                              width: 1.0))),
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          bottom: 24),
+                                                  child: ListTile(
+                                                      title: Text(
+                                                        state
+                                                            .categories[
+                                                                activeIndex]
+                                                            .subcategories[
+                                                                activeSubCategoryIndex]
+                                                            .items[index],
+                                                        style: const TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            color: Color(
+                                                                0xFF151515)),
+                                                      ),
+                                                      trailing: IconButton(
+                                                        icon: const Icon(
+                                                          Icons
+                                                              .arrow_forward_ios,
+                                                          color: Color(
+                                                            0xFF151515,
+                                                          ),
+                                                          size: 11,
+                                                        ),
+                                                        onPressed: () {},
+                                                      )),
+                                                );
+                                              },
                                             ),
                                     ),
                                   ],
