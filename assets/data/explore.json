@@ -1,0 +1,139 @@
+{
+  "categories": [
+    {
+      "name": "Popular",
+      "subcategories": [
+        {
+          "name": "Most Searched",
+          "items": [
+            "What social media platforms is best for my business?",
+            "How often should I post on my social media channels?",
+            "What type of content resonates with my target audience?",
+            "How do I measure the success of my social media campaigns?",
+            "Should I use paid advertising on social media?",
+            "How do I grow my followers organically?",
+            "What are the latest social media trends I should be aware of?",
+            "How can I use social media to improve customer service?",
+            "What strategies should I use to engage with my audience?",
+            "How can I convert social media traffic into real customers?",
+            "What tools can I use to manage and schedule my social media content?"
+          ]
+        },
+        {
+          "name": "SEO",
+          "items": []
+        },
+        {
+          "name": "Online Advertising",
+          "items": []
+        },
+        {
+          "name": "Content Marketing",
+          "items": []
+        },
+        {
+          "name": "Email Marketing",
+          "items": []
+        },
+        {
+          "name": "Sales Skills",
+          "items": []
+        },
+        {
+          "name": "Customer Service",
+          "items": []
+        }
+      ]
+    },
+    {
+      "name": "Online Advertising",
+      "subcategories": []
+    },
+    {
+      "name": "Content Marketing",
+      "subcategories": []
+    },
+    {
+      "name": "Email Marketing",
+      "subcategories": []
+    },
+    {
+      "name": "Sales Skills",
+      "subcategories": []
+    },
+    {
+      "name": "Customer Service",
+      "subcategories": []
+    },
+    {
+      "name": "Financial Management",
+      "subcategories": []
+    },
+    {
+      "name": "Human Resources",
+      "subcategories": []
+    },
+    {
+      "name": "E-commerce",
+      "subcategories": []
+    },
+    {
+      "name": "Analytics and Data Analysis",
+      "subcategories": []
+    },
+    {
+      "name": "Legal Knowledge",
+      "subcategories": []
+    },
+
+    {
+      "name": "Leadership and Management",
+      "subcategories": []
+    },
+    {
+      "name": "Networking and Partnerships",
+      "subcategories": []
+    },
+    {
+      "name": "Operational Efficiency",
+      "subcategories": []
+    },
+    {
+      "name": "Product Development and Management",
+      "subcategories": []
+    },
+    {
+      "name": "International Business",
+      "subcategories": []
+    },
+    {
+      "name": "Strategic Planning",
+      "subcategories": []
+    },
+    {
+      "name": "Crisis Management",
+      "subcategories": []
+    },
+    {
+      "name": "Brand Building",
+      "subcategories": []
+    },
+    {
+      "name": "Innovation and Growth Strategies",
+      "subcategories": []
+    },
+    {
+      "name": "Ethics and Corporate Social Responsibility",
+      "subcategories": []
+    },
+    {
+      "name": "Sustainability",
+      "subcategories": []
+    },
+    {
+      "name": "Technology and Digital Transformation",
+      "subcategories": []
+    }
+   
+  ]
+}

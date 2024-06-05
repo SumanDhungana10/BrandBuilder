@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:krofile_ai/cubit/dislikefeedback/dislikefeedback_cubit.dart';
 import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
 
 class ViewMoreFeedBack extends StatefulWidget {
   const ViewMoreFeedBack({
     super.key,
+    required this.responseIndex,
   });
-
+  final int responseIndex;
   @override
   State<ViewMoreFeedBack> createState() => _ViewMoreFeedBackState();
 }
@@ -69,9 +71,7 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
                   children: [
                     for (int i = 0; i < feedbackOptions.length; i++)
                       ElevatedButton(
-                          onPressed: () {
-                           
-                          },
+                          onPressed: () {},
                           style: ElevatedButton.styleFrom(
                             textStyle: const TextStyle(
                                 fontSize: 16,

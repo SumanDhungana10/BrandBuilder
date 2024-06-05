@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:krofile_ai/cubit/explore/explore_cubit.dart';
 import 'package:krofile_ai/cubit/homepage/homepage_cubit.dart';
 import 'package:krofile_ai/cubit/mylist/mylist_cubit.dart';
 import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
 import 'package:krofile_ai/cubit/threedot/threedot_cubit.dart';
-import 'package:krofile_ai/screen/customize.dart';
-import 'package:krofile_ai/screen/incognito.dart';
+import 'package:krofile_ai/screen/customize_page.dart';
+import 'package:krofile_ai/screen/incognito_page.dart';
 import 'package:krofile_ai/screen/mylist.dart';
-import 'package:krofile_ai/widgets/aichatting.dart';
-import 'package:krofile_ai/widgets/feedbackalert.dart';
+import 'package:krofile_ai/widgets/ai_chatting.dart';
+import 'package:krofile_ai/widgets/feedback_alert.dart';
 import 'package:krofile_ai/widgets/side_bar.dart';
 
 import 'explore_page.dart';
@@ -69,6 +70,7 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: BorderRadius.circular(5)),
                         ),
                         onPressed: () {
+                          context.read<ExploreCubit>().fetchCategories();
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
@@ -84,34 +86,43 @@ class _HomePageState extends State<HomePage> {
                     },
                   ),
                   const SizedBox(width: 10),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      textStyle: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF151515),
-                          fontWeight: FontWeight.w400),
-                      padding: const EdgeInsets.all(10),
-                      foregroundColor: const Color(0xFF151515),
-                      backgroundColor: Colors.white,
-                      side:
-                          const BorderSide(color: Color(0xFFE5E5E5), width: 1),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5)),
-                    ),
-                    onPressed: () {
-                      context.read<MylistCubit>().fetchCategories();
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const MyList()));
+                  BlocBuilder<MylistCubit, MylistState>(
+                    builder: (context, state) {
+                      return ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          textStyle: const TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF151515),
+                              fontWeight: FontWeight.w400),
+                          padding: const EdgeInsets.all(10),
+                          foregroundColor: const Color(0xFF151515),
+                          backgroundColor: Colors.white,
+                          side: const BorderSide(
+                              color: Color(0xFFE5E5E5), width: 1),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5)),
+                        ),
+                        onPressed: () {
+                          if (state.categories.isEmpty) {
+                            context.read<MylistCubit>().fetchCategories();
+                          }
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const MyList(
+                                        selectedCategoryIndex: 0,
+                                        selectedSubCategoryIndex : 0,
+                                      )));
+                        },
+                        icon: SvgPicture.asset(
+                          "assets/images/Bookmark.svg",
+                          height: 16,
+                          width: 16,
+                        ),
+                        label: const Text("My List"),
+                      );
                     },
-                    icon: SvgPicture.asset(
-                      "assets/images/Bookmark.svg",
-                      height: 16,
-                      width: 16,
-                    ),
-                    label: const Text("My List"),
                   ),
                   const ThreeDotMenu(),
                 ],

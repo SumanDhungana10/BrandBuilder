@@ -5,7 +5,7 @@ import 'package:krofile_ai/cubit/homepage/homepage_cubit.dart';
 import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
 import 'package:krofile_ai/screen/explore_page.dart';
 import 'package:krofile_ai/widgets/response_ui.dart';
-import 'package:krofile_ai/widgets/viewfaqalert.dart';
+import 'package:krofile_ai/widgets/viewfaq_alert.dart';
 import 'package:popover/popover.dart';
 
 class AiChatting extends StatefulWidget {

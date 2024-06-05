@@ -5,8 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:krofile_ai/cubit/dislikefeedback/dislikefeedback_cubit.dart';
+import 'package:krofile_ai/cubit/mylist/mylist_cubit.dart';
 import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
-import 'package:krofile_ai/widgets/viewmorefeedbackalert.dart';
+import 'package:krofile_ai/widgets/addto_mylist_alert.dart';
+import 'package:krofile_ai/widgets/viewmore_feedback_alert.dart';
 
 class ResponseUI extends StatefulWidget {
   const ResponseUI({
@@ -222,16 +224,25 @@ class _PromptResponseState extends State<PromptResponse> {
 
   final Map<int, Timer> _thankYouTimers = {};
 
-  Future<void> _viewMoreFeedBack() {
+  Future<void> _viewMoreFeedBack(int index) {
     return showDialog(
         barrierColor: const Color(0xFF000000).withOpacity(0.8),
         context: context,
         builder: (BuildContext context) {
-          return const ViewMoreFeedBack();
+          return  ViewMoreFeedBack(responseIndex: index);
         });
   }
 
-  void _showThankYouMessage(int index) {
+  Future<void> _addToMyList(String answer) {
+    return showDialog(
+        barrierColor: const Color(0xFF000000).withOpacity(0.8),
+        context: context,
+        builder: (BuildContext context) {
+          return AddToMyList(answer: answer);
+        });
+  }
+
+  void showThankYouMessage(int index) {
     context.read<DislikefeedbackCubit>().showThankYouMessage(index);
     context.read<DislikefeedbackCubit>().closeDisLikeFeedback(index);
     context.read<DislikefeedbackCubit>().closeRegenerateFeedBack(index);
@@ -314,13 +325,24 @@ class _PromptResponseState extends State<PromptResponse> {
                           Icons.file_copy_outlined,
                           size: 24,
                         )),
-                    IconButton(
-                      onPressed: () {},
-                      icon: SvgPicture.asset(
-                        "assets/images/Bookmark.svg",
-                        height: 24,
-                        width: 24,
-                      ),
+                    BlocBuilder<MylistCubit, MylistState>(
+                      builder: (context, state) {
+                        return IconButton(
+                          onPressed: () {
+                            if (state.categories.isEmpty) {
+                              context.read<MylistCubit>().fetchCategories();
+                              _addToMyList(answer);
+                            } else {
+                              _addToMyList(answer);
+                            }
+                          },
+                          icon: SvgPicture.asset(
+                            "assets/images/Bookmark.svg",
+                            height: 24,
+                            width: 24,
+                          ),
+                        );
+                      },
                     )
                   ],
                 ),
@@ -375,7 +397,7 @@ class _PromptResponseState extends State<PromptResponse> {
                                     children: [
                                       IconButton(
                                           onPressed: () {
-                                            _showThankYouMessage(widget.index);
+                                            showThankYouMessage(widget.index);
                                           },
                                           icon: const Icon(
                                             Icons.thumb_up_alt_outlined,
@@ -488,9 +510,9 @@ class _PromptResponseState extends State<PromptResponse> {
                                     ElevatedButton(
                                       onPressed: () {
                                         if (item == "More..") {
-                                          _viewMoreFeedBack();
+                                          _viewMoreFeedBack( widget.index );
                                         } else {
-                                          _showThankYouMessage(widget.index);
+                                          showThankYouMessage(widget.index);
                                         }
                                       },
                                       style: ElevatedButton.styleFrom(

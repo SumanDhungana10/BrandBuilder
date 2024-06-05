@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:krofile_ai/cubit/customizepage/customizepage_cubit.dart';
 import 'package:krofile_ai/cubit/dislikefeedback/dislikefeedback_cubit.dart';
+import 'package:krofile_ai/cubit/explore/explore_cubit.dart';
 import 'package:krofile_ai/cubit/homepage/homepage_cubit.dart';
 import 'package:krofile_ai/cubit/mylist/mylist_cubit.dart';
 import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
 import 'package:krofile_ai/cubit/threedot/threedot_cubit.dart';
-import 'package:krofile_ai/screen/homepage.dart';
+import 'package:krofile_ai/screen/home_page.dart';
+import 'package:krofile_ai/screen/mylist.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,6 +40,9 @@ class MyApp extends StatelessWidget {
         BlocProvider<CustomizepageCubit>(
           create: (context) => CustomizepageCubit(),
         ),
+        BlocProvider<ExploreCubit>(
+          create: (context) => ExploreCubit(),
+        ),
       ],
       child: BlocBuilder<ThreedotCubit, ThreedotState>(
         builder: (context, state) {
@@ -52,6 +57,11 @@ class MyApp extends StatelessWidget {
           //         title: 'Krofile AI',
           //         home: IncognitoMode(),
           //       );
+          // return const MaterialApp(
+          //   debugShowCheckedModeBanner: false,
+          //   title: 'Krofile AI',
+          //   home: HomePage(),
+          // );
           return const MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'Krofile AI',
