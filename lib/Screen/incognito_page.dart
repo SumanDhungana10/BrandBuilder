@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
-import 'package:krofile_ai/cubit/threedot/threedot_cubit.dart';
-import 'package:krofile_ai/screen/home_page.dart';
+import 'package:krofile_ai/cubit/homepage_popupmenu/homepage_popup_cubit.dart';
 import 'package:krofile_ai/widgets/incognito_alert.dart';
+import 'package:krofile_ai/widgets/incognito_exit_alert.dart';
 
 class IncognitoMode extends StatefulWidget {
   const IncognitoMode({super.key});
@@ -47,6 +46,16 @@ class _IncognitoModeState extends State<IncognitoMode> {
         context: context,
         builder: (BuildContext context) {
           return const IncognitoAlert();
+        });
+  }
+
+  Future<void> _incognitoExitAlert(BuildContext context) async {
+    return showDialog(
+        barrierDismissible: false,
+        barrierColor: const Color(0xFF000000).withOpacity(0.8),
+        context: context,
+        builder: (BuildContext context) {
+          return const IncognitoExitAlert();
         });
   }
 
@@ -103,78 +112,7 @@ class _IncognitoModeState extends State<IncognitoMode> {
                 builder: (context, state) {
                   return ElevatedButton.icon(
                       onPressed: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                                  backgroundColor:
-                                      const Color.fromARGB(255, 255, 255, 255),
-                                  shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10))),
-                                  contentPadding: const EdgeInsets.all(24),
-                                  title: const Row(
-                                    children: [
-                                      Icon(
-                                        Icons.error,
-                                        color: Color(0xFFFF8C22),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Text(
-                                        "Click continue to exit incognito mode.",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            color: Color(0xFF151515),
-                                            fontWeight: FontWeight.w400),
-                                      )
-                                    ],
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                        style: TextButton.styleFrom(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              30, 10, 30, 10),
-                                          backgroundColor:
-                                              const Color(0xFFCCCCCC),
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5)),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text("Cancel",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                color: Color(0xFF151515),
-                                                fontWeight: FontWeight.w400))),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    TextButton(
-                                        style: TextButton.styleFrom(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              30, 10, 30, 10),
-                                          backgroundColor:
-                                              const Color(0xFF21201F),
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5)),
-                                        ),
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                          Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const HomePage()));
-                                        },
-                                        child: const Text("Continue",
-                                            style: TextStyle(
-                                                fontSize: 18,
-                                                color: Color(0xFFFFFFFF),
-                                                fontWeight: FontWeight.w400)))
-                                  ],
-                                ));
+                        _incognitoExitAlert(context);
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.all(20),

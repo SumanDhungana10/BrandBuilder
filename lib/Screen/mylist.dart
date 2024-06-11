@@ -53,7 +53,12 @@ class _MyListState extends State<MyList> {
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.arrow_back_ios_new_sharp),
+                Icon(
+                  Icons.arrow_back_ios_new_sharp,
+                  size: 16,
+                  color: Color(0xFF73767B),
+                ),
+                SizedBox(width: 10),
                 Text(
                   "Back",
                   style: TextStyle(
@@ -64,6 +69,7 @@ class _MyListState extends State<MyList> {
               ],
             ),
           ),
+          const SizedBox(height: 8),
           const Text(
             "Mylist",
             style: TextStyle(
@@ -148,21 +154,20 @@ class _MyListState extends State<MyList> {
                                 onPressed: () {
                                   createNewMylist(context);
                                 },
-                                child: const Center(
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        "Create new",
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xFF15141A),
-                                        ),
+                                child: const Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      "Create new",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF15141A),
                                       ),
-                                      Icon(Icons.add)
-                                    ],
-                                  ),
+                                    ),
+                                    Icon(Icons.add)
+                                  ],
                                 ),
                               ),
                             ],
@@ -185,113 +190,118 @@ class _MyListState extends State<MyList> {
                         } else if (state.errorMessage != null) {
                           return Center(child: Text(state.errorMessage!));
                         } else {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TextFormField(
-                                decoration: InputDecoration(
-                                  prefixIcon: const Icon(Icons.search),
-                                  hintText: "Search",
-                                  hintStyle: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: const BorderSide(
-                                      width: 1,
+                          return SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextFormField(
+                                  decoration: InputDecoration(
+                                    prefixIcon: const Icon(Icons.search),
+                                    hintText: "Search",
+                                    hintStyle: const TextStyle(
+                                      fontSize: 16,
                                       color: Colors.grey,
+                                      fontWeight: FontWeight.w400,
                                     ),
-                                  ),
-                                  disabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: const BorderSide(
-                                      width: 1,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: const BorderSide(
-                                      width: 1,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: const BorderSide(
-                                      width: 1,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 24, bottom: 24),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(state.categories[buttomindex].name,
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF151515),
-                                        )),
-                                    PopupMenuButton(
-                                      onSelected: (value) {
-                                        if (value == 1) {
-                                          // context
-                                          //     .read<MylistCubit>()
-                                          //     .clearCategory(buttomindex);
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) =>
-                                                  ClearCategoryAlert(
-                                                      buttomindex:
-                                                          buttomindex));
-                                        }
-                                      },
-                                      padding: const EdgeInsets.all(12),
-                                      itemBuilder: (BuildContext context) =>
-                                          <PopupMenuEntry<int>>[
-                                        const PopupMenuItem<int>(
-                                          value: 1,
-                                          child: Row(
-                                            children: [
-                                              Icon(Icons.delete_outlined,
-                                                  color: Color(0xFFCD1F18),
-                                                  size: 21),
-                                              Padding(
-                                                padding:
-                                                    EdgeInsets.only(left: 8),
-                                                child: Text(
-                                                  'Clear',
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      color: Color(0xFFCD1F18)),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                      shape: const RoundedRectangleBorder(
-                                        side: BorderSide(
-                                            color: Color(0xFFCD1F18), width: 2),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(8.0)),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: const BorderSide(
+                                        width: 1,
+                                        color: Colors.grey,
                                       ),
-                                    )
-                                  ],
+                                    ),
+                                    disabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: const BorderSide(
+                                        width: 1,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: const BorderSide(
+                                        width: 1,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: const BorderSide(
+                                        width: 1,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              Expanded(
-                                child: ListView.builder(
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 24, bottom: 24),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(state.categories[buttomindex].name,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xFF151515),
+                                          )),
+                                      PopupMenuButton(
+                                        onSelected: (value) {
+                                          if (value == 1) {
+                                            // context
+                                            //     .read<MylistCubit>()
+                                            //     .clearCategory(buttomindex);
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) =>
+                                                    ClearCategoryAlert(
+                                                        buttomindex:
+                                                            buttomindex));
+                                          }
+                                        },
+                                        padding: const EdgeInsets.all(12),
+                                        itemBuilder: (BuildContext context) =>
+                                            <PopupMenuEntry<int>>[
+                                          const PopupMenuItem<int>(
+                                            value: 1,
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.delete_outlined,
+                                                    color: Color(0xFFCD1F18),
+                                                    size: 21),
+                                                Padding(
+                                                  padding:
+                                                      EdgeInsets.only(left: 8),
+                                                  child: Text(
+                                                    'Clear',
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color:
+                                                            Color(0xFFCD1F18)),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                        shape: const RoundedRectangleBorder(
+                                          side: BorderSide(
+                                              color: Color(0xFFCD1F18),
+                                              width: 2),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(8.0)),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
                                   itemCount: state.categories[buttomindex]
                                       .subcategories.length,
                                   itemBuilder: (context, subcategoryIndex) {
@@ -457,9 +467,9 @@ class _MyListState extends State<MyList> {
                                       ],
                                     );
                                   },
-                                ),
-                              )
-                            ],
+                                )
+                              ],
+                            ),
                           );
                         }
                       },

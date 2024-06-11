@@ -10,6 +10,10 @@ class HomepageCubit extends Cubit<HomepageState> {
   void toggleSideBar() {
     emit(state.copyWith(isSideBarOpen: !state.isSideBarOpen));
   }
+
+  void closeSideBar() {
+    emit(state.copyWith(isSideBarOpen: false));
+  }
    
  
 

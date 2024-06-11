@@ -1,11 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:krofile_ai/cubit/homepage/homepage_cubit.dart';
 import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
-import 'package:krofile_ai/cubit/threedot/threedot_cubit.dart';
+import 'package:krofile_ai/cubit/homepage_popupmenu/homepage_popup_cubit.dart';
 import 'package:krofile_ai/data/allList.dart';
-import 'package:krofile_ai/screen/home_page.dart';
 
 class SideBar extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;

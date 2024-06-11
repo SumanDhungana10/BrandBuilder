@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:krofile_ai/cubit/homepage/homepage_cubit.dart';
 import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
 import 'package:krofile_ai/screen/explore_page.dart';
-import 'package:krofile_ai/widgets/response_ui.dart';
+import 'package:krofile_ai/widgets/response_page_ui.dart';
 import 'package:krofile_ai/widgets/viewfaq_alert.dart';
 import 'package:popover/popover.dart';
 
@@ -18,6 +18,7 @@ class AiChatting extends StatefulWidget {
 class _AiChattingState extends State<AiChatting> {
   final TextEditingController _inputQuestion = TextEditingController();
   final FocusNode _textFocusNode = FocusNode();
+
 
   @override
   void dispose() {

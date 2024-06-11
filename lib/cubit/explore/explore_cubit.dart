@@ -24,4 +24,30 @@ class ExploreCubit extends Cubit<ExploreState> {
       emit(state.copyWith(errorMessage: e.toString(), isLoading: false));
     }
   }
+
+  void setActiveSubCategory(int index) {
+    emit(state.copyWith(activeSubCategoryIndex: index));
+  }
+
+  void showLeftButton() {
+    emit(state.copyWith(showLeftButton: true));
+  }
+
+  void hideLeftButton() {
+    emit(state.copyWith(showLeftButton: false));
+  }
+
+  void handelCategoryButton(int index) {
+    emit(state.copyWith(
+        actveCategoryIndex: index,
+        showSubCategory: true,
+        activeSubCategoryIndex: 0));
+  }
+
+  void resetCategory() {
+    emit(state.copyWith(
+        actveCategoryIndex: 0,
+        showSubCategory: true,
+        activeSubCategoryIndex: 0));
+  }
 }

@@ -71,7 +71,20 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
                   children: [
                     for (int i = 0; i < feedbackOptions.length; i++)
                       ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            context
+                                .read<DislikefeedbackCubit>()
+                                .showThankYouMessage(widget.responseIndex);
+                            context
+                                .read<DislikefeedbackCubit>()
+                                .closeDisLikeFeedback(widget.responseIndex);
+                            Future.delayed(const Duration(seconds: 2), () {
+                              context
+                                  .read<DislikefeedbackCubit>()
+                                  .closeThankYouMessage(widget.responseIndex);
+                            });
+                            Navigator.of(context).pop();
+                          },
                           style: ElevatedButton.styleFrom(
                             textStyle: const TextStyle(
                                 fontSize: 16,

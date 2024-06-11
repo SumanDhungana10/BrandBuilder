@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:krofile_ai/cubit/mylist/mylist_cubit.dart';
 import 'package:krofile_ai/model/mylist.dart';
 import 'package:krofile_ai/screen/mylist.dart';
@@ -77,6 +78,7 @@ class _AddToMyListState extends State<AddToMyList> {
                       Radio(
                         value: categories[i].name,
                         groupValue: _selectedCategory,
+                        activeColor: const Color(0xFF18C554),
                         onChanged: (value) {
                           setState(() {
                             _selectedCategory = value.toString();
@@ -104,8 +106,12 @@ class _AddToMyListState extends State<AddToMyList> {
                           ),
                           child: DropdownButton<SubCategory>(
                             isExpanded: true,
-                            focusColor: Colors.white,
+                            focusColor:
+                                Theme.of(context).scaffoldBackgroundColor,
                             underline: Container(),
+                            icon: SvgPicture.asset(
+                              "assets/images/fe_arrow-right.svg",
+                            ),
                             value: categories[i]
                                     .subcategories
                                     .contains(_selectedSubCategory)

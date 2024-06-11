@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_switch/flutter_switch.dart';
 import 'package:krofile_ai/cubit/customizepage/customizepage_cubit.dart';
 import 'package:krofile_ai/screen/home_page.dart';
 

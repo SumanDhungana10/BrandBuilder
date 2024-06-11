@@ -5,7 +5,8 @@ import 'package:krofile_ai/cubit/explore/explore_cubit.dart';
 import 'package:krofile_ai/cubit/homepage/homepage_cubit.dart';
 import 'package:krofile_ai/cubit/mylist/mylist_cubit.dart';
 import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
-import 'package:krofile_ai/cubit/threedot/threedot_cubit.dart';
+import 'package:krofile_ai/cubit/homepage_popupmenu/homepage_popup_cubit.dart';
+import 'package:krofile_ai/responsive.dart';
 import 'package:krofile_ai/screen/customize_page.dart';
 import 'package:krofile_ai/screen/incognito_page.dart';
 import 'package:krofile_ai/screen/mylist.dart';
@@ -112,7 +113,7 @@ class _HomePageState extends State<HomePage> {
                               MaterialPageRoute(
                                   builder: (context) => const MyList(
                                         selectedCategoryIndex: 0,
-                                        selectedSubCategoryIndex : 0,
+                                        selectedSubCategoryIndex: 0,
                                       )));
                         },
                         icon: SvgPicture.asset(
@@ -154,7 +155,11 @@ class _HomePageState extends State<HomePage> {
                 //     )),
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  width: (state.isSideBarOpen) ? 400 : 0,
+                  width: (Responsive.isDesktop(context))
+                      ? (state.isSideBarOpen)
+                          ? 400
+                          : 0
+                      : 0,
                   child: SideBar(
                     scaffoldKey: _scaffoldKey,
                   ),

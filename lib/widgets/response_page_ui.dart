@@ -229,7 +229,7 @@ class _PromptResponseState extends State<PromptResponse> {
         barrierColor: const Color(0xFF000000).withOpacity(0.8),
         context: context,
         builder: (BuildContext context) {
-          return  ViewMoreFeedBack(responseIndex: index);
+          return ViewMoreFeedBack(responseIndex: index);
         });
   }
 
@@ -243,12 +243,12 @@ class _PromptResponseState extends State<PromptResponse> {
   }
 
   void showThankYouMessage(int index) {
-    context.read<DislikefeedbackCubit>().showThankYouMessage(index);
     context.read<DislikefeedbackCubit>().closeDisLikeFeedback(index);
+    context.read<DislikefeedbackCubit>().showThankYouMessage(index);
     context.read<DislikefeedbackCubit>().closeRegenerateFeedBack(index);
 
     // Cancel any existing timer for this index
-    _thankYouTimers[index]?.cancel();
+    // _thankYouTimers[index]?.cancel();
 
     // Start a new timer for the thank you message
     _thankYouTimers[index] = Timer(const Duration(milliseconds: 2000), () {
@@ -510,7 +510,7 @@ class _PromptResponseState extends State<PromptResponse> {
                                     ElevatedButton(
                                       onPressed: () {
                                         if (item == "More..") {
-                                          _viewMoreFeedBack( widget.index );
+                                          _viewMoreFeedBack(widget.index);
                                         } else {
                                           showThankYouMessage(widget.index);
                                         }
