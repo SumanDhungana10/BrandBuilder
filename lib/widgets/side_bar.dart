@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
 import 'package:krofile_ai/cubit/homepage_popupmenu/homepage_popup_cubit.dart';
 import 'package:krofile_ai/data/allList.dart';
@@ -63,7 +64,7 @@ class _SideBarState extends State<SideBar> {
                 // key: widget.scaffoldKey,
                 padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
                 decoration: const BoxDecoration(
-                  // color: Colors.amber,
+                  // color: Colors.white,
                   border: Border(
                     left: BorderSide(color: Color(0xFFE5E5E5), width: 1),
                   ),
@@ -75,8 +76,13 @@ class _SideBarState extends State<SideBar> {
                     FittedBox(
                       child: DropdownButton<String>(
                         underline: Container(),
-                        focusColor: Colors.white,
+                        focusColor: Theme.of(context).scaffoldBackgroundColor,
                         value: dropDownValue,
+                        icon: SvgPicture.asset(
+                          "assets/images/fe_arrow-right.svg",
+                          width: 16,
+                          height: 16,
+                        ),
                         onChanged: (String? newValue) {
                           setState(() {
                             dropDownValue = newValue!;

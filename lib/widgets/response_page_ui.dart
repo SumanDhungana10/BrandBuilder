@@ -328,6 +328,7 @@ class _PromptResponseState extends State<PromptResponse> {
                     BlocBuilder<MylistCubit, MylistState>(
                       builder: (context, state) {
                         return IconButton(
+                          tooltip: "Add to My List",
                           onPressed: () {
                             if (state.categories.isEmpty) {
                               context.read<MylistCubit>().fetchCategories();

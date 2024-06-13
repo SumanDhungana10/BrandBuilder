@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:krofile_ai/screen/home_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
+// import 'package:krofile_ai/screen/home_page.dart';
 
-class IncognitoExitAlert extends StatelessWidget {
-  const IncognitoExitAlert({
+class ClearAllChatAlert extends StatelessWidget {
+  const ClearAllChatAlert({
     super.key,
   });
 
@@ -16,6 +18,7 @@ class IncognitoExitAlert extends StatelessWidget {
       actionsPadding:
           const EdgeInsets.only(top: 14, right: 32, left: 32, bottom: 32),
       title: const Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             Icons.help_outline_rounded,
@@ -31,15 +34,15 @@ class IncognitoExitAlert extends StatelessWidget {
       content: const SizedBox(
         width: 500,
         child: Text(
-          "Are you sure you want to close the incognito mode? This action cannot be undone.",
+          "Are you sure you want to clear all the chat? This action cannot be undone.",
           style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               color: Color(0xFF151515),
               fontWeight: FontWeight.w400),
         ),
       ),
       actions: [
-        TextButton(
+        ElevatedButton(
             style: TextButton.styleFrom(
               padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
               backgroundColor: const Color(0xFFCCCCCC),
@@ -57,7 +60,7 @@ class IncognitoExitAlert extends StatelessWidget {
         const SizedBox(
           width: 10,
         ),
-        TextButton(
+        ElevatedButton(
             style: TextButton.styleFrom(
               padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
               backgroundColor: const Color(0xFF21201F),
@@ -66,10 +69,12 @@ class IncognitoExitAlert extends StatelessWidget {
             ),
             onPressed: () {
               Navigator.pop(context);
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const HomePage()));
+              // Navigator.pushReplacement(context,
+              //     MaterialPageRoute(builder: (context) => const HomePage()));
+              BlocProvider.of<ResponsepageCubit>(context)
+                  .resetQuestionAnswerList();
             },
-            child: const Text("Continue",
+            child: const Text("Clear",
                 style: TextStyle(
                     fontSize: 18,
                     color: Color(0xFFFFFFFF),

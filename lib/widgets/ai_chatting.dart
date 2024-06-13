@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:krofile_ai/cubit/homepage/homepage_cubit.dart';
@@ -18,7 +19,6 @@ class AiChatting extends StatefulWidget {
 class _AiChattingState extends State<AiChatting> {
   final TextEditingController _inputQuestion = TextEditingController();
   final FocusNode _textFocusNode = FocusNode();
-
 
   @override
   void dispose() {
@@ -157,167 +157,175 @@ class _AiChattingState extends State<AiChatting> {
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(10.0),
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            IconButton(
-              onPressed: () {},
-              icon: Image.asset("assets/images/image32.png"),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: BlocBuilder<ResponsepageCubit, ResponsepageState>(
-                builder: (context, state) {
-                  // Update the controller's text if questionFromFAQ is not empty and differs from current text
-                  if (state.questionFromFAQ.isNotEmpty &&
-                      _inputQuestion.text != state.questionFromFAQ) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (_inputQuestion.text != state.questionFromFAQ) {
-                        // Check again to avoid race conditions
-                        _inputQuestion.text = state.questionFromFAQ;
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () {},
+                  icon: Image.asset("assets/images/image32.png"),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: BlocBuilder<ResponsepageCubit, ResponsepageState>(
+                    builder: (context, state) {
+                      // Update the controller's text if questionFromFAQ is not empty and differs from current text
+                      if (state.questionFromFAQ.isNotEmpty &&
+                          _inputQuestion.text != state.questionFromFAQ) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (_inputQuestion.text != state.questionFromFAQ) {
+                            // Check again to avoid race conditions
+                            _inputQuestion.text = state.questionFromFAQ;
+                          }
+                        });
                       }
-                    });
-                  }
 
-                  return TextFormField(
-                    controller: _inputQuestion,
-                    focusNode: _textFocusNode,
-                    decoration: InputDecoration(
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(width: 1),
-                      ),
-                      prefixIcon: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: IconButton(
-                          icon: SvgPicture.asset(
-                            "assets/images/arrow-up.svg",
+                      return TextFormField(
+                        controller: _inputQuestion,
+                        focusNode: _textFocusNode,
+                        decoration: InputDecoration(
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(width: 1),
                           ),
-                          onPressed: () {
-                            if (state.faq.isNotEmpty) {
-                              _viewFaq();
-                            } else {
-                              showPopover(
-                                  context: context,
-                                  barrierColor: Colors.transparent,
-                                  direction: PopoverDirection.top,
-                                  bodyBuilder: (context) {
-                                    return Container(
-                                      padding: const EdgeInsets.all(16),
-                                      width: 450,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              const Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.info,
-                                                    color: Colors.green,
-                                                  ),
-                                                  Text("Instructions",
-                                                      style: TextStyle(
-                                                          fontSize: 24,
-                                                          color:
-                                                              Color(0xFF151515),
-                                                          fontWeight:
-                                                              FontWeight.w600)),
-                                                ],
-                                              ),
-                                              IconButton(
-                                                icon: const Icon(Icons.close),
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 10),
-                                          const Text(
-                                              "To our FAQ section! To add a question, click on the plus icon (+) next to existing questions. You can add up to 10 questions. Need to find the FAQ? Click the plus icon (+) on the search field. Questions? Reach out to us. Happy FAQ-ing!")
-                                        ],
-                                      ),
-                                    );
-                                  });
-                            }
-                          },
-                        ),
-                      ),
-                      suffixIcon: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topRight,
-                                end: Alignment.bottomLeft,
-                                colors: [
-                                  Color(0xFF7B5AFF),
-                                  Color(0xFF4A25E1),
-                                ],
-                                stops: [0.263, 0.864],
-                              ),
-                              shape: BoxShape.circle,
-                            ),
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.all(8.0),
                             child: IconButton(
                               icon: SvgPicture.asset(
-                                "assets/images/send.svg",
+                                "assets/images/arrow-up.svg",
                               ),
                               onPressed: () {
-                                if (_inputQuestion.text.isNotEmpty) {
-                                  context
-                                      .read<ResponsepageCubit>()
-                                      .resetTextFeildController();
-                                  context
-                                      .read<ResponsepageCubit>()
-                                      .handelQuestionType();
-                                  context
-                                      .read<ResponsepageCubit>()
-                                      .addQuestionAnswerList(
-                                          _inputQuestion.text);
-
-                                  _inputQuestion.clear();
+                                if (state.faq.isNotEmpty) {
+                                  _viewFaq();
+                                } else {
+                                  showPopover(
+                                      context: context,
+                                      barrierColor: Colors.transparent,
+                                      direction: PopoverDirection.top,
+                                      bodyBuilder: (context) {
+                                        return Container(
+                                          padding: const EdgeInsets.all(16),
+                                          width: 450,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  const Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.info,
+                                                        color: Colors.green,
+                                                      ),
+                                                      Text("Instructions",
+                                                          style: TextStyle(
+                                                              fontSize: 24,
+                                                              color: Color(
+                                                                  0xFF151515),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600)),
+                                                    ],
+                                                  ),
+                                                  IconButton(
+                                                    icon:
+                                                        const Icon(Icons.close),
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 10),
+                                              const Text(
+                                                  "To our FAQ section! To add a question, click on the plus icon (+) next to existing questions. You can add up to 10 questions. Need to find the FAQ? Click the plus icon (+) on the search field. Questions? Reach out to us. Happy FAQ-ing!")
+                                            ],
+                                          ),
+                                        );
+                                      });
                                 }
                               },
                             ),
-                          )),
-                      hintText: 'Message Krofile...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
-                    onFieldSubmitted: (value) {
-                      if (_inputQuestion.text.isNotEmpty) {
-                        context
-                            .read<ResponsepageCubit>()
-                            .resetTextFeildController();
-                        context.read<ResponsepageCubit>().handelQuestionType();
-                        context
-                            .read<ResponsepageCubit>()
-                            .addQuestionAnswerList(_inputQuestion.text);
+                          ),
+                          suffixIcon: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFF18C554),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: IconButton(
+                                  icon: SvgPicture.asset(
+                                    "assets/images/send.svg",
+                                  ),
+                                  onPressed: () {
+                                    if (_inputQuestion.text.isNotEmpty) {
+                                      context
+                                          .read<ResponsepageCubit>()
+                                          .resetTextFeildController();
+                                      context
+                                          .read<ResponsepageCubit>()
+                                          .handelQuestionType();
+                                      context
+                                          .read<ResponsepageCubit>()
+                                          .addQuestionAnswerList(
+                                              _inputQuestion.text);
 
-                        FocusScope.of(context).requestFocus(_textFocusNode);
+                                      _inputQuestion.clear();
+                                    }
+                                  },
+                                ),
+                              )),
+                          hintText: 'Message Krofile...',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        onFieldSubmitted: (value) {
+                          if (_inputQuestion.text.isNotEmpty) {
+                            context
+                                .read<ResponsepageCubit>()
+                                .resetTextFeildController();
+                            context
+                                .read<ResponsepageCubit>()
+                                .handelQuestionType();
+                            context
+                                .read<ResponsepageCubit>()
+                                .addQuestionAnswerList(_inputQuestion.text);
 
-                        _inputQuestion.clear();
-                      }
+                            FocusScope.of(context).requestFocus(_textFocusNode);
+
+                            _inputQuestion.clear();
+                          }
+                        },
+                      );
                     },
-                  );
-                },
+                  ),
+                ),
+                const SizedBox(width: 10),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ExplorePage()));
+                  },
+                  icon: SvgPicture.asset("assets/images/apps.svg"),
+                ),
+              ],
+            ),
+            const Padding(
+              padding: EdgeInsets.only(top: 10.0),
+              child: Text(
+                "Double-check important information as GPT can make mistakes.",
               ),
-            ),
-            const SizedBox(width: 10),
-            IconButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ExplorePage()));
-              },
-              icon: SvgPicture.asset("assets/images/apps.svg"),
-            ),
+            )
           ],
         ),
       ),

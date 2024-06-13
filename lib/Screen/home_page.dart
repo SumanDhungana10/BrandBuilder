@@ -11,6 +11,8 @@ import 'package:krofile_ai/screen/customize_page.dart';
 import 'package:krofile_ai/screen/incognito_page.dart';
 import 'package:krofile_ai/screen/mylist.dart';
 import 'package:krofile_ai/widgets/ai_chatting.dart';
+import 'package:krofile_ai/widgets/clear_chat_alert.dart';
+import 'package:krofile_ai/widgets/delete_all_searchhistory_alert.dart';
 import 'package:krofile_ai/widgets/feedback_alert.dart';
 import 'package:krofile_ai/widgets/side_bar.dart';
 
@@ -155,11 +157,7 @@ class _HomePageState extends State<HomePage> {
                 //     )),
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  width: (Responsive.isDesktop(context))
-                      ? (state.isSideBarOpen)
-                          ? 400
-                          : 0
-                      : 0,
+                  width: (state.isSideBarOpen) ? 400 : 0,
                   child: SideBar(
                     scaffoldKey: _scaffoldKey,
                   ),
@@ -205,6 +203,24 @@ class _ThreeDotMenuState extends State<ThreeDotMenu> {
         });
   }
 
+  Future<void> _viewClearAllAlert() {
+    return showDialog(
+        barrierColor: const Color(0xFF000000).withOpacity(0.8),
+        context: context,
+        builder: (BuildContext context) {
+          return const ClearAllChatAlert();
+        });
+  }
+
+  Future<void> _viewDeleteHistoryAlert() {
+    return showDialog(
+        barrierColor: const Color(0xFF000000).withOpacity(0.8),
+        context: context,
+        builder: (BuildContext context) {
+          return const DeletAllSearchHistoryAlert();
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ThreedotCubit, ThreedotState>(
@@ -216,8 +232,9 @@ class _ThreeDotMenuState extends State<ThreeDotMenu> {
               BlocProvider.of<ThreedotCubit>(context).toggleHistory();
             }
             if (result == 2) {
-              BlocProvider.of<ResponsepageCubit>(context)
-                  .resetQuestionAnswerList();
+              // BlocProvider.of<ResponsepageCubit>(context)
+              //     .resetQuestionAnswerList();
+              _viewClearAllAlert();
             }
             if (result == 3) {
               Navigator.pushReplacement(
@@ -230,6 +247,9 @@ class _ThreeDotMenuState extends State<ThreeDotMenu> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => const IncognitoMode()));
+            }
+            if (result == 5) {
+              _viewDeleteHistoryAlert();
             }
             if (result == 6) {
               _viewFeedBaclAlert();

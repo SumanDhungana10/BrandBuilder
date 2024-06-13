@@ -97,4 +97,8 @@ class ResponsepageCubit extends Cubit<ResponsepageState> {
   void resetQuestionAnswerList() {
     emit(state.copyWith(questionAnswerList: [], isQuestionType: false));
   }
+
+  void deleteAllHistory() {
+    emit(state.copyWith(historyList: []));
+  }
 }

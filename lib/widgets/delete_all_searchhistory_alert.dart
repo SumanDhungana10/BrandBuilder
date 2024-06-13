@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:krofile_ai/screen/home_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
+// import 'package:krofile_ai/screen/home_page.dart';
 
-class IncognitoExitAlert extends StatelessWidget {
-  const IncognitoExitAlert({
+class DeletAllSearchHistoryAlert extends StatelessWidget {
+  const DeletAllSearchHistoryAlert({
     super.key,
   });
 
@@ -15,31 +17,35 @@ class IncognitoExitAlert extends StatelessWidget {
       contentPadding: const EdgeInsets.only(left: 56, right: 32),
       actionsPadding:
           const EdgeInsets.only(top: 14, right: 32, left: 32, bottom: 32),
-      title: const Row(
-        children: [
-          Icon(
-            Icons.help_outline_rounded,
-          ),
-          SizedBox(width: 10),
-          Text("Confirm",
-              style: TextStyle(
-                  fontSize: 18,
-                  color: Color(0xFF151515),
-                  fontWeight: FontWeight.w500)),
-        ],
+      title: const SizedBox(
+        // width: 500,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.help_outline_rounded,
+            ),
+            SizedBox(width: 10),
+            Text("Confirm",
+                style: TextStyle(
+                    fontSize: 18,
+                    color: Color(0xFF151515),
+                    fontWeight: FontWeight.w500)),
+          ],
+        ),
       ),
       content: const SizedBox(
         width: 500,
         child: Text(
-          "Are you sure you want to close the incognito mode? This action cannot be undone.",
+          "Are you sure you want to delete all search history? This action cannot be undone.",
           style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               color: Color(0xFF151515),
               fontWeight: FontWeight.w400),
         ),
       ),
       actions: [
-        TextButton(
+        ElevatedButton(
             style: TextButton.styleFrom(
               padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
               backgroundColor: const Color(0xFFCCCCCC),
@@ -57,7 +63,7 @@ class IncognitoExitAlert extends StatelessWidget {
         const SizedBox(
           width: 10,
         ),
-        TextButton(
+        ElevatedButton(
             style: TextButton.styleFrom(
               padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
               backgroundColor: const Color(0xFF21201F),
@@ -66,10 +72,11 @@ class IncognitoExitAlert extends StatelessWidget {
             ),
             onPressed: () {
               Navigator.pop(context);
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const HomePage()));
+              BlocProvider.of<ResponsepageCubit>(context)
+                  .resetQuestionAnswerList();
+              BlocProvider.of<ResponsepageCubit>(context).deleteAllHistory();
             },
-            child: const Text("Continue",
+            child: const Text("Delete All",
                 style: TextStyle(
                     fontSize: 18,
                     color: Color(0xFFFFFFFF),
