@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:krofile_ai/cubit/dislikefeedback/dislikefeedback_cubit.dart';
@@ -26,6 +28,12 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
     "Something else",
   ];
 
+  void showThankYouMessage(int index) {
+    context.read<DislikefeedbackCubit>().closeDisLikeFeedback(index);
+    context.read<DislikefeedbackCubit>().showThankYouMessage(index);
+  }
+
+  
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -72,17 +80,18 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
                     for (int i = 0; i < feedbackOptions.length; i++)
                       ElevatedButton(
                           onPressed: () {
-                            context
-                                .read<DislikefeedbackCubit>()
-                                .showThankYouMessage(widget.responseIndex);
-                            context
-                                .read<DislikefeedbackCubit>()
-                                .closeDisLikeFeedback(widget.responseIndex);
-                            Future.delayed(const Duration(seconds: 2), () {
-                              context
-                                  .read<DislikefeedbackCubit>()
-                                  .closeThankYouMessage(widget.responseIndex);
-                            });
+                            // context
+                            //     .read<DislikefeedbackCubit>()
+                            //     .showThankYouMessage(widget.responseIndex);
+                            // context
+                            //     .read<DislikefeedbackCubit>()
+                            //     .closeDisLikeFeedback(widget.responseIndex);
+                            // Future.delayed(const Duration(seconds: 2), () {
+                            //   context
+                            //       .read<DislikefeedbackCubit>()
+                            //       .closeThankYouMessage(widget.responseIndex);
+                            // });
+                            showThankYouMessage(widget.responseIndex);
                             Navigator.of(context).pop();
                           },
                           style: ElevatedButton.styleFrom(

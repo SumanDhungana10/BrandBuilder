@@ -187,9 +187,13 @@ class _SideBarState extends State<SideBar> {
                                       )),
                                       child: ListTile(
                                         title: Text(
-                                            historyList[index]['question']!),
+                                          historyList[index]['question']!,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                         subtitle: Text(
                                           historyList[index]['answer']!,
+                                          maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         trailing: const Icon(

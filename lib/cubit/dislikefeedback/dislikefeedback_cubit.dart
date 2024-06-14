@@ -1,4 +1,6 @@
 
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -35,13 +37,15 @@ class DislikefeedbackCubit extends Cubit<DislikefeedbackState> {
     final newShowThankYouMessage = {...state.showThankYouMessage};
     newShowThankYouMessage[index] = true;
     emit(state.copyWith(showThankYouMessage: newShowThankYouMessage));
-    print(state.showThankYouMessage);
+
+    Timer(const Duration(milliseconds: 2000), () {
+      closeThankYouMessage(index);
+    });
   }
 
   void closeThankYouMessage(int index) {
     final newShowThankYouMessage = {...state.showThankYouMessage};
     newShowThankYouMessage[index] = false;
     emit(state.copyWith(showThankYouMessage: newShowThankYouMessage));
-    print(state.showThankYouMessage);
   }
 }

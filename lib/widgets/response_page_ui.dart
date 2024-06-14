@@ -13,9 +13,7 @@ import 'package:krofile_ai/widgets/viewmore_feedback_alert.dart';
 class ResponseUI extends StatefulWidget {
   const ResponseUI({
     super.key,
-    // required this.questionAnswerList,
   });
-  // final List<Map<String, dynamic>> questionAnswerList;
 
   @override
   State<ResponseUI> createState() => _ResponseUIState();
@@ -222,8 +220,6 @@ class _PromptResponseState extends State<PromptResponse> {
     "More.."
   ];
 
-  final Map<int, Timer> _thankYouTimers = {};
-
   Future<void> _viewMoreFeedBack(int index) {
     return showDialog(
         barrierColor: const Color(0xFF000000).withOpacity(0.8),
@@ -245,24 +241,6 @@ class _PromptResponseState extends State<PromptResponse> {
   void showThankYouMessage(int index) {
     context.read<DislikefeedbackCubit>().closeDisLikeFeedback(index);
     context.read<DislikefeedbackCubit>().showThankYouMessage(index);
-    context.read<DislikefeedbackCubit>().closeRegenerateFeedBack(index);
-
-    // Cancel any existing timer for this index
-    // _thankYouTimers[index]?.cancel();
-
-    // Start a new timer for the thank you message
-    _thankYouTimers[index] = Timer(const Duration(milliseconds: 2000), () {
-      context.read<DislikefeedbackCubit>().closeThankYouMessage(index);
-    });
-  }
-
-  @override
-  void dispose() {
-    // Cancel all timers when the widget is disposed
-    for (var timer in _thankYouTimers.values) {
-      timer.cancel();
-    }
-    super.dispose();
   }
 
   @override
@@ -398,6 +376,10 @@ class _PromptResponseState extends State<PromptResponse> {
                                     children: [
                                       IconButton(
                                           onPressed: () {
+                                            context
+                                                .read<DislikefeedbackCubit>()
+                                                .closeRegenerateFeedBack(
+                                                    widget.index);
                                             showThankYouMessage(widget.index);
                                           },
                                           icon: const Icon(

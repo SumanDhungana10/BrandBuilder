@@ -17,7 +17,6 @@ class IncognitoMode extends StatefulWidget {
 class _IncognitoModeState extends State<IncognitoMode> {
   final TextEditingController _inputQuestion = TextEditingController();
   final FocusNode _textFocusNode = FocusNode();
-
   @override
   void dispose() {
     super.dispose();
@@ -60,8 +59,8 @@ class _IncognitoModeState extends State<IncognitoMode> {
   }
 
   FilePickerResult? result;
-  PlatformFile? pickedFile;
-  Uint8List? pickedFileBytes;
+  List<PlatformFile?> pickedFile = [];
+  List<Uint8List?> pickedFileBytes = [];
   bool _isHovering = false;
   bool _isQuestion = false;
   List<String> answerList = [
@@ -188,8 +187,6 @@ class _IncognitoModeState extends State<IncognitoMode> {
                             ),
                           ),
                         );
-                        //   }
-                        // );
                       }),
                 ),
               ],
@@ -241,8 +238,6 @@ class _IncognitoModeState extends State<IncognitoMode> {
                                           Text(
                                             questionAnswerList[updateIndex]
                                                 ['question']!,
-                                            // widget.questionAnswerList[updateIndex]
-                                            //     ['question'],
                                             style: TextStyle(
                                               fontSize: 16,
                                               color:
@@ -283,8 +278,6 @@ class _IncognitoModeState extends State<IncognitoMode> {
                                           Text(
                                             questionAnswerList[index]
                                                 ['answer']!,
-                                            // widget.questionAnswerList[index]
-                                            //     ['answer'],
                                             style: TextStyle(
                                               fontSize: 16,
                                               color:
@@ -300,12 +293,7 @@ class _IncognitoModeState extends State<IncognitoMode> {
                                               Row(
                                                 children: [
                                                   IconButton(
-                                                      onPressed: () {
-                                                        // context.read()<ResponsepageCubit>().regenerateAnswer(
-                                                        //     widget.index,
-                                                        //     state.questionAnswerList[widget.index]
-                                                        //         ['question']);
-                                                      },
+                                                      onPressed: () {},
                                                       icon: Icon(
                                                         Icons.repeat,
                                                         size: 24,
@@ -391,9 +379,8 @@ class _IncognitoModeState extends State<IncognitoMode> {
                 ),
               ],
             ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(10),
-        width: double.infinity,
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -406,63 +393,70 @@ class _IncognitoModeState extends State<IncognitoMode> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (result != null)
-                    Stack(
+                  if (pickedFile.isNotEmpty)
+                    Row(
                       children: [
-                        MouseRegion(
-                          onEnter: (event) => setState(() {
-                            _isHovering = true;
-                          }),
-                          onHover: (event) => setState(() {
-                            _isHovering = true;
-                          }),
-                          onExit: (event) => setState(() {
-                            _isHovering = false;
-                          }),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.memory(
-                              pickedFileBytes!,
-                              fit: BoxFit.cover,
-                              width: 60,
-                              height: 60,
-                            ),
+                        for (int i = 0; i < pickedFile.length; i++)
+                          Stack(
+                            children: [
+                              MouseRegion(
+                                onEnter: (event) => setState(() {
+                                  _isHovering = true;
+                                }),
+                                onHover: (event) => setState(() {
+                                  _isHovering = true;
+                                }),
+                                onExit: (event) => setState(() {
+                                  _isHovering = false;
+                                }),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.memory(
+                                    pickedFileBytes[i]!,
+                                    height: 100,
+                                    width: 100,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                right: 0,
+                                top: 0,
+                                child: MouseRegion(
+                                  onEnter: (event) => setState(() {
+                                    _isHovering = true;
+                                  }),
+                                  onHover: (event) => setState(() {
+                                    _isHovering = true;
+                                  }),
+                                  onExit: (event) => setState(() {
+                                    _isHovering = false;
+                                  }),
+                                  child: _isHovering
+                                      ? InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              result = null;
+                                              pickedFile.clear();
+                                            });
+                                          },
+                                          child: CircleAvatar(
+                                            radius: 12,
+                                            backgroundColor: darktheme
+                                                .colorScheme.background,
+                                            child: Icon(
+                                              Icons.close_sharp,
+                                              color:
+                                                  darktheme.colorScheme.primary,
+                                              size: 20,
+                                            ),
+                                          ),
+                                        )
+                                      : Container(),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        Positioned(
-                          right: 0,
-                          top: 0,
-                          child: MouseRegion(
-                            onEnter: (event) => setState(() {
-                              _isHovering = true;
-                            }),
-                            onHover: (event) => setState(() {
-                              _isHovering = true;
-                            }),
-                            onExit: (event) => setState(() {
-                              _isHovering = false;
-                            }),
-                            child: _isHovering
-                                ? InkWell(
-                                    onTap: () {
-                                      setState(() {
-                                        result = null;
-                                      });
-                                    },
-                                    child: CircleAvatar(
-                                      radius: 12,
-                                      backgroundColor:
-                                          darktheme.colorScheme.background,
-                                      child: Icon(
-                                        Icons.close_sharp,
-                                        color: darktheme.colorScheme.primary,
-                                        size: 20,
-                                      ),
-                                    ),
-                                  )
-                                : Container(),
-                          ),
-                        ),
                       ],
                     ),
                   TextFormField(
@@ -552,11 +546,19 @@ class _IncognitoModeState extends State<IncognitoMode> {
   }
 
   Future<void> uploadedFile() async {
-    result = await FilePicker.platform.pickFiles(allowMultiple: true);
+    result = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'png', 'pdf', 'doc']);
+
     if (result != null && result!.files.isNotEmpty) {
       setState(() {
-        pickedFile = result!.files.first;
-        pickedFileBytes = pickedFile!.bytes;
+        // pickedFile = result!.files.first;
+        // pickedFileBytes = pickedFile!.bytes;
+        for (int i = 0; i < result!.files.length; i++) {
+          pickedFile.add(result!.files[i]);
+          pickedFileBytes.add(pickedFile[i]!.bytes!);
+        }
       });
     }
   }

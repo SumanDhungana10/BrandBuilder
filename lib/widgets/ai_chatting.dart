@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:krofile_ai/cubit/homepage/homepage_cubit.dart';
 import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
+import 'package:krofile_ai/responsive.dart';
 import 'package:krofile_ai/screen/explore_page.dart';
 import 'package:krofile_ai/widgets/response_page_ui.dart';
 import 'package:krofile_ai/widgets/viewfaq_alert.dart';
 import 'package:popover/popover.dart';
 
 class AiChatting extends StatefulWidget {
-  const AiChatting({super.key});
+  const AiChatting({super.key, required this.scaffoldKey});
+  final GlobalKey<ScaffoldState> scaffoldKey;
 
   @override
   State<AiChatting> createState() => _AiChattingState();
@@ -126,30 +127,46 @@ class _AiChattingState extends State<AiChatting> {
             builder: (context, state) {
               return GestureDetector(
                 onTap: () {
-                  context.read<HomepageCubit>().toggleSideBar();
+                  if (Responsive.isDesktop(context)) {
+                    context.read<HomepageCubit>().toggleSideBar();
+                  }
+                  if (Responsive.isMobile(context)) {
+                    widget.scaffoldKey.currentState!.openEndDrawer();
+                  }
                 },
                 child: Container(
-                  padding: const EdgeInsets.fromLTRB(8, 22, 8, 22),
-                  decoration: BoxDecoration(
-                    border:
-                        Border.all(color: const Color(0xFFE5E5E5), width: 1),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      bottomLeft: Radius.circular(8),
+                    padding: const EdgeInsets.fromLTRB(8, 22, 8, 22),
+                    decoration: BoxDecoration(
+                      border:
+                          Border.all(color: const Color(0xFFE5E5E5), width: 1),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        bottomLeft: Radius.circular(8),
+                      ),
                     ),
-                  ),
-                  child: (state.isSideBarOpen)
-                      ? Image.asset(
-                          "assets/images/Vectorright.png",
-                          height: 12,
-                          width: 8,
-                        )
-                      : Image.asset(
-                          "assets/images/Vectorleft.png",
-                          height: 12,
-                          width: 8,
-                        ),
-                ),
+                    child: (Responsive.isDesktop(context))
+                        ? (state.isSideBarOpen)
+                            ? Image.asset(
+                                "assets/images/Vectorright.png",
+                                height: 12,
+                                width: 8,
+                              )
+                            : Image.asset(
+                                "assets/images/Vectorleft.png",
+                                height: 12,
+                                width: 8,
+                              )
+                        : Image.asset(
+                            "assets/images/Vectorleft.png",
+                            height: 12,
+                            width: 8,
+                          )
+                    // : Image.asset(
+                    //     "assets/images/Vectorright.png",
+                    //     height: 12,
+                    //     width: 8,
+                    //   ),
+                    ),
               );
             },
           ),
