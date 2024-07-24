@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-
 class IncognitoAlert extends StatefulWidget {
   const IncognitoAlert({
     super.key,
@@ -42,7 +41,7 @@ class _IncognitoAlertState extends State<IncognitoAlert> {
               ),
               const Text(
                 textAlign: TextAlign.center,
-                "Incognito Mode ensures enhanced privacy, safer communication, and avoids biased responses by not accessing previous conversations or user data, giving users control over sharing personal details and enabling uninterrupted, natural conversations without history tracking.",
+                "This chat won't be saved in your history, stored as a memory, or used to train our models. For safety reasons, we might retain a copy for up to 30 days.",
                 style: TextStyle(
                     fontSize: 18,
                     color: Color(0xFF15141A),

@@ -1,18 +1,27 @@
-
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-part 'dislikefeedback_state.dart';
+part 'responsefeedback_state.dart';
 
-class DislikefeedbackCubit extends Cubit<DislikefeedbackState> {
-  DislikefeedbackCubit() : super(const DislikefeedbackState());
+class ResponsefeedbackCubit extends Cubit<ResponsefeedbackState> {
+  ResponsefeedbackCubit() : super(const ResponsefeedbackState());
+
+  void likeFeedback(int index) {
+    final newLikedIndex = {...state.isLikedPressed};
+    newLikedIndex[index] = true;
+    emit(state.copyWith(isLikedPressed: newLikedIndex));
+  }
 
   void disLikeFeedback(int index) {
     final newDisLikedIndex = {...state.disLikedIndex};
+    final newIsDislikedPressed = {...state.isDislikedPressed};
+    newIsDislikedPressed[index] = true;
     newDisLikedIndex[index] = true;
-    emit(state.copyWith(disLikedIndex: newDisLikedIndex));
+    emit(state.copyWith(
+        disLikedIndex: newDisLikedIndex,
+        isDislikedPressed: newIsDislikedPressed));
   }
 
   void closeDisLikeFeedback(int index) {

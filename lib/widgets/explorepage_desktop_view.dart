@@ -308,7 +308,8 @@ class _ExplorePageDeskTopState extends State<ExplorePageDeskTop> {
                                             ),
                                             size: 16,
                                           ),
-                                          onPressed: () {},
+                                          onPressed: () {
+                                          },
                                         );
                                       },
                                     ),

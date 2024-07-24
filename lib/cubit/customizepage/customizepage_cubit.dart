@@ -8,7 +8,9 @@ class CustomizepageCubit extends Cubit<CustomizepageState> {
 
   void addStarterConversation(String question) {
     final newStarterConversation = [...state.starterConversation];
-    newStarterConversation.add(question);
+    if (question != '') {
+      newStarterConversation.add(question);
+    }
     emit(state.copyWith(starterConversation: newStarterConversation));
   }
 
@@ -19,7 +21,7 @@ class CustomizepageCubit extends Cubit<CustomizepageState> {
   }
 
   void updateAllStarterConversations(List<String> conversations) {
-    emit(state.copyWith(starterConversation: conversations));
+    final x = conversations.where((element) => element.isNotEmpty).toList();
+    emit(state.copyWith(starterConversation: x));
   }
-
 }

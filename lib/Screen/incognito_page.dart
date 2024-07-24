@@ -136,60 +136,33 @@ class _IncognitoModeState extends State<IncognitoMode> {
         ),
       ),
       body: (_isQuestion == false)
-          ? Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Image.asset(
-                  "assets/images/SquareLogo.png",
-                  height: 80,
-                  width: 80,
-                ),
-                Text("How can I help you today?",
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    "assets/images/SquareLogo.png",
+                    height: 80,
+                    width: 80,
+                  ),
+                  Text("Temporary Chats",
+                      style: TextStyle(
+                          fontSize: 30,
+                          color: darktheme.colorScheme.secondary,
+                          fontWeight: FontWeight.w700)),
+                  const SizedBox(
+                    height: 48,
+                  ),
+                  Text(
+                    "This chat won't be saved in your history, stored as a memory, or used to train our models. \n For safety reasons, we might retain a copy for up to 30 days.",
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                        fontSize: 30,
-                        color: darktheme.colorScheme.secondary,
-                        fontWeight: FontWeight.w700)),
-                Flexible(
-                  child: GridView.builder(
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.all(24),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        mainAxisExtent: 100,
-                      ),
-                      itemCount: initialView
-                          .length, // Replace with your actual item count
-                      itemBuilder: (context, index) {
-                        return InkWell(
-                          onTap: () {
-                            setState(() {
-                              _isQuestion = true;
-                            });
-                            handelQuestionType(initialView[index]);
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border:
-                                  Border.all(color: const Color(0xFFE5E5E5)),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: const EdgeInsets.all(24),
-                            child: Text(
-                              initialView[index],
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: darktheme.colorScheme.primary,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                ),
-              ],
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: darktheme.colorScheme.secondary),
+                  ),
+                ],
+              ),
             )
           : Column(
               children: [

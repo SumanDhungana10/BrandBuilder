@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:krofile_ai/cubit/customizepage/customizepage_cubit.dart';
 import 'package:krofile_ai/cubit/homepage/homepage_cubit.dart';
 import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
 import 'package:krofile_ai/responsive.dart';
@@ -28,12 +29,6 @@ class _AiChattingState extends State<AiChatting> {
     _inputQuestion.dispose();
   }
 
-  List<String> initialView = [
-    'Generate strategies to effectively scale my social media marketing efforts.',
-    'How brands can effectively leverage online advertising?',
-    'Generate top five content ideas for my business',
-    'Give me 5 subject lines for my email marketing campaign.'
-  ];
   Future<void> _viewFaq() {
     return showDialog(
         barrierColor: const Color(0xFF000000).withOpacity(0.8),
@@ -71,28 +66,32 @@ class _AiChattingState extends State<AiChatting> {
                                       fontSize: 30,
                                       color: Color(0xFF151515),
                                       fontWeight: FontWeight.w700)),
-                              GridView.builder(
+                              BlocBuilder<CustomizepageCubit,
+                                      CustomizepageState>(
+                                  builder: (context, state) {
+                                return GridView.builder(
                                   shrinkWrap: true,
                                   padding: const EdgeInsets.all(24),
                                   gridDelegate:
-                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
+                                      const SliverGridDelegateWithMaxCrossAxisExtent(
+                                    maxCrossAxisExtent: 620,
+                                    mainAxisExtent: 90,
                                     crossAxisSpacing: 10,
                                     mainAxisSpacing: 10,
-                                    mainAxisExtent: 100,
                                   ),
-                                  itemCount: initialView
+                                  itemCount: state.starterConversation
                                       .length, // Replace with your actual item count
                                   itemBuilder: (context, index) {
                                     return InkWell(
                                       onTap: () {
+                                        String question =
+                                            state.starterConversation[index];
                                         context
                                             .read<ResponsepageCubit>()
                                             .handelQuestionType();
                                         context
                                             .read<ResponsepageCubit>()
-                                            .addQuestionAnswerList(
-                                                initialView[index]);
+                                            .addQuestionAnswerList(question);
                                       },
                                       child: Container(
                                         decoration: BoxDecoration(
@@ -103,7 +102,9 @@ class _AiChattingState extends State<AiChatting> {
                                         ),
                                         padding: const EdgeInsets.all(24),
                                         child: Text(
-                                          initialView[index],
+                                          state.starterConversation[index],
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
                                             fontSize: 16,
                                             color: Color(0xFF151515),
@@ -114,7 +115,9 @@ class _AiChattingState extends State<AiChatting> {
                                     );
                                     //   }
                                     // );
-                                  }),
+                                  },
+                                );
+                              }),
                             ],
                           ),
                         )
@@ -341,6 +344,7 @@ class _AiChattingState extends State<AiChatting> {
               padding: EdgeInsets.only(top: 10.0),
               child: Text(
                 "Double-check important information as GPT can make mistakes.",
+                textAlign: TextAlign.center,
               ),
             )
           ],

@@ -19,5 +19,5 @@ class CustomizepageState extends Equatable {
   }
 
   @override
-  List<Object> get props => [ starterConversation];
+  List<Object> get props => [starterConversation];
 }

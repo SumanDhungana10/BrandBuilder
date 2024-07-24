@@ -213,6 +213,7 @@ class _AddToMyListState extends State<AddToMyList> {
             builder: (context, state) {
               return ElevatedButton(
                 style: ElevatedButton.styleFrom(
+                  disabledBackgroundColor: const Color(0xFF96D2AB),
                   backgroundColor: const Color(0xFF18C554),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

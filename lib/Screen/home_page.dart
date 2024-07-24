@@ -15,7 +15,6 @@ import 'package:krofile_ai/widgets/delete_all_searchhistory_alert.dart';
 import 'package:krofile_ai/widgets/feedback_alert.dart';
 import 'package:krofile_ai/widgets/mobileview_sidebar.dart';
 import 'package:krofile_ai/widgets/side_bar.dart';
-
 import 'explore_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -138,8 +137,6 @@ class _HomePageState extends State<HomePage> {
           builder: (context, state) {
             return Row(
               children: [
-                // (state.isSideBarOpen)
-
                 Expanded(
                   flex: 3,
                   child: AiChatting(scaffoldKey: _scaffoldKey),
@@ -205,11 +202,11 @@ class _ThreeDotMenuState extends State<ThreeDotMenu> {
           onSelected: (int result) {
             if (result == 1) {
               BlocProvider.of<ThreedotCubit>(context).toggleHistory();
-              Scaffold.of(context).openEndDrawer();
+              if (Responsive.isMobile(context)) {
+                Scaffold.of(context).openEndDrawer();
+              }
             }
             if (result == 2) {
-              // BlocProvider.of<ResponsepageCubit>(context)
-              //     .resetQuestionAnswerList();
               _viewClearAllAlert();
             }
             if (result == 3) {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:krofile_ai/cubit/customizepage/customizepage_cubit.dart';
-import 'package:krofile_ai/cubit/dislikefeedback/dislikefeedback_cubit.dart';
+import 'package:krofile_ai/cubit/dislikefeedback/responsefeedback_cubit.dart';
 import 'package:krofile_ai/cubit/explore/explore_cubit.dart';
 import 'package:krofile_ai/cubit/homepage/homepage_cubit.dart';
 import 'package:krofile_ai/cubit/mylist/mylist_cubit.dart';
@@ -27,8 +27,8 @@ class MyApp extends StatelessWidget {
         BlocProvider<ResponsepageCubit>(
           create: (context) => ResponsepageCubit(),
         ),
-        BlocProvider<DislikefeedbackCubit>(
-          create: (context) => DislikefeedbackCubit(),
+        BlocProvider<ResponsefeedbackCubit>(
+          create: (context) => ResponsefeedbackCubit(),
         ),
         BlocProvider<ThreedotCubit>(
           create: (context) => ThreedotCubit(),

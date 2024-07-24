@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:krofile_ai/cubit/dislikefeedback/dislikefeedback_cubit.dart';
+import 'package:krofile_ai/cubit/dislikefeedback/responsefeedback_cubit.dart';
 import 'package:krofile_ai/cubit/mylist/mylist_cubit.dart';
 import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
 import 'package:krofile_ai/widgets/addto_mylist_alert.dart';
 import 'package:krofile_ai/widgets/viewmore_feedback_alert.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ResponseUI extends StatefulWidget {
   const ResponseUI({
@@ -88,80 +89,14 @@ class _ResponseUIState extends State<ResponseUI> {
                                             .read<ResponsepageCubit>()
                                             .addFaq(question);
                                         showDialog(
-                                            context: context,
-                                            barrierColor:
-                                                const Color(0xFF000000)
-                                                    .withOpacity(0.0),
-                                            barrierDismissible: true,
-                                            builder: (context) {
-                                              return AlertDialog(
-                                                shadowColor:
-                                                    const Color(0xFF000000)
-                                                        .withOpacity(0.2),
-                                                backgroundColor:
-                                                    const Color(0xFFFAFAFA),
-                                                shape:
-                                                    const RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius.circular(
-                                                                    4))),
-                                                contentPadding:
-                                                    const EdgeInsets.only(
-                                                        bottom: 0),
-                                                titlePadding:
-                                                    const EdgeInsets.all(10),
-                                                alignment: Alignment.topCenter,
-                                                insetPadding:
-                                                    const EdgeInsets.only(
-                                                        top: 20),
-                                                title: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    const Padding(
-                                                      padding: EdgeInsets.only(
-                                                          right: 5),
-                                                      child: Icon(
-                                                        Icons
-                                                            .check_circle_rounded,
-                                                        color:
-                                                            Color(0xFF18C554),
-                                                        size: 16,
-                                                      ),
-                                                    ),
-                                                    const Text(
-                                                      "Question has been added to FAQs successfully",
-                                                      style: TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                          color: Color(
-                                                              0xFF151515)),
-                                                    ),
-                                                    IconButton(
-                                                      onPressed: () {
-                                                        Navigator.of(context)
-                                                            .pop();
-                                                      },
-                                                      icon: const Icon(
-                                                        Icons.close,
-                                                        size: 16,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                content:
-                                                    const LinearProgressIndicator(
-                                                  value: 0.7,
-                                                  valueColor:
-                                                      AlwaysStoppedAnimation<
-                                                              Color>(
-                                                          Color(0xFF18C554)),
-                                                ),
-                                              );
-                                            });
+                                          context: context,
+                                          barrierColor: const Color(0xFF000000)
+                                              .withOpacity(0.0),
+                                          barrierDismissible: true,
+                                          builder: (context) {
+                                            return const DynamicProgressDialog();
+                                          },
+                                        );
                                       }
                                     : null),
                           ],
@@ -197,6 +132,90 @@ class _ResponseUIState extends State<ResponseUI> {
                   );
                 });
           }),
+    );
+  }
+}
+
+class DynamicProgressDialog extends StatefulWidget {
+  const DynamicProgressDialog({super.key});
+
+  @override
+  DynamicProgressDialogState createState() => DynamicProgressDialogState();
+}
+
+class DynamicProgressDialogState extends State<DynamicProgressDialog> {
+  double _progress = 0.0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startProgress();
+  }
+
+  void _startProgress() {
+    _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      setState(() {
+        _progress += 0.1;
+        if (_progress >= 1.0) {
+          _progress = 1.0;
+          _timer?.cancel();
+          Navigator.of(context).pop();
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shadowColor: const Color(0xFF000000).withOpacity(0.2),
+      backgroundColor: const Color(0xFFFAFAFA),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(4))),
+      contentPadding: const EdgeInsets.only(bottom: 0),
+      titlePadding: const EdgeInsets.all(10),
+      alignment: Alignment.topCenter,
+      insetPadding: const EdgeInsets.only(top: 20),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(right: 5),
+            child: Icon(
+              Icons.check_circle_rounded,
+              color: Color(0xFF18C554),
+              size: 16,
+            ),
+          ),
+          const Text(
+            "Question has been added to FAQs successfully",
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: Color(0xFF151515)),
+          ),
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(
+              Icons.close,
+              size: 16,
+            ),
+          ),
+        ],
+      ),
+      content: LinearProgressIndicator(
+        value: _progress,
+        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF18C554)),
+      ),
     );
   }
 }
@@ -239,8 +258,8 @@ class _PromptResponseState extends State<PromptResponse> {
   }
 
   void showThankYouMessage(int index) {
-    context.read<DislikefeedbackCubit>().closeDisLikeFeedback(index);
-    context.read<DislikefeedbackCubit>().showThankYouMessage(index);
+    context.read<ResponsefeedbackCubit>().closeDisLikeFeedback(index);
+    context.read<ResponsefeedbackCubit>().showThankYouMessage(index);
   }
 
   @override
@@ -273,7 +292,7 @@ class _PromptResponseState extends State<PromptResponse> {
                               .read<ResponsepageCubit>()
                               .regenerateAnswer(widget.index);
                           context
-                              .read<DislikefeedbackCubit>()
+                              .read<ResponsefeedbackCubit>()
                               .regenerateFeedBack(widget.index);
                         },
                         icon: const Icon(
@@ -281,7 +300,10 @@ class _PromptResponseState extends State<PromptResponse> {
                           size: 24,
                         )),
                     IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Share.share(
+                              state.questionAnswerList[widget.index].answer);
+                        },
                         icon: const Icon(
                           Icons.share_outlined,
                           size: 24,
@@ -294,7 +316,7 @@ class _PromptResponseState extends State<PromptResponse> {
                               .then((_) {
                             ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                    duration: Duration(milliseconds: 200),
+                                    duration: Duration(milliseconds: 500),
                                     content:
                                         Text('Copied to your clipboard!')));
                           });
@@ -325,29 +347,65 @@ class _PromptResponseState extends State<PromptResponse> {
                     )
                   ],
                 ),
-                Row(
-                  children: [
-                    IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.thumb_up_alt_outlined,
-                          size: 24,
-                        )),
-                    IconButton(
-                        onPressed: () {
-                          context
-                              .read<DislikefeedbackCubit>()
-                              .disLikeFeedback(widget.index);
-                        },
-                        icon: const Icon(
-                          Icons.thumb_down_alt_outlined,
-                          size: 24,
-                        )),
-                  ],
+                BlocBuilder<ResponsefeedbackCubit, ResponsefeedbackState>(
+                  builder: (context, state) {
+                    return Row(
+                      children: [
+                        (state.isLikedPressed[widget.index] == null)
+                            ? IconButton(
+                                onPressed:
+                                    (state.isDislikedPressed[widget.index] ==
+                                            true)
+                                        ? null
+                                        : () {
+                                            context
+                                                .read<ResponsefeedbackCubit>()
+                                                .likeFeedback(widget.index);
+                                          },
+                                icon: SvgPicture.asset(
+                                  "assets/images/thumbs-up.svg",
+                                ),
+                              )
+                            : RotatedBox(
+                                quarterTurns: 2,
+                                child: IconButton(
+                                  onPressed: () {},
+                                  icon: SvgPicture.asset(
+                                    "assets/images/thumbs-down.svg",
+                                  ),
+                                ),
+                              ),
+                        (state.isDislikedPressed[widget.index] == null)
+                            ? RotatedBox(
+                                quarterTurns: 2,
+                                child: IconButton(
+                                  onPressed: (state
+                                              .isLikedPressed[widget.index] ==
+                                          true)
+                                      ? null
+                                      : () {
+                                          context
+                                              .read<ResponsefeedbackCubit>()
+                                              .disLikeFeedback(widget.index);
+                                        },
+                                  icon: SvgPicture.asset(
+                                    "assets/images/thumbs-up.svg",
+                                  ),
+                                ),
+                              )
+                            : IconButton(
+                                onPressed: () {},
+                                icon: SvgPicture.asset(
+                                  "assets/images/thumbs-down.svg",
+                                ),
+                              ),
+                      ],
+                    );
+                  },
                 )
               ],
             ),
-            BlocBuilder<DislikefeedbackCubit, DislikefeedbackState>(
+            BlocBuilder<ResponsefeedbackCubit, ResponsefeedbackState>(
               builder: (context, state) {
                 return (state.regeneratedIndex[widget.index] == true)
                     ? Padding(
@@ -377,7 +435,7 @@ class _PromptResponseState extends State<PromptResponse> {
                                       IconButton(
                                           onPressed: () {
                                             context
-                                                .read<DislikefeedbackCubit>()
+                                                .read<ResponsefeedbackCubit>()
                                                 .closeRegenerateFeedBack(
                                                     widget.index);
                                             showThankYouMessage(widget.index);
@@ -430,7 +488,7 @@ class _PromptResponseState extends State<PromptResponse> {
                               IconButton(
                                   onPressed: () {
                                     context
-                                        .read<DislikefeedbackCubit>()
+                                        .read<ResponsefeedbackCubit>()
                                         .closeRegenerateFeedBack(widget.index);
                                   },
                                   icon: const Icon(Icons.close))
@@ -440,7 +498,7 @@ class _PromptResponseState extends State<PromptResponse> {
                     : Container();
               },
             ),
-            BlocBuilder<DislikefeedbackCubit, DislikefeedbackState>(
+            BlocBuilder<ResponsefeedbackCubit, ResponsefeedbackState>(
               builder: (context, state) {
                 return (state.disLikedIndex[widget.index] == true)
                     ? Padding(
@@ -474,7 +532,7 @@ class _PromptResponseState extends State<PromptResponse> {
                                     IconButton(
                                         onPressed: () {
                                           context
-                                              .read<DislikefeedbackCubit>()
+                                              .read<ResponsefeedbackCubit>()
                                               .closeDisLikeFeedback(
                                                   widget.index);
                                         },
@@ -524,7 +582,7 @@ class _PromptResponseState extends State<PromptResponse> {
                     : Container();
               },
             ),
-            BlocBuilder<DislikefeedbackCubit, DislikefeedbackState>(
+            BlocBuilder<ResponsefeedbackCubit, ResponsefeedbackState>(
               builder: (context, state) {
                 return (state.showThankYouMessage[widget.index] == true)
                     ? Padding(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:krofile_ai/cubit/customizepage/customizepage_cubit.dart';
 import 'package:krofile_ai/screen/home_page.dart';
+import 'package:krofile_ai/widgets/back_button.dart';
 
 class CustomizePage extends StatefulWidget {
   const CustomizePage({super.key});
@@ -19,9 +20,8 @@ class _CustomizePageState extends State<CustomizePage> {
           'Always use knowledge document krofileknowledge.txt to align with business goals of "One Link" before generating output.');
   final FocusNode _textFocusNode = FocusNode();
   final List<TextEditingController> _conversationStarterControllers = [];
-  bool isSuggestedRepliesEnabled = false;
-  bool isAdditionalSettingEnabled = false;
-  bool isUseChatDataEnabled = false;
+
+  bool isUseChatData = false;
 
   @override
   void dispose() {
@@ -43,6 +43,7 @@ class _CustomizePageState extends State<CustomizePage> {
         text: i < state.starterConversation.length
             ? state.starterConversation[i]
             : '',
+        // text: state.starterConversation[i],
       );
       _conversationStarterControllers.add(controller);
     }
@@ -66,34 +67,7 @@ class _CustomizePageState extends State<CustomizePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              InkWell(
-                onTap: () {
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const HomePage()));
-                },
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.arrow_back_ios,
-                      size: 16,
-                      color: Color(0xFF73767B),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      "Back",
-                      style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF73767B),
-                          fontWeight: FontWeight.w400),
-                    )
-                  ],
-                ),
-              ),
+              const OneBackButton(),
               Padding(
                 padding: const EdgeInsets.only(top: 15),
                 child: Row(
@@ -107,6 +81,10 @@ class _CustomizePageState extends State<CustomizePage> {
                     ElevatedButton(
                       onPressed: isSaveButtonEnabled
                           ? () {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const HomePage()));
                               _saveConversations();
                             }
                           : null,
@@ -238,9 +216,11 @@ class _CustomizePageState extends State<CustomizePage> {
                           ),
                           child: TextFormField(
                             controller: _conversationStarterControllers[index],
+                            maxLength: 150,
                             decoration: InputDecoration(
+                              counterText: '',
                               border: InputBorder.none,
-                              contentPadding: const EdgeInsets.all(0),
+                              contentPadding: const EdgeInsets.all(10),
                               hintStyle: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
@@ -333,72 +313,6 @@ class _CustomizePageState extends State<CustomizePage> {
                     )),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: Row(
-                  children: [
-                    const Text("Suggest Replies:",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xFF151515),
-                        )),
-                    Transform.scale(
-                      scale:
-                          0.75, // Adjust the scale factor to get the desired size
-                      child: CupertinoSwitch(
-                        value: isSuggestedRepliesEnabled,
-                        thumbColor: const Color(0xFFFFFFFF),
-                        activeColor: const Color(0xFF18C554),
-                        trackColor: const Color(0xFF73767B),
-                        onChanged: (val) {
-                          setState(() {
-                            isSaveButtonEnabled = true;
-                            isSuggestedRepliesEnabled = val;
-                          });
-                        },
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              if (isSuggestedRepliesEnabled)
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.arrow_forward_ios_sharp,
-                        size: 16,
-                        color: Color(0xFF151515),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(" Additional Settings:",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xFF151515),
-                            )),
-                      ),
-                      Transform.scale(
-                        scale:
-                            0.75, // Adjust the scale factor to get the desired size
-                        child: CupertinoSwitch(
-                          value: isAdditionalSettingEnabled,
-                          thumbColor: const Color(0xFFFFFFFF),
-                          activeColor: const Color(0xFF18C554),
-                          trackColor: const Color(0xFF73767B),
-                          onChanged: (val) {
-                            setState(() {
-                              isAdditionalSettingEnabled = val;
-                            });
-                          },
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              Padding(
                 padding: const EdgeInsets.only(top: 10),
                 child: Row(
                   children: [
@@ -412,15 +326,15 @@ class _CustomizePageState extends State<CustomizePage> {
                       scale:
                           0.75, // Adjust the scale factor to get the desired size
                       child: CupertinoSwitch(
-                        value: isUseChatDataEnabled,
+                        value: isUseChatData,
                         thumbColor: const Color(0xFFFFFFFF),
                         activeColor: const Color(0xFF18C554),
                         trackColor: const Color(0xFF73767B),
-                        onChanged: (val) {
+                        onChanged: (value) {
                           setState(() {
                             isSaveButtonEnabled = true;
 
-                            isUseChatDataEnabled = val;
+                            isUseChatData = value;
                           });
                         },
                       ),

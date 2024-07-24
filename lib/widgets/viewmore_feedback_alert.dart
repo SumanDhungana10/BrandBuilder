@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:krofile_ai/cubit/dislikefeedback/dislikefeedback_cubit.dart';
+import 'package:krofile_ai/cubit/dislikefeedback/responsefeedback_cubit.dart';
 import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
 
 class ViewMoreFeedBack extends StatefulWidget {
@@ -29,8 +29,8 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
   ];
 
   void showThankYouMessage(int index) {
-    context.read<DislikefeedbackCubit>().closeDisLikeFeedback(index);
-    context.read<DislikefeedbackCubit>().showThankYouMessage(index);
+    context.read<ResponsefeedbackCubit>().closeDisLikeFeedback(index);
+    context.read<ResponsefeedbackCubit>().showThankYouMessage(index);
   }
 
   
@@ -80,17 +80,6 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
                     for (int i = 0; i < feedbackOptions.length; i++)
                       ElevatedButton(
                           onPressed: () {
-                            // context
-                            //     .read<DislikefeedbackCubit>()
-                            //     .showThankYouMessage(widget.responseIndex);
-                            // context
-                            //     .read<DislikefeedbackCubit>()
-                            //     .closeDisLikeFeedback(widget.responseIndex);
-                            // Future.delayed(const Duration(seconds: 2), () {
-                            //   context
-                            //       .read<DislikefeedbackCubit>()
-                            //       .closeThankYouMessage(widget.responseIndex);
-                            // });
                             showThankYouMessage(widget.responseIndex);
                             Navigator.of(context).pop();
                           },

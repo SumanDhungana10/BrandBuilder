@@ -16,7 +16,7 @@ class ExploreState extends Equatable {
     this.isLoading = false,
     this.actveCategoryIndex = -0,
     this.activeSubCategoryIndex = 0,
-    this.showSubCategory = true,
+    this.showSubCategory = false,
     this.dropDownValue = '',
     this.showLeftButton = false,
   });

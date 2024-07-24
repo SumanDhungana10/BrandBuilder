@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:krofile_ai/cubit/explore/explore_cubit.dart';
 import 'package:krofile_ai/responsive.dart';
 import 'package:krofile_ai/screen/home_page.dart';
+import 'package:krofile_ai/widgets/back_button.dart';
 import 'package:krofile_ai/widgets/explorepage_desktop_view.dart';
 import 'package:krofile_ai/widgets/explorepage_mobile_view.dart';
 
@@ -34,21 +35,7 @@ class _ExplorePageState extends State<ExplorePage>
                   padding: const EdgeInsets.fromLTRB(32, 24, 32, 12),
                   child: Row(
                     children: [
-                      TextButton.icon(
-                          onPressed: () {
-                            context.read<ExploreCubit>().resetCategory();
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const HomePage()));
-                          },
-                          icon: const Icon(Icons.arrow_back_ios,
-                              size: 16, color: Color(0xFF73767B)),
-                          label: const Text("Back",
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  color: Color(0xFF73767B),
-                                  fontWeight: FontWeight.w400))),
+                      const OneBackButton(),
                       const SizedBox(width: 24),
                       Flexible(
                         fit: FlexFit.loose,
@@ -220,14 +207,15 @@ class _ExplorePageState extends State<ExplorePage>
                                   },
                                   style: ElevatedButton.styleFrom(
                                     elevation: 0,
-                                    backgroundColor:
-                                        (state.actveCategoryIndex == index)
-                                            ? const Color(0xFF18C554)
-                                            : const Color(0xFFFFFFFF),
+                                    // backgroundColor:
+                                    //     (state.actveCategoryIndex == index)
+                                    //         ? const Color(0xFF18C554)
+                                    //         : const Color(0xFFFFFFFF),
                                     foregroundColor:
-                                        (state.actveCategoryIndex == index)
-                                            ? const Color(0xFFFFFFFF)
-                                            : const Color(0xFF73767B),
+                                        // (state.actveCategoryIndex == index)
+                                        //     ? const Color(0xFFFFFFFF)
+                                        // :
+                                        const Color(0xFF73767B),
                                     padding: const EdgeInsets.all(20),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(14),

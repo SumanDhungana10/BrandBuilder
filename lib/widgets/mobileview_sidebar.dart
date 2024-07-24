@@ -110,16 +110,21 @@ class _SibeBarDrawerState extends State<SibeBarDrawer> {
                               itemBuilder: (context, index) {
                                 return ListTile(
                                   title: Container(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          0, 10, 0, 10),
-                                      decoration: const BoxDecoration(
-                                          border: Border(
-                                        bottom: BorderSide(
-                                          color: Color(0xFFE5E5E5),
-                                          width: 1,
-                                        ),
-                                      )),
-                                      child: Text(selectedList[index])),
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                    decoration: const BoxDecoration(
+                                        border: Border(
+                                      bottom: BorderSide(
+                                        color: Color(0xFFE5E5E5),
+                                        width: 1,
+                                      ),
+                                    )),
+                                    child: Text(
+                                      selectedList[index],
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
                                   onTap: () {
                                     context
                                         .read<ResponsepageCubit>()

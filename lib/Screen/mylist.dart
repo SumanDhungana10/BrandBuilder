@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:krofile_ai/cubit/mylist/mylist_cubit.dart';
-import 'package:krofile_ai/screen/home_page.dart';
+import 'package:krofile_ai/widgets/back_button.dart';
 import 'package:krofile_ai/widgets/create_new_mylist_alert.dart';
+import 'package:share_plus/share_plus.dart';
 
 class MyList extends StatefulWidget {
   const MyList(
@@ -45,30 +47,7 @@ class _MyListState extends State<MyList> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          InkWell(
-            onTap: () {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const HomePage()));
-            },
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.arrow_back_ios_new_sharp,
-                  size: 16,
-                  color: Color(0xFF73767B),
-                ),
-                SizedBox(width: 10),
-                Text(
-                  "Back",
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF73767B)),
-                ),
-              ],
-            ),
-          ),
+          const OneBackButton(),
           const SizedBox(height: 8),
           const Text(
             "Mylist",
@@ -341,11 +320,30 @@ class _MyListState extends State<MyList> {
                                                   Row(
                                                     children: [
                                                       IconButton(
-                                                          onPressed: () {},
+                                                          onPressed: () {
+                                                            Share.share(
+                                                                response);
+                                                          },
                                                           icon: const Icon(Icons
                                                               .share_outlined)),
                                                       IconButton(
-                                                          onPressed: () {},
+                                                          onPressed: () {
+                                                            Clipboard.setData(
+                                                                    ClipboardData(
+                                                                        text:
+                                                                            response))
+                                                                .then((_) {
+                                                              ScaffoldMessenger
+                                                                      .of(
+                                                                          context)
+                                                                  .showSnackBar(const SnackBar(
+                                                                      duration: Duration(
+                                                                          milliseconds:
+                                                                              500),
+                                                                      content: Text(
+                                                                          'Copied to your clipboard!')));
+                                                            });
+                                                          },
                                                           icon: const Icon(Icons
                                                               .file_copy_outlined)),
                                                       PopupMenuButton(
