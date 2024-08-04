@@ -2,8 +2,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
-import 'package:krofile_ai/cubit/homepage_popupmenu/homepage_popup_cubit.dart';
+import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
+import 'package:krofile_ai/bloc/homescreen/homescreen_bloc.dart';
 import 'package:krofile_ai/data/allList.dart';
 
 class SideBar extends StatefulWidget {
@@ -28,11 +28,8 @@ class _SideBarState extends State<SideBar> {
   @override
   void initState() {
     super.initState();
-    // Select a random item from dropDownItems and assign it to dropDownValue
     dropDownValue = dropDownItems[Random().nextInt(dropDownItems.length)];
   }
-
-  bool isHistoryon = false;
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +54,7 @@ class _SideBarState extends State<SideBar> {
         selectedList = [];
     }
 
-    return BlocBuilder<ThreedotCubit, ThreedotState>(
+    return BlocBuilder<HomeScreenBloc, HomeScreenState>(
       builder: (context, state) {
         return (!state.isHistoryOpen)
             ? Container(
@@ -98,8 +95,13 @@ class _SideBarState extends State<SideBar> {
                       ),
                     ),
                     Expanded(
-                      child: BlocBuilder<ResponsepageCubit, ResponsepageState>(
+                      child: BlocBuilder<BusinessResponseBloc,
+                          BusinessResponseState>(
                         builder: (context, state) {
+                          bool isLastAnswerLoading =
+                              state.questionAnswerList.isNotEmpty &&
+                                  state.questionAnswerList.last.isloading;
+
                           return ListView.builder(
                             itemCount: selectedList.length,
                             itemBuilder: (context, index) {
@@ -115,15 +117,17 @@ class _SideBarState extends State<SideBar> {
                                       ),
                                     )),
                                     child: Text(selectedList[index])),
-                                onTap: () {
-                                  context
-                                      .read<ResponsepageCubit>()
-                                      .handelQuestionType();
-                                  context
-                                      .read<ResponsepageCubit>()
-                                      .addQuestionAnswerList(
-                                          selectedList[index]);
-                                },
+                                onTap: isLastAnswerLoading
+                                    ? null
+                                    : () {
+                                        context
+                                            .read<BusinessResponseBloc>()
+                                            .add(HandleQuestionType());
+                                        context
+                                            .read<BusinessResponseBloc>()
+                                            .add(AddQuestionAnswerList(
+                                                selectedList[index]));
+                                      },
                               );
                             },
                           );
@@ -133,7 +137,7 @@ class _SideBarState extends State<SideBar> {
                   ],
                 ),
               )
-            : BlocBuilder<ResponsepageCubit, ResponsepageState>(
+            : BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
                 builder: (context, state) {
                   final historyList = state.historyList.reversed.toList();
                   return Container(
@@ -156,17 +160,13 @@ class _SideBarState extends State<SideBar> {
                                     fontSize: 20,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xFF15141A))),
-                            BlocBuilder<ThreedotCubit, ThreedotState>(
-                              builder: (context, state) {
-                                return IconButton(
-                                  onPressed: () {
-                                    context
-                                        .read<ThreedotCubit>()
-                                        .toggleHistory();
-                                  },
-                                  icon: const Icon(Icons.close),
-                                );
+                            IconButton(
+                              onPressed: () {
+                                context
+                                    .read<HomeScreenBloc>()
+                                    .add(ToggleHistory());
                               },
+                              icon: const Icon(Icons.close),
                             ),
                           ],
                         ),
@@ -203,19 +203,19 @@ class _SideBarState extends State<SideBar> {
                                         ),
                                         onTap: () {
                                           context
-                                              .read<ResponsepageCubit>()
-                                              .resetQuestionAnswerList();
+                                              .read<BusinessResponseBloc>()
+                                              .add(ResetQuestionAnswerList());
                                           context
-                                              .read<ResponsepageCubit>()
-                                              .handelQuestionType();
+                                              .read<BusinessResponseBloc>()
+                                              .add(HandleQuestionType());
 
                                           context
-                                              .read<ResponsepageCubit>()
-                                              .showhistoyData(
+                                              .read<BusinessResponseBloc>()
+                                              .add(ShowHistoryData(
                                                   historyList[index]
                                                       ['question']!,
                                                   historyList[index]
-                                                      ['answer']!);
+                                                      ['answer']!));
                                         },
                                       ),
                                     );

@@ -56,7 +56,8 @@ class _FeedBackAlertState extends State<FeedBackAlert> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      // backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      surfaceTintColor: const Color(0xFFFAFAFA),
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10))),
       contentPadding: const EdgeInsets.all(24),

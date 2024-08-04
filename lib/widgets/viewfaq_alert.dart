@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
+import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
 
 class ViewFAQ extends StatefulWidget {
   const ViewFAQ({
@@ -15,7 +15,7 @@ class _ViewFAQState extends State<ViewFAQ> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      surfaceTintColor: const Color(0xFFFAFAFA),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
@@ -41,7 +41,7 @@ class _ViewFAQState extends State<ViewFAQ> {
       content: SizedBox(
         width: 600,
         height: 500,
-        child: BlocBuilder<ResponsepageCubit, ResponsepageState>(
+        child: BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
           builder: (context, state) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,8 +57,8 @@ class _ViewFAQState extends State<ViewFAQ> {
                         child: ListTile(
                           onTap: () {
                             context
-                                .read<ResponsepageCubit>()
-                                .toggleQuestionFromFAQ(faqItem);
+                                .read<BusinessResponseBloc>()
+                                .add(ToggleQuestionFromFAQ(faqItem));
                             Navigator.of(context).pop();
                           },
                           title: Text(
@@ -72,8 +72,8 @@ class _ViewFAQState extends State<ViewFAQ> {
                           trailing: IconButton(
                             onPressed: () {
                               context
-                                  .read<ResponsepageCubit>()
-                                  .removeFaq(faqItem);
+                                  .read<BusinessResponseBloc>()
+                                  .add(RemoveFaq(faqItem));
                             },
                             icon: const Icon(Icons.close),
                           ),

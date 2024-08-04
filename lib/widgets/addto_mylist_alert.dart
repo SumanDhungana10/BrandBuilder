@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:krofile_ai/cubit/mylist/mylist_cubit.dart';
+import 'package:krofile_ai/bloc/mylist/mylist_bloc.dart';
 import 'package:krofile_ai/model/mylist.dart';
-import 'package:krofile_ai/screen/mylist.dart';
+import 'package:krofile_ai/screen/mylist_screen.dart';
 
 class AddToMyList extends StatefulWidget {
   const AddToMyList({super.key, required this.answer});
@@ -29,6 +29,7 @@ class _AddToMyListState extends State<AddToMyList> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      surfaceTintColor: const Color(0xFFFAFAFA),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
@@ -59,7 +60,7 @@ class _AddToMyListState extends State<AddToMyList> {
           ],
         ),
       ),
-      content: BlocBuilder<MylistCubit, MylistState>(
+      content: BlocBuilder<MylistBloc, MylistState>(
         builder: (context, state) {
           if (state.isLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -209,7 +210,7 @@ class _AddToMyListState extends State<AddToMyList> {
         ),
         Padding(
           padding: const EdgeInsets.only(left: 10),
-          child: BlocBuilder<MylistCubit, MylistState>(
+          child: BlocBuilder<MylistBloc, MylistState>(
             builder: (context, state) {
               return ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -223,13 +224,13 @@ class _AddToMyListState extends State<AddToMyList> {
                 ),
                 onPressed: _selectedCategoryIndex != null
                     ? () {
-                        context.read<MylistCubit>().addSubCategory(
+                        context.read<MylistBloc>().add(AddSubCategory(
                               _selectedCategoryIndex!,
                               _newSubCategory.text.isNotEmpty
                                   ? _newSubCategory.text
                                   : _selectedSubCategory!.name,
                               widget.answer,
-                            );
+                            ));
 
                         Navigator.pushReplacement(
                             context,

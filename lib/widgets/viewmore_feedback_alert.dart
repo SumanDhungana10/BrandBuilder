@@ -1,9 +1,8 @@
-import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:krofile_ai/cubit/dislikefeedback/responsefeedback_cubit.dart';
-import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
+import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
+import '../bloc/responsefeedback/responsefeedback_bloc.dart';
 
 class ViewMoreFeedBack extends StatefulWidget {
   const ViewMoreFeedBack({
@@ -27,17 +26,17 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
     "Seems incomplete or lacking effort",
     "Something else",
   ];
+  int selectedFeedbackOption = -1;
 
   void showThankYouMessage(int index) {
-    context.read<ResponsefeedbackCubit>().closeDisLikeFeedback(index);
-    context.read<ResponsefeedbackCubit>().showThankYouMessage(index);
+    context.read<ResponsefeedbackBloc>().add(CloseDislikeFeedback(index));
+    context.read<ResponsefeedbackBloc>().add(ShowThankYouMessage(index));
   }
 
-  
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      surfaceTintColor: const Color(0xFFFAFAFA),
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10))),
       title: Container(
@@ -66,7 +65,7 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
           ],
         ),
       ),
-      content: BlocBuilder<ResponsepageCubit, ResponsepageState>(
+      content: BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
         builder: (context, state) {
           return SizedBox(
             width: 800,
@@ -80,8 +79,9 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
                     for (int i = 0; i < feedbackOptions.length; i++)
                       ElevatedButton(
                           onPressed: () {
-                            showThankYouMessage(widget.responseIndex);
-                            Navigator.of(context).pop();
+                            setState(() {
+                              selectedFeedbackOption = i;
+                            });
                           },
                           style: ElevatedButton.styleFrom(
                             textStyle: const TextStyle(
@@ -90,7 +90,9 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
                                 fontWeight: FontWeight.w400),
                             padding: const EdgeInsets.all(24),
                             foregroundColor: const Color(0xFF151515),
-                            // backgroundColor: Colors.white
+                            backgroundColor: (selectedFeedbackOption == i)
+                                ? const Color(0xFFE5E5E5)
+                                : const Color(0xFFFAFAFA),
                             side: const BorderSide(
                                 color: Color(0xFFD4D4D4), width: 1),
                             shape: RoundedRectangleBorder(
@@ -153,10 +155,17 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ElevatedButton(
-                        onPressed: () {},
+                        onPressed: (selectedFeedbackOption != -1)
+                            ? () {
+                                showThankYouMessage(widget.responseIndex);
+                                Navigator.of(context).pop();
+                              }
+                            : null,
                         style: ElevatedButton.styleFrom(
+                          disabledBackgroundColor: const Color(0xFF96D2AB),
                           backgroundColor: const Color(0xFF18C554),
-                          foregroundColor: Colors.white,
+                          foregroundColor: const Color(0xFFFFFFFF),
+                          disabledForegroundColor: const Color(0xFFFFFFFF),
                           padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),

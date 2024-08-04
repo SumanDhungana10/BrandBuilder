@@ -1,12 +1,10 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:krofile_ai/cubit/homepage_popupmenu/homepage_popup_cubit.dart';
-import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
+import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
+import 'package:krofile_ai/bloc/homescreen/homescreen_bloc.dart';
 import 'package:krofile_ai/data/alllist.dart';
-import 'package:krofile_ai/widgets/response_page_ui.dart';
 
 class SibeBarDrawer extends StatefulWidget {
   const SibeBarDrawer({super.key});
@@ -62,7 +60,7 @@ class _SibeBarDrawerState extends State<SibeBarDrawer> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(topRight: Radius.circular(0)),
       ),
-      child: BlocBuilder<ThreedotCubit, ThreedotState>(
+      child: BlocBuilder<HomeScreenBloc, HomeScreenState>(
         builder: (context, state) {
           return (!state.isHistoryOpen)
               ? Container(
@@ -103,7 +101,7 @@ class _SibeBarDrawerState extends State<SibeBarDrawer> {
                       ),
                       Expanded(
                         child:
-                            BlocBuilder<ResponsepageCubit, ResponsepageState>(
+                            BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
                           builder: (context, state) {
                             return ListView.builder(
                               itemCount: selectedList.length,
@@ -127,12 +125,12 @@ class _SibeBarDrawerState extends State<SibeBarDrawer> {
                                   ),
                                   onTap: () {
                                     context
-                                        .read<ResponsepageCubit>()
-                                        .handelQuestionType();
+                                        .read<BusinessResponseBloc>()
+                                        .add(HandleQuestionType());
                                     context
-                                        .read<ResponsepageCubit>()
-                                        .addQuestionAnswerList(
-                                            selectedList[index]);
+                                        .read<BusinessResponseBloc>()
+                                        .add(AddQuestionAnswerList(
+                                            selectedList[index]));
                                   },
                                 );
                               },
@@ -143,7 +141,7 @@ class _SibeBarDrawerState extends State<SibeBarDrawer> {
                     ],
                   ),
                 )
-              : BlocBuilder<ResponsepageCubit, ResponsepageState>(
+              : BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
                   builder: (context, state) {
                     final historyList = state.historyList.reversed.toList();
                     return Container(
@@ -166,18 +164,14 @@ class _SibeBarDrawerState extends State<SibeBarDrawer> {
                                       fontSize: 20,
                                       fontWeight: FontWeight.w600,
                                       color: Color(0xFF15141A))),
-                              BlocBuilder<ThreedotCubit, ThreedotState>(
-                                builder: (context, state) {
-                                  return IconButton(
-                                    onPressed: () {
-                                      context
-                                          .read<ThreedotCubit>()
-                                          .toggleHistory();
-                                    },
-                                    icon: const Icon(Icons.close),
-                                  );
+                              IconButton(
+                                onPressed: () {
+                                  context
+                                      .read<HomeScreenBloc>()
+                                      .add(ToggleHistory());
                                 },
-                              ),
+                                icon: const Icon(Icons.close),
+                              )
                             ],
                           ),
                           Expanded(
@@ -213,19 +207,19 @@ class _SibeBarDrawerState extends State<SibeBarDrawer> {
                                           ),
                                           onTap: () {
                                             context
-                                                .read<ResponsepageCubit>()
-                                                .resetQuestionAnswerList();
+                                                .read<BusinessResponseBloc>()
+                                                .add(ResetQuestionAnswerList());
                                             context
-                                                .read<ResponsepageCubit>()
-                                                .handelQuestionType();
+                                                .read<BusinessResponseBloc>()
+                                                .add(HandleQuestionType());
 
                                             context
-                                                .read<ResponsepageCubit>()
-                                                .showhistoyData(
+                                                .read<BusinessResponseBloc>()
+                                                .add(ShowHistoryData(
                                                     historyList[index]
                                                         ['question']!,
                                                     historyList[index]
-                                                        ['answer']!);
+                                                        ['answer']!));
                                           },
                                         ),
                                       );

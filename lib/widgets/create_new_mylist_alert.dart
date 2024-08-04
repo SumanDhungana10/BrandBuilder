@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:krofile_ai/cubit/mylist/mylist_cubit.dart';
+import 'package:krofile_ai/bloc/mylist/mylist_bloc.dart';
 
 class CreateNewMylistAlert extends StatefulWidget {
   const CreateNewMylistAlert({super.key});
@@ -35,7 +35,7 @@ class _CreateNewMylistAlertState extends State<CreateNewMylistAlert> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      surfaceTintColor: const Color(0xFFFAFAFA),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
@@ -125,8 +125,8 @@ class _CreateNewMylistAlertState extends State<CreateNewMylistAlert> {
             onPressed: _isButtonEnabled
                 ? () {
                     context
-                        .read<MylistCubit>()
-                        .addCategory(_newListController.text);
+                        .read<MylistBloc>()
+                        .add(AddCategory(_newListController.text));
                     Navigator.pop(context);
                   }
                 : null,

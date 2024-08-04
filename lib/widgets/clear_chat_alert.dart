@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
+import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
 // import 'package:krofile_ai/screen/home_page.dart';
 
 class ClearAllChatAlert extends StatelessWidget {
@@ -12,7 +11,7 @@ class ClearAllChatAlert extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      surfaceTintColor: const Color(0xFFFAFAFA),
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(10))),
       contentPadding: const EdgeInsets.only(left: 56, right: 32, bottom: 32),
@@ -83,8 +82,8 @@ class ClearAllChatAlert extends StatelessWidget {
                           Navigator.pop(context);
                           // Navigator.pushReplacement(context,
                           //     MaterialPageRoute(builder: (context) => const HomePage()));
-                          BlocProvider.of<ResponsepageCubit>(context)
-                              .resetQuestionAnswerList();
+                          BlocProvider.of<BusinessResponseBloc>(context)
+                              .add(ResetQuestionAnswerList());
                         },
                         child: const Text("Clear",
                             style: TextStyle(

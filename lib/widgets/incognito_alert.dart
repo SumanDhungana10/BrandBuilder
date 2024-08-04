@@ -15,7 +15,7 @@ class _IncognitoAlertState extends State<IncognitoAlert> {
   Widget build(BuildContext context) {
     return AlertDialog(
         contentPadding: const EdgeInsets.all(30),
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        surfaceTintColor: const Color(0xFFFFFFFF),
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10))),
         content: SizedBox(
@@ -41,7 +41,7 @@ class _IncognitoAlertState extends State<IncognitoAlert> {
               ),
               const Text(
                 textAlign: TextAlign.center,
-                "This chat won't be saved in your history, stored as a memory, or used to train our models. For safety reasons, we might retain a copy for up to 30 days.",
+                "Incognito Mode ensures enhanced privacy, safer communication, and avoids biased responses by not accessing previous conversations or user data, giving users control over sharing personal details and enabling uninterrupted, natural conversations without history tracking.",
                 style: TextStyle(
                     fontSize: 18,
                     color: Color(0xFF15141A),

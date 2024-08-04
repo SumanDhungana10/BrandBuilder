@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:krofile_ai/cubit/explore/explore_cubit.dart';
-import 'package:krofile_ai/cubit/homepage/homepage_cubit.dart';
-import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
-import 'package:krofile_ai/screen/home_page.dart';
+import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
+import 'package:krofile_ai/bloc/explorescreen/explorescreen_bloc.dart';
+import 'package:krofile_ai/screen/home_screen.dart';
 
 class ExplorePageDeskTop extends StatefulWidget {
   const ExplorePageDeskTop({super.key});
@@ -49,15 +48,15 @@ class _ExplorePageDeskTopState extends State<ExplorePageDeskTop> {
 
   void _scrollListener() {
     if (_scrollController.offset > 0) {
-      context.read<ExploreCubit>().showLeftButton();
+      context.read<ExploreScreenBloc>().add(ShowLeftButton());
     } else {
-      context.read<ExploreCubit>().hideLeftButton();
+      context.read<ExploreScreenBloc>().add(HideLeftButton());
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ExploreCubit, ExploreState>(
+    return BlocBuilder<ExploreScreenBloc, ExploreScreenState>(
       builder: (context, state) {
         final activeIndex = state.actveCategoryIndex;
         final activeSubCategoryIndex = state.activeSubCategoryIndex;
@@ -85,8 +84,8 @@ class _ExplorePageDeskTopState extends State<ExplorePageDeskTop> {
                                 child: ElevatedButton(
                                   onPressed: () {
                                     context
-                                        .read<ExploreCubit>()
-                                        .handelCategoryButton(index);
+                                        .read<ExploreScreenBloc>()
+                                        .add(HandleCategoryButton(index));
                                   },
                                   style: ElevatedButton.styleFrom(
                                     elevation: 0,
@@ -126,8 +125,8 @@ class _ExplorePageDeskTopState extends State<ExplorePageDeskTop> {
                                   child: ElevatedButton(
                                     onPressed: () {
                                       context
-                                          .read<ExploreCubit>()
-                                          .handelCategoryButton(index);
+                                          .read<ExploreScreenBloc>()
+                                          .add(HandleCategoryButton(index));
                                     },
                                     style: ElevatedButton.styleFrom(
                                       elevation: 0,
@@ -238,8 +237,8 @@ class _ExplorePageDeskTopState extends State<ExplorePageDeskTop> {
                                     ),
                                     onPressed: () {
                                       context
-                                          .read<ExploreCubit>()
-                                          .setActiveSubCategory(index);
+                                          .read<ExploreScreenBloc>()
+                                          .add(SetActiveSubCategory(index));
                                     },
                                     child: Text(
                                         state.categories[activeIndex]
@@ -297,39 +296,33 @@ class _ExplorePageDeskTopState extends State<ExplorePageDeskTop> {
                                           fontWeight: FontWeight.w400,
                                           color: Color(0xFF151515)),
                                     ),
-                                    trailing: BlocBuilder<HomepageCubit,
-                                        HomepageState>(
-                                      builder: (context, state) {
-                                        return IconButton(
-                                          icon: const Icon(
-                                            Icons.arrow_forward_ios,
-                                            color: Color(
-                                              0xFF151515,
-                                            ),
-                                            size: 16,
-                                          ),
-                                          onPressed: () {
-                                          },
-                                        );
-                                      },
+                                    trailing: IconButton(
+                                      icon: const Icon(
+                                        Icons.arrow_forward_ios,
+                                        color: Color(
+                                          0xFF151515,
+                                        ),
+                                        size: 16,
+                                      ),
+                                      onPressed: () {},
                                     ),
                                     onTap: () {
                                       Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  const HomePage()));
-                                      BlocProvider.of<ResponsepageCubit>(
+                                                  const HomeScreen()));
+                                      BlocProvider.of<BusinessResponseBloc>(
                                               context)
-                                          .handelQuestionType();
-                                      BlocProvider.of<ResponsepageCubit>(
+                                          .add(HandleQuestionType());
+                                      BlocProvider.of<BusinessResponseBloc>(
                                               context)
-                                          .addQuestionAnswerList(state
+                                          .add(AddQuestionAnswerList(state
                                               .categories[
                                                   state.actveCategoryIndex]
                                               .subcategories[
                                                   state.activeSubCategoryIndex]
-                                              .items[index]);
+                                              .items[index]));
                                     },
                                   ),
                                 );

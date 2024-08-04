@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
-// import 'package:krofile_ai/screen/home_page.dart';
+import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
 
 class DeletAllSearchHistoryAlert extends StatelessWidget {
   const DeletAllSearchHistoryAlert({
@@ -72,9 +71,9 @@ class DeletAllSearchHistoryAlert extends StatelessWidget {
             ),
             onPressed: () {
               Navigator.pop(context);
-              BlocProvider.of<ResponsepageCubit>(context)
-                  .resetQuestionAnswerList();
-              BlocProvider.of<ResponsepageCubit>(context).deleteAllHistory();
+              BlocProvider.of<BusinessResponseBloc>(context)
+                  .add(ResetQuestionAnswerList());
+              BlocProvider.of<BusinessResponseBloc>(context).add(DeleteAllHistory());
             },
             child: const Text("Delete All",
                 style: TextStyle(

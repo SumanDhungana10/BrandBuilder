@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:krofile_ai/cubit/explore/explore_cubit.dart';
-import 'package:krofile_ai/cubit/responsepage/responsepage_cubit.dart';
-import 'package:krofile_ai/screen/home_page.dart';
+import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
+import 'package:krofile_ai/bloc/explorescreen/explorescreen_bloc.dart';
+import 'package:krofile_ai/screen/home_screen.dart';
 
 class ExplorePgaeMobileView extends StatefulWidget {
   const ExplorePgaeMobileView({super.key});
@@ -15,7 +15,7 @@ class ExplorePgaeMobileView extends StatefulWidget {
 class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ExploreCubit, ExploreState>(
+    return BlocBuilder<ExploreScreenBloc, ExploreScreenState>(
       builder: (context, state) {
         return Column(
           children: [
@@ -36,8 +36,8 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                             child: ElevatedButton(
                               onPressed: () {
                                 context
-                                    .read<ExploreCubit>()
-                                    .handelCategoryButton(index);
+                                    .read<ExploreScreenBloc>()
+                                    .add(HandleCategoryButton(index));
                               },
                               style: ElevatedButton.styleFrom(
                                 elevation: 0,
@@ -80,8 +80,8 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   context
-                                      .read<ExploreCubit>()
-                                      .handelCategoryButton(index);
+                                      .read<ExploreScreenBloc>()
+                                      .add(HandleCategoryButton(index));
                                 },
                                 style: ElevatedButton.styleFrom(
                                   elevation: 0,
@@ -143,8 +143,8 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                               .indexWhere(
                                   (element) => element.name == newValue);
                           context
-                              .read<ExploreCubit>()
-                              .setActiveSubCategory(index);
+                              .read<ExploreScreenBloc>()
+                              .add(SetActiveSubCategory(index));
                         },
                         items: state
                             .categories[state.actveCategoryIndex].subcategories
@@ -212,15 +212,15 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                               Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const HomePage()));
-                              BlocProvider.of<ResponsepageCubit>(context)
-                                  .handelQuestionType();
-                              BlocProvider.of<ResponsepageCubit>(context)
-                                  .addQuestionAnswerList(state
+                                      builder: (context) => const HomeScreen()));
+                              BlocProvider.of<BusinessResponseBloc>(context)
+                                  .add(HandleQuestionType());
+                              BlocProvider.of<BusinessResponseBloc>(context)
+                                  .add(AddQuestionAnswerList(state
                                       .categories[state.actveCategoryIndex]
                                       .subcategories[
                                           state.activeSubCategoryIndex]
-                                      .items[index]);
+                                      .items[index]));
                             },
                           ),
                         );

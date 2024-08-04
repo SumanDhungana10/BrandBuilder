@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:krofile_ai/screen/home_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:krofile_ai/screen/home_screen.dart';
 
 class OneBackButton extends StatelessWidget {
   const OneBackButton({
@@ -10,8 +11,9 @@ class OneBackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const HomePage()));
+        // Navigator.pushReplacement(
+        //     context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+        context.pop();
       },
       child: const Row(
         mainAxisSize: MainAxisSize.min,
