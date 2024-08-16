@@ -80,8 +80,6 @@ class ClearAllChatAlert extends StatelessWidget {
                         ),
                         onPressed: () {
                           Navigator.pop(context);
-                          // Navigator.pushReplacement(context,
-                          //     MaterialPageRoute(builder: (context) => const HomePage()));
                           BlocProvider.of<BusinessResponseBloc>(context)
                               .add(ResetQuestionAnswerList());
                         },

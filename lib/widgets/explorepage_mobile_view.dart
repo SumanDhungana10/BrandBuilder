@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:krofile_ai/bloc/bloc/explore_bloc.dart';
 import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
-import 'package:krofile_ai/bloc/explorescreen/explorescreen_bloc.dart';
 import 'package:krofile_ai/screen/home_screen.dart';
 
 class ExplorePgaeMobileView extends StatefulWidget {
@@ -15,7 +15,7 @@ class ExplorePgaeMobileView extends StatefulWidget {
 class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ExploreScreenBloc, ExploreScreenState>(
+    return BlocBuilder<ExploreBloc, ExploreState>(
       builder: (context, state) {
         return Column(
           children: [
@@ -35,18 +35,21 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                             padding: const EdgeInsets.only(left: 12),
                             child: ElevatedButton(
                               onPressed: () {
+                                // context
+                                //     .read<ExploreScreenBloc>()
+                                //     .add(HandleCategoryButton(index));
                                 context
-                                    .read<ExploreScreenBloc>()
-                                    .add(HandleCategoryButton(index));
+                                    .read<ExploreBloc>()
+                                    .add(HandelCategoryButton(index));
                               },
                               style: ElevatedButton.styleFrom(
                                 elevation: 0,
                                 backgroundColor:
-                                    (state.actveCategoryIndex == index)
+                                    (state.activeCategoryIndex == index)
                                         ? const Color(0xFF18C554)
                                         : const Color(0xFFFFFFFF),
                                 foregroundColor:
-                                    (state.actveCategoryIndex == index)
+                                    (state.activeCategoryIndex == index)
                                         ? const Color(0xFFFFFFFF)
                                         : const Color(0xFF73767B),
                                 padding:
@@ -58,7 +61,7 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                                 ),
                               ),
                               child: Text(
-                                state.categories[index].name,
+                                state.categories[index],
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
@@ -79,18 +82,21 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                               padding: const EdgeInsets.only(left: 12),
                               child: ElevatedButton(
                                 onPressed: () {
+                                  // context
+                                  //     .read<ExploreScreenBloc>()
+                                  //     .add(HandleCategoryButton(index));
                                   context
-                                      .read<ExploreScreenBloc>()
-                                      .add(HandleCategoryButton(index));
+                                      .read<ExploreBloc>()
+                                      .add(HandelCategoryButton(index));
                                 },
                                 style: ElevatedButton.styleFrom(
                                   elevation: 0,
                                   backgroundColor:
-                                      (state.actveCategoryIndex == index)
+                                      (state.activeCategoryIndex == index)
                                           ? const Color(0xFF18C554)
                                           : const Color(0xFFFFFFFF),
                                   foregroundColor:
-                                      (state.actveCategoryIndex == index)
+                                      (state.activeCategoryIndex == index)
                                           ? const Color(0xFFFFFFFF)
                                           : const Color(0xFF73767B),
                                   padding: const EdgeInsets.fromLTRB(
@@ -102,7 +108,7 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                                   ),
                                 ),
                                 child: Text(
-                                  state.categories[index].name,
+                                  state.categories[index],
                                   style: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
@@ -117,7 +123,7 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                 ),
               ),
             ),
-            (state.categories[state.actveCategoryIndex].subcategories.isEmpty)
+            (state.subCategories.isEmpty)
                 ? Container()
                 : Container(
                     width: MediaQuery.of(context).size.width * 0.7,
@@ -134,25 +140,22 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                         icon: SvgPicture.asset(
                             'assets/images/fe_arrow-right.svg'),
                         focusColor: Theme.of(context).scaffoldBackgroundColor,
-                        value: state.categories[state.actveCategoryIndex]
-                            .subcategories[state.activeSubCategoryIndex].name,
+                        value:
+                            state.subCategories[state.activeSubCategoryIndex],
                         onChanged: (String? newValue) {
-                          final index = state
-                              .categories[state.actveCategoryIndex]
-                              .subcategories
-                              .indexWhere(
-                                  (element) => element.name == newValue);
+                          final index = state.subCategories
+                              .indexWhere((element) => element == newValue);
                           context
-                              .read<ExploreScreenBloc>()
-                              .add(SetActiveSubCategory(index));
+                              .read<ExploreBloc>()
+                              .add(HandelSubCategoryButton(index));
+                          context.read<ExploreBloc>().add(FetchQuestions());
                         },
-                        items: state
-                            .categories[state.actveCategoryIndex].subcategories
+                        items: state.subCategories
                             .map<DropdownMenuItem<String>>((subcategory) {
                           return DropdownMenuItem<String>(
-                            value: subcategory.name,
+                            value: subcategory,
                             child: Text(
-                              subcategory.name,
+                              subcategory,
                               style: const TextStyle(fontSize: 12),
                             ),
                           );
@@ -160,12 +163,7 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                       ),
                     ),
                   ),
-            (state.categories[state.actveCategoryIndex].subcategories.isEmpty ||
-                    state
-                        .categories[state.actveCategoryIndex]
-                        .subcategories[state.activeSubCategoryIndex]
-                        .items
-                        .isEmpty)
+            (state.subCategories.isEmpty || state.questions.isEmpty)
                 ? Container()
                 : Container(
                     margin: const EdgeInsets.only(
@@ -181,11 +179,7 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                     ),
                     child: ListView.builder(
                       shrinkWrap: true,
-                      itemCount: state
-                          .categories[state.actveCategoryIndex]
-                          .subcategories[state.activeSubCategoryIndex]
-                          .items
-                          .length,
+                      itemCount: state.questions.length,
                       itemBuilder: (context, index) {
                         return Container(
                           decoration: const BoxDecoration(
@@ -197,10 +191,7 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                           ),
                           child: ListTile(
                             title: Text(
-                              state
-                                  .categories[state.actveCategoryIndex]
-                                  .subcategories[state.activeSubCategoryIndex]
-                                  .items[index],
+                              state.questions[index],
                               style: const TextStyle(fontSize: 12),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -212,15 +203,13 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                               Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const HomeScreen()));
+                                      builder: (context) =>
+                                          const HomeScreen()));
                               BlocProvider.of<BusinessResponseBloc>(context)
                                   .add(HandleQuestionType());
                               BlocProvider.of<BusinessResponseBloc>(context)
-                                  .add(AddQuestionAnswerList(state
-                                      .categories[state.actveCategoryIndex]
-                                      .subcategories[
-                                          state.activeSubCategoryIndex]
-                                      .items[index]));
+                                  .add(AddQuestionAnswerList(
+                                      state.questions[index]));
                             },
                           ),
                         );

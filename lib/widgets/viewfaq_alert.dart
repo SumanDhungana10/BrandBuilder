@@ -43,22 +43,23 @@ class _ViewFAQState extends State<ViewFAQ> {
         height: 500,
         child: BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
           builder: (context, state) {
+            final faq = state.faq;
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: ListView.builder(
                     padding: const EdgeInsets.only(top: 10),
-                    itemCount: state.faq.length,
+                    itemCount: faq.length,
                     itemBuilder: (context, index) {
-                      final faqItem = state.faq[index];
+                      final faqItem = faq[index];
                       return Padding(
                         padding: const EdgeInsets.only(top: 10),
                         child: ListTile(
                           onTap: () {
-                            context
-                                .read<BusinessResponseBloc>()
-                                .add(ToggleQuestionFromFAQ(faqItem));
+                            // context
+                            //     .read<BusinessResponseBloc>()
+                            //     .add(ToggleQuestionFromFAQ(faqItem));
                             Navigator.of(context).pop();
                           },
                           title: Text(

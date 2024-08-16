@@ -73,7 +73,8 @@ class DeletAllSearchHistoryAlert extends StatelessWidget {
               Navigator.pop(context);
               BlocProvider.of<BusinessResponseBloc>(context)
                   .add(ResetQuestionAnswerList());
-              BlocProvider.of<BusinessResponseBloc>(context).add(DeleteAllHistory());
+              BlocProvider.of<BusinessResponseBloc>(context)
+                  .add(DeleteAllHistory());
             },
             child: const Text("Delete All",
                 style: TextStyle(

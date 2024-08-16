@@ -18,22 +18,16 @@ class AddQuestionAnswerList extends BusinessResponseEvent {
   List<Object> get props => [question];
 }
 
-class RegenerateAnswer extends BusinessResponseEvent {
+class HandleRegenerate extends BusinessResponseEvent {
   final int index;
 
-  const RegenerateAnswer(this.index);
+  const HandleRegenerate(this.index);
 
   @override
   List<Object> get props => [index];
 }
 
-class AddFaq extends BusinessResponseEvent {
-  final String question;
-
-  const AddFaq(this.question);
-
-  @override
-  List<Object> get props => [question];
+class GetFaq extends BusinessResponseEvent {
 }
 
 class ResetTextFieldController extends BusinessResponseEvent {}
@@ -69,3 +63,14 @@ class ShowHistoryData extends BusinessResponseEvent {
 class ResetQuestionAnswerList extends BusinessResponseEvent {}
 
 class DeleteAllHistory extends BusinessResponseEvent {}
+
+class FetchHistory extends BusinessResponseEvent {}
+
+class AnimationCompleted extends BusinessResponseEvent {
+  final int index;
+
+  const AnimationCompleted(this.index);
+
+  @override
+  List<Object> get props => [index];
+}

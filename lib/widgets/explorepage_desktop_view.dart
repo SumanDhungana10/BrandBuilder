@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:krofile_ai/bloc/bloc/explore_bloc.dart';
 import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
-import 'package:krofile_ai/bloc/explorescreen/explorescreen_bloc.dart';
 import 'package:krofile_ai/screen/home_screen.dart';
 
 class ExplorePageDeskTop extends StatefulWidget {
@@ -48,20 +48,24 @@ class _ExplorePageDeskTopState extends State<ExplorePageDeskTop> {
 
   void _scrollListener() {
     if (_scrollController.offset > 0) {
-      context.read<ExploreScreenBloc>().add(ShowLeftButton());
+      context.read<ExploreBloc>().add(SLeftButton());
     } else {
-      context.read<ExploreScreenBloc>().add(HideLeftButton());
+      context.read<ExploreBloc>().add(HLeftButton());
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ExploreScreenBloc, ExploreScreenState>(
+    return BlocBuilder<ExploreBloc, ExploreState>(
       builder: (context, state) {
-        final activeIndex = state.actveCategoryIndex;
+        final activeIndex = state.activeCategoryIndex;
         final activeSubCategoryIndex = state.activeSubCategoryIndex;
+
         return Padding(
-          padding: const EdgeInsets.only(left: 32, top: 32),
+          padding: const EdgeInsets.only(
+            left: 32,
+            top: 32,
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -80,12 +84,15 @@ class _ExplorePageDeskTopState extends State<ExplorePageDeskTop> {
                                 index < state.categories.length / 2;
                                 index++)
                               Padding(
-                                padding: const EdgeInsets.only(left: 12),
+                                padding: const EdgeInsets.only(right: 15),
                                 child: ElevatedButton(
                                   onPressed: () {
                                     context
-                                        .read<ExploreScreenBloc>()
-                                        .add(HandleCategoryButton(index));
+                                        .read<ExploreBloc>()
+                                        .add(HandelCategoryButton(index));
+                                    // context
+                                    //     .read<ExploreBloc>()
+                                    //     .add(FetchExploreSubCategories(index));
                                   },
                                   style: ElevatedButton.styleFrom(
                                     elevation: 0,
@@ -103,7 +110,7 @@ class _ExplorePageDeskTopState extends State<ExplorePageDeskTop> {
                                     ),
                                   ),
                                   child: Text(
-                                    state.categories[index].name,
+                                    state.categories[index],
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
@@ -113,47 +120,48 @@ class _ExplorePageDeskTopState extends State<ExplorePageDeskTop> {
                               ),
                           ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: Row(
-                            children: [
-                              for (int index = state.categories.length ~/ 2;
-                                  index < state.categories.length;
-                                  index++)
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 12),
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      context
-                                          .read<ExploreScreenBloc>()
-                                          .add(HandleCategoryButton(index));
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      elevation: 0,
-                                      backgroundColor: (activeIndex == index)
-                                          ? const Color(0xFF18C554)
-                                          : const Color(0xFFFFFFFF),
-                                      foregroundColor: (activeIndex == index)
-                                          ? const Color(0xFFFFFFFF)
-                                          : const Color(0xFF73767B),
-                                      padding: const EdgeInsets.all(20),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(14),
-                                        side: const BorderSide(
-                                            color: Colors.grey, width: 1.0),
-                                      ),
+                        Row(
+                          children: [
+                            for (int index = state.categories.length ~/ 2;
+                                index < state.categories.length;
+                                index++)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 12, right: 15),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    context
+                                        .read<ExploreBloc>()
+                                        .add(HandelCategoryButton(index));
+                                    context
+                                        .read<ExploreBloc>()
+                                        .add(FetchExploreSubCategories(index));
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: 0,
+                                    backgroundColor: (activeIndex == index)
+                                        ? const Color(0xFF18C554)
+                                        : const Color(0xFFFFFFFF),
+                                    foregroundColor: (activeIndex == index)
+                                        ? const Color(0xFFFFFFFF)
+                                        : const Color(0xFF73767B),
+                                    padding: const EdgeInsets.all(20),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                      side: const BorderSide(
+                                          color: Colors.grey, width: 1.0),
                                     ),
-                                    child: Text(
-                                      state.categories[index].name,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                  ),
+                                  child: Text(
+                                    state.categories[index],
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
-                            ],
-                          ),
+                              ),
+                          ],
                         )
                       ],
                     ),
@@ -200,137 +208,136 @@ class _ExplorePageDeskTopState extends State<ExplorePageDeskTop> {
                       color: const Color(0xFFE5E5E5),
                       width: 1.0,
                     )),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: state.categories[activeIndex].subcategories.isEmpty
-                          ? const Center(
-                              child: Text("No subcategories"),
-                            )
-                          : ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: state
-                                  .categories[activeIndex].subcategories.length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      alignment: Alignment.centerLeft,
-                                      elevation: 0,
-                                      backgroundColor:
-                                          (activeSubCategoryIndex == index)
-                                              ? const Color(0xFF18C554)
-                                              : const Color(0xFFFFFFFF),
-                                      foregroundColor:
-                                          (activeSubCategoryIndex == index)
-                                              ? const Color(0xFFFFFFFF)
-                                              : const Color(0xFF73767B),
-                                      padding: const EdgeInsets.all(16),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(14),
-                                        side: const BorderSide(
-                                            color: Colors.grey, width: 1.0),
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      context
-                                          .read<ExploreScreenBloc>()
-                                          .add(SetActiveSubCategory(index));
-                                    },
-                                    child: Text(
-                                        state.categories[activeIndex]
-                                            .subcategories[index].name,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                        )),
-                                  ),
-                                );
-                              },
-                            ),
-                    ),
-                    const SizedBox(width: 34),
-                    Expanded(
-                      flex: 4,
-                      child: state.categories[activeIndex].subcategories
-                                  .isEmpty ||
-                              state
-                                  .categories[activeIndex]
-                                  .subcategories[activeSubCategoryIndex]
-                                  .items
-                                  .isEmpty
-                          ? const Center(
-                              child: Text("No items"),
-                            )
-                          : ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: state
-                                  .categories[activeIndex]
-                                  .subcategories[activeSubCategoryIndex]
-                                  .items
-                                  .length,
-                              itemBuilder: (context, index) {
-                                return Container(
-                                  margin: const EdgeInsets.only(bottom: 24),
-                                  decoration: const BoxDecoration(
-                                      border: Border(
-                                          bottom: BorderSide(
-                                              color: Color(0xFFE5E5E5),
-                                              width: 1.0))),
-                                  padding: const EdgeInsets.only(
-                                    bottom: 24,
-                                  ),
-                                  child: ListTile(
-                                    title: Text(
-                                      state
-                                          .categories[activeIndex]
-                                          .subcategories[activeSubCategoryIndex]
-                                          .items[index],
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xFF151515)),
-                                    ),
-                                    trailing: IconButton(
-                                      icon: const Icon(
-                                        Icons.arrow_forward_ios,
-                                        color: Color(
-                                          0xFF151515,
+                child: (state.isSubCategoriesLoading)
+                    ? const Center(child: CircularProgressIndicator())
+                    : Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: state.subCategories.isEmpty
+                                ? const Center(
+                                    child: Text("No subcategories"),
+                                  )
+                                : ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: state.subCategories.length,
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 12),
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            alignment: Alignment.centerLeft,
+                                            elevation: 0,
+                                            backgroundColor:
+                                                (activeSubCategoryIndex ==
+                                                        index)
+                                                    ? const Color(0xFF18C554)
+                                                    : const Color(0xFFFFFFFF),
+                                            foregroundColor:
+                                                (activeSubCategoryIndex ==
+                                                        index)
+                                                    ? const Color(0xFFFFFFFF)
+                                                    : const Color(0xFF73767B),
+                                            padding: const EdgeInsets.all(16),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                              side: const BorderSide(
+                                                  color: Colors.grey,
+                                                  width: 1.0),
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            context.read<ExploreBloc>().add(
+                                                HandelSubCategoryButton(index));
+                                            context
+                                                .read<ExploreBloc>()
+                                                .add(FetchQuestions());
+                                          },
+                                          child: Text(
+                                              state.subCategories[index],
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                              )),
                                         ),
-                                        size: 16,
-                                      ),
-                                      onPressed: () {},
-                                    ),
-                                    onTap: () {
-                                      Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const HomeScreen()));
-                                      BlocProvider.of<BusinessResponseBloc>(
-                                              context)
-                                          .add(HandleQuestionType());
-                                      BlocProvider.of<BusinessResponseBloc>(
-                                              context)
-                                          .add(AddQuestionAnswerList(state
-                                              .categories[
-                                                  state.actveCategoryIndex]
-                                              .subcategories[
-                                                  state.activeSubCategoryIndex]
-                                              .items[index]));
+                                      );
                                     },
                                   ),
-                                );
-                              },
-                            ),
-                    ),
-                  ],
-                ),
+                          ),
+                          const SizedBox(width: 34),
+                          Flexible(
+                            flex: 4,
+                            child: (state.isQuestionsLoading)
+                                ? const Center(
+                                    child: CircularProgressIndicator())
+                                : state.subCategories.isEmpty ||
+                                        state.questions.isEmpty
+                                    ? const Center(
+                                        child: Text("No items"),
+                                      )
+                                    : ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: state.questions.length,
+                                        itemBuilder: (context, index) {
+                                          return Container(
+                                            margin: const EdgeInsets.only(
+                                                bottom: 24),
+                                            decoration: const BoxDecoration(
+                                                border: Border(
+                                                    bottom: BorderSide(
+                                                        color:
+                                                            Color(0xFFE5E5E5),
+                                                        width: 1.0))),
+                                            padding: const EdgeInsets.only(
+                                              bottom: 24,
+                                            ),
+                                            child: ListTile(
+                                              title: Text(
+                                                state.questions[index],
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Color(0xFF151515)),
+                                              ),
+                                              trailing: IconButton(
+                                                icon: const Icon(
+                                                  Icons.arrow_forward_ios,
+                                                  color: Color(
+                                                    0xFF151515,
+                                                  ),
+                                                  size: 16,
+                                                ),
+                                                onPressed: () {},
+                                              ),
+                                              onTap: () {
+                                                Navigator.pushReplacement(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const HomeScreen()));
+                                                BlocProvider.of<
+                                                            BusinessResponseBloc>(
+                                                        context)
+                                                    .add(HandleQuestionType());
+                                                BlocProvider.of<
+                                                            BusinessResponseBloc>(
+                                                        context)
+                                                    .add(AddQuestionAnswerList(
+                                                        state
+                                                            .questions[index]));
+                                              },
+                                            ),
+                                          );
+                                        },
+                                      ),
+                          ),
+                        ],
+                      ),
               )
             ],
           ),

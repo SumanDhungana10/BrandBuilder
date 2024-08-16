@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:krofile_ai/responsive.dart';
 import 'package:krofile_ai/screen/home_screen.dart';
 
 class OneBackButton extends StatelessWidget {
@@ -30,7 +31,7 @@ class OneBackButton extends StatelessWidget {
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 color: Color(0xFF73767B)),
-          ),
+          )
         ],
       ),
     );

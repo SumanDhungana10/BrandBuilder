@@ -100,8 +100,8 @@ class _SibeBarDrawerState extends State<SibeBarDrawer> {
                         }).toList(),
                       ),
                       Expanded(
-                        child:
-                            BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
+                        child: BlocBuilder<BusinessResponseBloc,
+                            BusinessResponseState>(
                           builder: (context, state) {
                             return ListView.builder(
                               itemCount: selectedList.length,
@@ -127,9 +127,8 @@ class _SibeBarDrawerState extends State<SibeBarDrawer> {
                                     context
                                         .read<BusinessResponseBloc>()
                                         .add(HandleQuestionType());
-                                    context
-                                        .read<BusinessResponseBloc>()
-                                        .add(AddQuestionAnswerList(
+                                    context.read<BusinessResponseBloc>().add(
+                                        AddQuestionAnswerList(
                                             selectedList[index]));
                                   },
                                 );
@@ -174,59 +173,59 @@ class _SibeBarDrawerState extends State<SibeBarDrawer> {
                               )
                             ],
                           ),
-                          Expanded(
-                            child: (state.historyList.isNotEmpty)
-                                ? ListView.builder(
-                                    itemCount: historyList.length,
-                                    itemBuilder: (context, index) {
-                                      return Container(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            0, 10, 0, 10),
-                                        decoration: const BoxDecoration(
-                                            border: Border(
-                                          bottom: BorderSide(
-                                            color: Color(0xFFE5E5E5),
-                                            width: 1,
-                                          ),
-                                        )),
-                                        child: ListTile(
-                                          title: Text(
-                                            historyList[index]['question']!,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          subtitle: Text(
-                                            historyList[index]['answer']!,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          trailing: const Icon(
-                                            Icons.arrow_forward_ios,
-                                            size: 16,
-                                            color: Color(0xFF73767B),
-                                          ),
-                                          onTap: () {
-                                            context
-                                                .read<BusinessResponseBloc>()
-                                                .add(ResetQuestionAnswerList());
-                                            context
-                                                .read<BusinessResponseBloc>()
-                                                .add(HandleQuestionType());
+                          // Expanded(
+                          //   child: (state.historyList.isNotEmpty)
+                          //       ? ListView.builder(
+                          //           itemCount: historyList.length,
+                          //           itemBuilder: (context, index) {
+                          //             return Container(
+                          //               padding: const EdgeInsets.fromLTRB(
+                          //                   0, 10, 0, 10),
+                          //               decoration: const BoxDecoration(
+                          //                   border: Border(
+                          //                 bottom: BorderSide(
+                          //                   color: Color(0xFFE5E5E5),
+                          //                   width: 1,
+                          //                 ),
+                          //               )),
+                          //               child: ListTile(
+                          //                 title: Text(
+                          //                   historyList[index]['question']!,
+                          //                   maxLines: 2,
+                          //                   overflow: TextOverflow.ellipsis,
+                          //                 ),
+                          //                 subtitle: Text(
+                          //                   historyList[index]['answer']!,
+                          //                   maxLines: 2,
+                          //                   overflow: TextOverflow.ellipsis,
+                          //                 ),
+                          //                 trailing: const Icon(
+                          //                   Icons.arrow_forward_ios,
+                          //                   size: 16,
+                          //                   color: Color(0xFF73767B),
+                          //                 ),
+                          //                 onTap: () {
+                          //                   context
+                          //                       .read<BusinessResponseBloc>()
+                          //                       .add(ResetQuestionAnswerList());
+                          //                   context
+                          //                       .read<BusinessResponseBloc>()
+                          //                       .add(HandleQuestionType());
 
-                                            context
-                                                .read<BusinessResponseBloc>()
-                                                .add(ShowHistoryData(
-                                                    historyList[index]
-                                                        ['question']!,
-                                                    historyList[index]
-                                                        ['answer']!));
-                                          },
-                                        ),
-                                      );
-                                    },
-                                  )
-                                : const Center(child: Text("No History")),
-                          )
+                          //                   context
+                          //                       .read<BusinessResponseBloc>()
+                          //                       .add(ShowHistoryData(
+                          //                           historyList[index]
+                          //                               ['question']!,
+                          //                           historyList[index]
+                          //                               ['answer']!));
+                          //                 },
+                          //               ),
+                          //             );
+                          //           },
+                          //         )
+                          //       : const Center(child: Text("No History")),
+                          // )
                         ],
                       ),
                     );

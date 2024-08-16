@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
 import 'package:krofile_ai/bloc/homescreen/homescreen_bloc.dart';
 import 'package:krofile_ai/data/allList.dart';
+import 'package:krofile_ai/services/showhistory_services.dart';
 
 class SideBar extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -23,7 +24,7 @@ class _SideBarState extends State<SideBar> {
     'Customer Retention'
   ];
 
-  String dropDownValue = ''; // Initialize dropDownValue
+  String dropDownValue = '';
 
   @override
   void initState() {
@@ -100,7 +101,8 @@ class _SideBarState extends State<SideBar> {
                         builder: (context, state) {
                           bool isLastAnswerLoading =
                               state.questionAnswerList.isNotEmpty &&
-                                  state.questionAnswerList.last.isloading;
+                                  !state.questionAnswerList.last
+                                      .isAnimationCompleted;
 
                           return ListView.builder(
                             itemCount: selectedList.length,
@@ -139,7 +141,7 @@ class _SideBarState extends State<SideBar> {
               )
             : BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
                 builder: (context, state) {
-                  final historyList = state.historyList.reversed.toList();
+                  final historyList = state.historyList;
                   return Container(
                     padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
                     decoration: const BoxDecoration(
@@ -170,59 +172,65 @@ class _SideBarState extends State<SideBar> {
                             ),
                           ],
                         ),
-                        Expanded(
-                          child: (state.historyList.isNotEmpty)
-                              ? ListView.builder(
-                                  itemCount: historyList.length,
-                                  itemBuilder: (context, index) {
-                                    return Container(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          0, 10, 0, 10),
-                                      decoration: const BoxDecoration(
-                                          border: Border(
-                                        bottom: BorderSide(
-                                          color: Color(0xFFE5E5E5),
-                                          width: 1,
-                                        ),
-                                      )),
-                                      child: ListTile(
-                                        title: Text(
-                                          historyList[index]['question']!,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        subtitle: Text(
-                                          historyList[index]['answer']!,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        trailing: const Icon(
-                                          Icons.arrow_forward_ios,
-                                          size: 16,
-                                          color: Color(0xFF73767B),
-                                        ),
-                                        onTap: () {
-                                          context
-                                              .read<BusinessResponseBloc>()
-                                              .add(ResetQuestionAnswerList());
-                                          context
-                                              .read<BusinessResponseBloc>()
-                                              .add(HandleQuestionType());
+                        (state.isHistoryLoading)
+                            ? const Center(
+                                child: CircularProgressIndicator(),
+                              )
+                            : (state.historyList.isEmpty)
+                                ? const Text("No history found")
+                                : Expanded(
+                                    child: ListView.builder(
+                                      itemCount: historyList.length,
+                                      itemBuilder: (context, index) {
+                                        return Container(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              0, 10, 0, 10),
+                                          decoration: const BoxDecoration(
+                                            border: Border(
+                                              bottom: BorderSide(
+                                                color: Color(0xFFE5E5E5),
+                                                width: 1,
+                                              ),
+                                            ),
+                                          ),
+                                          child: ListTile(
+                                            title: Text(
+                                              historyList[index][
+                                                  2], // assuming 'question' is at index 2
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            subtitle: Text(
+                                              historyList[index][
+                                                  3], // assuming 'answer' is at index 3
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            trailing: const Icon(
+                                              Icons.arrow_forward_ios,
+                                              size: 16,
+                                              color: Color(0xFF73767B),
+                                            ),
+                                            onTap: () {
+                                              context
+                                                  .read<BusinessResponseBloc>()
+                                                  .add(
+                                                      ResetQuestionAnswerList());
+                                              context
+                                                  .read<BusinessResponseBloc>()
+                                                  .add(HandleQuestionType());
 
-                                          context
-                                              .read<BusinessResponseBloc>()
-                                              .add(ShowHistoryData(
-                                                  historyList[index]
-                                                      ['question']!,
-                                                  historyList[index]
-                                                      ['answer']!));
-                                        },
-                                      ),
-                                    );
-                                  },
-                                )
-                              : const Center(child: Text("No History")),
-                        )
+                                              context
+                                                  .read<BusinessResponseBloc>()
+                                                  .add(ShowHistoryData(
+                                                      historyList[index][2]!,
+                                                      historyList[index][3]!));
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  )
                       ],
                     ),
                   );

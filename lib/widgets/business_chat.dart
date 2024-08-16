@@ -6,10 +6,8 @@ import 'package:krofile_ai/bloc/customizescreen/customizescreen_bloc.dart';
 import 'package:krofile_ai/bloc/homescreen/homescreen_bloc.dart';
 import 'package:krofile_ai/responsive.dart';
 import 'package:krofile_ai/screen/explore_screen.dart';
-import 'package:krofile_ai/services/business_chat_services.dart';
+import 'package:krofile_ai/widgets/prefixButton.dart';
 import 'package:krofile_ai/widgets/response_ui.dart';
-import 'package:krofile_ai/widgets/viewfaq_alert.dart';
-import 'package:popover/popover.dart';
 
 class BusinessChat extends StatefulWidget {
   const BusinessChat({super.key, required this.scaffoldKey});
@@ -30,15 +28,6 @@ class _BusinessChatState extends State<BusinessChat> {
     _inputQuestion.dispose();
   }
 
-  Future<void> _viewFaq() {
-    return showDialog(
-        barrierColor: const Color(0xFF000000).withOpacity(0.8),
-        context: context,
-        builder: (BuildContext context) {
-          return const ViewFAQ();
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,6 +41,7 @@ class _BusinessChatState extends State<BusinessChat> {
               children: [
                 BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
                     builder: (context, state) {
+                  
                   return (state.isQuestionType == false)
                       ? Expanded(
                           child: Column(
@@ -195,7 +185,6 @@ class _BusinessChatState extends State<BusinessChat> {
                           _inputQuestion.text != state.questionFromFAQ) {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           if (_inputQuestion.text != state.questionFromFAQ) {
-                            // Check again to avoid race conditions
                             _inputQuestion.text = state.questionFromFAQ;
                           }
                         });
@@ -204,111 +193,51 @@ class _BusinessChatState extends State<BusinessChat> {
                       return BlocBuilder<BusinessResponseBloc,
                           BusinessResponseState>(
                         builder: (context, state) {
-                          bool isLastAnswerLoading =
+                          bool isAnimationCompleted =
                               state.questionAnswerList.isNotEmpty &&
-                                  state.questionAnswerList.last.isloading;
+                                  !state.questionAnswerList.last
+                                      .isAnimationCompleted;
 
                           return TextFormField(
                             controller: _inputQuestion,
                             focusNode: _textFocusNode,
-                            readOnly: isLastAnswerLoading,
+                            readOnly: isAnimationCompleted,
                             decoration: InputDecoration(
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 borderSide: const BorderSide(
                                     width: 1, color: Color(0xFF18C554)),
                               ),
-                              prefixIcon: Padding(
+                              prefixIcon: const PrefixButton(),
+                              suffixIcon: Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: IconButton(
-                                  icon: SvgPicture.asset(
-                                    "assets/images/arrow-up.svg",
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF18C554),
+                                    shape: BoxShape.circle,
                                   ),
-                                  onPressed: () {
-                                    if (state.faq.isNotEmpty) {
-                                      _viewFaq();
-                                    } else {
-                                      showPopover(
-                                          context: context,
-                                          barrierColor: Colors.transparent,
-                                          direction: PopoverDirection.top,
-                                          bodyBuilder: (context) {
-                                            return Container(
-                                              padding: const EdgeInsets.all(16),
-                                              width: 450,
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      const Row(
-                                                        children: [
-                                                          Icon(
-                                                            Icons.info,
-                                                            color: Colors.green,
-                                                          ),
-                                                          Text("Instructions",
-                                                              style: TextStyle(
-                                                                  fontSize: 24,
-                                                                  color: Color(
-                                                                      0xFF151515),
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600)),
-                                                        ],
-                                                      ),
-                                                      IconButton(
-                                                        icon: const Icon(
-                                                            Icons.close),
-                                                        onPressed: () {
-                                                          Navigator.pop(
-                                                              context);
-                                                        },
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(height: 10),
-                                                  const Text(
-                                                      "To our FAQ section! To add a question, click on the plus icon (+) next to existing questions. You can add up to 10 questions. Need to find the FAQ? Click the plus icon (+) on the search field. Questions? Reach out to us. Happy FAQ-ing!")
-                                                ],
-                                              ),
-                                            );
-                                          });
-                                    }
-                                  },
+                                  child: IconButton(
+                                    icon: SvgPicture.asset(
+                                        "assets/images/send.svg"),
+                                    onPressed: () {
+                                      if (_inputQuestion.text.isNotEmpty &&
+                                          !isAnimationCompleted) {
+                                        context
+                                            .read<BusinessResponseBloc>()
+                                            .add(ResetTextFieldController());
+                                        context
+                                            .read<BusinessResponseBloc>()
+                                            .add(HandleQuestionType());
+                                        context
+                                            .read<BusinessResponseBloc>()
+                                            .add(AddQuestionAnswerList(
+                                                _inputQuestion.text));
+                                        _inputQuestion.clear();
+                                      }
+                                    },
+                                  ),
                                 ),
                               ),
-                              suffixIcon: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF18C554),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: IconButton(
-                                      icon: SvgPicture.asset(
-                                        "assets/images/send.svg",
-                                      ),
-                                      onPressed: () {
-                                        if (_inputQuestion.text.isNotEmpty) {
-                                          context
-                                              .read<BusinessResponseBloc>()
-                                              .add(ResetTextFieldController());
-                                          context
-                                              .read<BusinessResponseBloc>()
-                                              .add(HandleQuestionType());
-                                          context
-                                              .read<BusinessResponseBloc>()
-                                              .add(AddQuestionAnswerList(
-                                                  _inputQuestion.text));
-                                          _inputQuestion.clear();
-                                        }
-                                      },
-                                    ),
-                                  )),
                               hintText: 'Message Krofile...',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -317,7 +246,8 @@ class _BusinessChatState extends State<BusinessChat> {
                               fillColor: Colors.white,
                             ),
                             onFieldSubmitted: (value) {
-                              if (_inputQuestion.text.isNotEmpty) {
+                              if (_inputQuestion.text.isNotEmpty &&
+                                  !isAnimationCompleted) {
                                 context
                                     .read<BusinessResponseBloc>()
                                     .add(ResetTextFieldController());
@@ -328,7 +258,6 @@ class _BusinessChatState extends State<BusinessChat> {
                                     AddQuestionAnswerList(_inputQuestion.text));
                                 FocusScope.of(context)
                                     .requestFocus(_textFocusNode);
-
                                 _inputQuestion.clear();
                               }
                             },
@@ -342,9 +271,10 @@ class _BusinessChatState extends State<BusinessChat> {
                 IconButton(
                   onPressed: () {
                     Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ExploreScreen()));
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ExploreScreen()),
+                    );
                   },
                   icon: SvgPicture.asset("assets/images/apps.svg"),
                 ),

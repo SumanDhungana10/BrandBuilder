@@ -4,11 +4,11 @@ class BusinessResponseState extends Equatable {
   final bool isQuestionType;
   final List<String> questionList;
   final List<QuestionAnswer> questionAnswerList;
-  final List<Map<String, dynamic>> historyList;
+  final List<List<dynamic>> historyList;
   final List<String> faq;
   final String questionFromFAQ;
-  final bool isLoading;
-  
+  final bool isHistoryLoading;
+  final Map<int, bool> regeneratingIndices;
 
   const BusinessResponseState({
     this.isQuestionType = false,
@@ -17,18 +17,19 @@ class BusinessResponseState extends Equatable {
     this.historyList = const [],
     this.faq = const [],
     this.questionFromFAQ = "",
-    this.isLoading = false,
+    this.isHistoryLoading = false,
+    this.regeneratingIndices = const {},
   });
 
   BusinessResponseState copyWith({
     bool? isQuestionType,
     List<String>? questionList,
     List<QuestionAnswer>? questionAnswerList,
-    List<Map<String, dynamic>>? historyList,
+    List<List<dynamic>>? historyList,
     List<String>? faq,
     String? questionFromFAQ,
-    bool? isLoading,
-    bool? isNewResponse,
+    bool? isHistoryLoading,
+    Map<int, bool>? regeneratingIndices,
   }) {
     return BusinessResponseState(
       isQuestionType: isQuestionType ?? this.isQuestionType,
@@ -37,7 +38,8 @@ class BusinessResponseState extends Equatable {
       historyList: historyList ?? this.historyList,
       faq: faq ?? this.faq,
       questionFromFAQ: questionFromFAQ ?? this.questionFromFAQ,
-      isLoading: isLoading ?? this.isLoading,
+      isHistoryLoading: isHistoryLoading ?? this.isHistoryLoading,
+      regeneratingIndices: regeneratingIndices ?? this.regeneratingIndices,
     );
   }
 
@@ -49,33 +51,53 @@ class BusinessResponseState extends Equatable {
         historyList,
         faq,
         questionFromFAQ,
-        isLoading,
+        isHistoryLoading,
+        regeneratingIndices,
       ];
 }
 
 class QuestionAnswer extends Equatable {
   final String question;
   final String answer;
-  final bool isloading;
+  final bool isLoading;
   final bool isNewResponse;
+  final bool isRegenerating;
+  final bool isAnimationCompleted;
 
   const QuestionAnswer(
-      this.question, this.answer, this.isloading, this.isNewResponse);
-
-  @override
-  List<Object> get props => [question, answer, isloading, isNewResponse];
+    this.question,
+    this.answer,
+    this.isLoading,
+    this.isNewResponse, {
+    this.isRegenerating = false,
+    this.isAnimationCompleted = false,
+  });
 
   QuestionAnswer copyWith({
     String? question,
     String? answer,
-    bool? isloading,
+    bool? isLoading,
     bool? isNewResponse,
+    bool? isRegenerating,
+    bool? isAnimationCompleted,
   }) {
     return QuestionAnswer(
       question ?? this.question,
       answer ?? this.answer,
-      isloading ?? this.isloading,
+      isLoading ?? this.isLoading,
       isNewResponse ?? this.isNewResponse,
+      isRegenerating: isRegenerating ?? this.isRegenerating,
+      isAnimationCompleted: isAnimationCompleted ?? this.isAnimationCompleted,
     );
   }
+
+  @override
+  List<Object> get props => [
+        question,
+        answer,
+        isLoading,
+        isNewResponse,
+        isRegenerating,
+        isAnimationCompleted
+      ];
 }

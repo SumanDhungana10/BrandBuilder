@@ -1,8 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:krofile_ai/bloc/explorescreen/explorescreen_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:krofile_ai/bloc/bloc/explore_bloc.dart';
 import 'package:krofile_ai/responsive.dart';
 import 'package:krofile_ai/screen/home_screen.dart';
 import 'package:krofile_ai/widgets/back_button.dart';
@@ -18,6 +18,8 @@ class ExploreScreen extends StatefulWidget {
 
 class _ExploreScreenState extends State<ExploreScreen>
     with TickerProviderStateMixin {
+  int? _hoveredIndex;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,10 +113,11 @@ class _ExploreScreenState extends State<ExploreScreen>
                     children: [
                       IconButton(
                         onPressed: () {
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const HomeScreen()));
+                          // Navigator.pushReplacement(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (context) => const HomeScreen()));
+                          context.pop();
                         },
                         icon: const Icon(Icons.arrow_back_ios,
                             size: 16, color: Color(0xFF73767B)),
@@ -179,15 +182,11 @@ class _ExploreScreenState extends State<ExploreScreen>
                   ),
                 ),
               ),
-            BlocBuilder<ExploreScreenBloc, ExploreScreenState>(
+            BlocBuilder<ExploreBloc, ExploreState>(
               builder: (context, state) {
-                if (state.isLoading) {
+                if (state.isCategoriesLoading) {
                   return const Center(
                     child: CircularProgressIndicator(),
-                  );
-                } else if (state.errorMessage != null) {
-                  return Center(
-                    child: Text(state.errorMessage!),
                   );
                 } else {
                   return (!state.showSubCategory)
@@ -201,22 +200,30 @@ class _ExploreScreenState extends State<ExploreScreen>
                                   index < state.categories.length;
                                   index++)
                                 ElevatedButton(
+                                  onHover: (_) {
+                                    setState(() {
+                                      _hoveredIndex = index;
+                                    });
+                                  },
                                   onPressed: () {
                                     context
-                                        .read<ExploreScreenBloc>()
-                                        .add(HandleCategoryButton(index));
+                                        .read<ExploreBloc>()
+                                        .add(HandelCategoryButton(index));
+                                    context
+                                        .read<ExploreBloc>()
+                                        .add(ReorderCategories(index));
+                                    // context
+                                    //     .read<ExploreBloc>()
+                                    //     .add(FetchExploreSubCategories(index));
                                   },
                                   style: ElevatedButton.styleFrom(
                                     elevation: 0,
-                                    // backgroundColor:
-                                    //     (state.actveCategoryIndex == index)
-                                    //         ? const Color(0xFF18C554)
-                                    //         : const Color(0xFFFFFFFF),
-                                    foregroundColor:
-                                        // (state.actveCategoryIndex == index)
-                                        //     ? const Color(0xFFFFFFFF)
-                                        // :
-                                        const Color(0xFF73767B),
+                                    backgroundColor: _hoveredIndex == index
+                                        ? const Color(0xFF18C554)
+                                        : const Color(0xFFFFFFFF),
+                                    foregroundColor: _hoveredIndex == index
+                                        ? const Color(0xFFFFFFFF)
+                                        : const Color(0xFF73767B),
                                     padding: const EdgeInsets.all(20),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(14),
@@ -225,7 +232,7 @@ class _ExploreScreenState extends State<ExploreScreen>
                                     ),
                                   ),
                                   child: Text(
-                                    state.categories[index].name,
+                                    state.categories[index],
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,

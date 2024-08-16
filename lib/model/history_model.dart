@@ -11,28 +11,35 @@ class HistoryItem {
     required this.answer,
   });
 
-  // Factory method to create a HistoryItem from JSON
-  factory HistoryItem.fromJson(Map<String, dynamic> json) {
+  factory HistoryItem.fromJson(List<dynamic> json) {
     return HistoryItem(
-      id: json[0] as int,
-      email: json[1] as String,
-      question: json[2] as String,
-      answer: json[3] as String,
+      id: json[0],
+      email: json[1],
+      question: json[2],
+      answer: json[3],
     );
   }
 
-  // Method to convert a HistoryItem to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'email': email,
-      'question': question,
-      'answer': answer,
-    };
+  List<dynamic> toJson() {
+    return [id, email, question, answer];
   }
 }
 
-// Parsing the JSON data to a List of HistoryItem
-List<HistoryItem> parseHistory(List<dynamic> json) {
-  return json.map((item) => HistoryItem.fromJson(item)).toList();
+class HistoryResponse {
+  final List<HistoryItem> history;
+
+  HistoryResponse({required this.history});
+
+  factory HistoryResponse.fromJson(Map<String, dynamic> json) {
+    var historyList = json['history'] as List;
+    List<HistoryItem> historyItems =
+        historyList.map((item) => HistoryItem.fromJson(item)).toList();
+    return HistoryResponse(history: historyItems);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'history': history.map((item) => item.toJson()).toList(),
+    };
+  }
 }

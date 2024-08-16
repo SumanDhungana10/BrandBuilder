@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:krofile_ai/bloc/explorescreen/explorescreen_bloc.dart';
+import 'package:krofile_ai/bloc/bloc/explore_bloc.dart';
+import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
 import 'package:krofile_ai/bloc/mylist/mylist_bloc.dart';
 import 'package:krofile_ai/bloc/homescreen/homescreen_bloc.dart';
 import 'package:krofile_ai/responsive.dart';
-import 'package:krofile_ai/services/showHIstory_service.dart';
+import 'package:krofile_ai/services/faq_services.dart';
 import 'package:krofile_ai/widgets/business_chat.dart';
 import 'package:krofile_ai/widgets/clear_chat_alert.dart';
 import 'package:krofile_ai/widgets/delete_all_searchhistory_alert.dart';
@@ -23,6 +24,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<BusinessResponseBloc>().add(GetFaq());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,9 +79,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             borderRadius: BorderRadius.circular(5)),
                       ),
                       onPressed: () {
-                        context
-                            .read<ExploreScreenBloc>()
-                            .add(FetchExploreCategories());
+                        // context
+                        //     .read<ExploreScreenBloc>()
+                        //     .add(FetchExploreCategories());
+                        context.read<ExploreBloc>().add(ExploreCategories());
                         context.go('/KrofileAI/explore');
                       },
                       icon: SvgPicture.asset(
@@ -133,17 +141,28 @@ class _HomeScreenState extends State<HomeScreen> {
             return Row(
               children: [
                 Expanded(
-                  flex: 3,
+                  flex: state.isSideBarOpen ? 7 : 10,
                   child: BusinessChat(scaffoldKey: _scaffoldKey),
                 ),
                 if (Responsive.isDesktop(context))
                   AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
-                    width: (state.isSideBarOpen) ? 400 : 0,
+                    // width: (state.isSideBarOpen) ? 400 : 0,
+                    width: state.isSideBarOpen
+                        ? MediaQuery.of(context).size.width * 0.25
+                        : 0,
                     child: SideBar(
                       scaffoldKey: _scaffoldKey,
                     ),
                   )
+                // if (Responsive.isDesktop(context))
+                //   if (state.isSideBarOpen)
+                //     Expanded(
+                //       flex: 3,
+                //       child: SideBar(
+                //         scaffoldKey: _scaffoldKey,
+                //       ),
+                //     ),
               ],
             );
           },
@@ -193,71 +212,79 @@ class _ThreeDotMenuState extends State<ThreeDotMenu> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      child: MenuAnchor(
-        controller: _menuController,
-        style: const MenuStyle(
-          backgroundColor: WidgetStatePropertyAll(Color(0xFFFAFAFA)),
-          padding: WidgetStatePropertyAll(EdgeInsets.all(10)),
-        ),
-        menuChildren: [
-          SizedBox(
-            width: 200,
-            child: Column(
-              children: [
-                MenuItemButton(
-                  style: const ButtonStyle(
-                    padding: WidgetStatePropertyAll(
-                      EdgeInsets.symmetric(horizontal: 6, vertical: 16),
-                    ),
-                  ),
-                  child: const Text(
-                    'History',
-                  ),
-                  onPressed: () {
-                    context.read<HomeScreenBloc>().add(ToggleHistory());
-                    showHistory();
-                    if (Responsive.isMobile(context)) {
-                      Scaffold.of(context).openEndDrawer();
-                    }
-                  },
-                ),
-                MenuItemButton(
-                  onPressed: _viewClearAllAlert,
-                  child: const Text('Clear All Chat'),
-                ),
-                MenuItemButton(
-                  child: const Text('Customize'),
-                  onPressed: () {
-                    context.go('/KrofileAI/customize');
-                  },
-                ),
-                MenuItemButton(
-                  child: const Text('Incognito Mode'),
-                  onPressed: () {
-                    context.go('/KrofileAI/incognito');
-                  },
-                ),
-                MenuItemButton(
-                  onPressed: _viewDeleteHistoryAlert,
-                  child: const Text('Delete All Search History'),
-                ),
-                MenuItemButton(
-                  onPressed: _viewFeedBackAlert,
-                  child: const Text('Feedback'),
-                ),
-              ],
+      child: BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
+        builder: (context, state) {
+          return MenuAnchor(
+            controller: _menuController,
+            style: const MenuStyle(
+              backgroundColor: WidgetStatePropertyAll(Color(0xFFFAFAFA)),
+              padding: WidgetStatePropertyAll(EdgeInsets.all(10)),
             ),
-          ),
-        ],
-        builder: (context, controller, child) {
-          return IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {
-              if (controller.isOpen) {
-                controller.close();
-              } else {
-                controller.open();
-              }
+            menuChildren: [
+              SizedBox(
+                width: 200,
+                child: Column(
+                  children: [
+                    MenuItemButton(
+                      style: const ButtonStyle(
+                        padding: WidgetStatePropertyAll(
+                          EdgeInsets.symmetric(horizontal: 6, vertical: 16),
+                        ),
+                      ),
+                      child: const Text(
+                        'History',
+                      ),
+                      onPressed: () {
+                        context.read<HomeScreenBloc>().add(ToggleHistory());
+                        if (state.historyList.isEmpty) {
+                          context
+                              .read<BusinessResponseBloc>()
+                              .add(FetchHistory());
+                        }
+                        if (Responsive.isMobile(context)) {
+                          Scaffold.of(context).openEndDrawer();
+                        }
+                      },
+                    ),
+                    MenuItemButton(
+                      onPressed: _viewClearAllAlert,
+                      child: const Text('Clear All Chat'),
+                    ),
+                    MenuItemButton(
+                      child: const Text('Customize'),
+                      onPressed: () {
+                        context.go('/KrofileAI/customize');
+                      },
+                    ),
+                    MenuItemButton(
+                      child: const Text('Incognito Mode'),
+                      onPressed: () {
+                        context.go('/KrofileAI/incognito');
+                      },
+                    ),
+                    MenuItemButton(
+                      onPressed: _viewDeleteHistoryAlert,
+                      child: const Text('Delete All Search History'),
+                    ),
+                    MenuItemButton(
+                      onPressed: _viewFeedBackAlert,
+                      child: const Text('Feedback'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            builder: (context, controller, child) {
+              return IconButton(
+                icon: const Icon(Icons.more_vert),
+                onPressed: () {
+                  if (controller.isOpen) {
+                    controller.close();
+                  } else {
+                    controller.open();
+                  }
+                },
+              );
             },
           );
         },

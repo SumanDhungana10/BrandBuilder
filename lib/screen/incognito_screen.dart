@@ -1,12 +1,18 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:krofile_ai/bloc/bloc/incognitoresponse_bloc.dart';
+import 'package:krofile_ai/bloc/incognitoresponse/incognitoresponse_bloc.dart';
+import 'package:krofile_ai/helper.dart';
+import 'package:krofile_ai/services/incognito_file_services.dart';
+import 'package:krofile_ai/utils/skeleton.dart';
 import 'package:krofile_ai/utils/text_parse.dart';
+import 'package:krofile_ai/utils/typewriter_text.dart';
 import 'package:krofile_ai/widgets/incognito_alert.dart';
 import 'package:krofile_ai/widgets/incognito_exit_alert.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class IncognitoMode extends StatefulWidget {
   const IncognitoMode({super.key});
@@ -22,6 +28,9 @@ class _IncognitoModeState extends State<IncognitoMode> {
   PlatformFile? pickedFile;
   Uint8List? pickedFileBytes;
   bool isHoveringList = false;
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+
   @override
   void initState() {
     super.initState();
@@ -88,6 +97,8 @@ class _IncognitoModeState extends State<IncognitoMode> {
               ElevatedButton.icon(
                 onPressed: () {
                   _incognitoExitAlert(context);
+                  deleteIncognitoFile();
+                  deleteallIncognitoHistory();
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.all(20),
@@ -109,7 +120,23 @@ class _IncognitoModeState extends State<IncognitoMode> {
           ),
         ),
       ),
-      body: BlocBuilder<IncognitoResponseBloc, IncognitoResponseState>(
+      body: BlocConsumer<IncognitoResponseBloc, IncognitoResponseState>(
+        bloc: context.read<IncognitoResponseBloc>(),
+        listenWhen: (previous, current) =>
+            previous.fileUploadStatus != current.fileUploadStatus,
+        listener: (context, state) {
+          if (state.fileUploadStatus == FileUploadStatus.uploaded) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                duration: Duration(milliseconds: 2000),
+                content: Text('File uploaded successfully!')));
+            context.read<IncognitoResponseBloc>().add(ResetFileUploaded());
+          } else if (state.fileUploadStatus == FileUploadStatus.failed) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                duration: const Duration(milliseconds: 500),
+                content:
+                    Text('File upload failed: ${state.fileuploadedresponse}')));
+          }
+        },
         builder: (context, state) {
           final length = state.questionAnswerList.length;
           return (!state.isQuestionType)
@@ -153,10 +180,12 @@ class _IncognitoModeState extends State<IncognitoMode> {
                           itemBuilder: (context, index) {
                             final updateIndex =
                                 state.questionAnswerList.length - index - 1;
-                            final files =
-                                state.questionAnswerList[updateIndex].file;
-                            final question =
-                                state.questionAnswerList[updateIndex].question;
+                            final questionanswer =
+                                state.questionAnswerList[updateIndex];
+                            final question = questionanswer.question;
+                            final answer = questionanswer.answer;
+                            final isRegenerating =
+                                state.regeneratingIndices[updateIndex] ?? false;
 
                             return Column(
                               mainAxisAlignment: MainAxisAlignment.end,
@@ -195,83 +224,6 @@ class _IncognitoModeState extends State<IncognitoMode> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            if (files != null)
-                                              Row(
-                                                children: [
-                                                  if (files.extension ==
-                                                          'jpg' ||
-                                                      files.extension == 'png')
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              right: 10.0),
-                                                      child: Image.memory(
-                                                        files.bytes!,
-                                                        height: 100,
-                                                        width: 100,
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    )
-                                                  else
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              right: 10.0),
-                                                      child: Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(10),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                                color: darktheme
-                                                                    .colorScheme
-                                                                    .surface,
-                                                                shape: BoxShape
-                                                                    .rectangle,
-                                                                border: Border.all(
-                                                                    color: darktheme
-                                                                        .colorScheme
-                                                                        .secondary,
-                                                                    width: 1),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                  10,
-                                                                )),
-                                                        child: Row(
-                                                          children: [
-                                                            Center(
-                                                              child: Icon(
-                                                                files.extension ==
-                                                                        'pdf'
-                                                                    ? Icons
-                                                                        .picture_as_pdf
-                                                                    : Icons
-                                                                        .description,
-                                                                color: Colors
-                                                                    .white,
-                                                                size: 50,
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                                width: 10),
-                                                            Text(
-                                                              files.name,
-                                                              style: TextStyle(
-                                                                  fontSize: 16,
-                                                                  color: darktheme
-                                                                      .colorScheme
-                                                                      .primary),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                ],
-                                              ),
-                                            const SizedBox(
-                                                height:
-                                                    8), // Add some space between images and text
                                             Text(
                                               question,
                                               style: TextStyle(
@@ -312,127 +264,148 @@ class _IncognitoModeState extends State<IncognitoMode> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            (state
-                                                        .questionAnswerList[
-                                                            updateIndex]
-                                                        .isLoading ==
-                                                    true)
-                                                ? const LinearProgressIndicator(
-                                                    valueColor:
-                                                        AlwaysStoppedAnimation<
-                                                                Color>(
-                                                            Color(0xFF18C554)),
-                                                  )
-                                                // : Text(
-                                                //     state
-                                                //         .questionAnswerList[
-                                                //             updateIndex]
-                                                //         .answer,
-                                                //     style: TextStyle(
-                                                //       fontSize: 16,
-                                                //       color: darktheme
-                                                //           .colorScheme.primary,
-                                                //       fontWeight:
-                                                //           FontWeight.w400,
-                                                //     ),
-                                                //   ),
-                                                : RichText(
-                                                    text: TextSpan(
-                                                      children:
-                                                          convertToBoldText(state
-                                                              .questionAnswerList[
-                                                                  updateIndex]
-                                                              .answer, fontSize: 16),
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: darktheme
-                                                            .colorScheme
-                                                            .primary,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                      ),
+                                            if (questionanswer.isLoading ||
+                                                isRegenerating)
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: List.generate(
+                                                  3,
+                                                  (index) => const Padding(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 10),
+                                                    child: Skeletal(
+                                                      height: 16,
+                                                      width: double.infinity,
+                                                      isIncognito: true,
                                                     ),
                                                   ),
-                                            const SizedBox(height: 10),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    IconButton(
-                                                      tooltip: "Regenerate",
-                                                      onPressed: () {},
-                                                      icon: const Icon(
-                                                        Icons.replay_outlined,
-                                                        size: 24,
-                                                        color:
-                                                            Color(0xFFFFFFFF),
-                                                      ),
-                                                    ),
-                                                    IconButton(
-                                                      tooltip: "Share",
-                                                      onPressed: () {},
-                                                      icon: const Icon(
-                                                        Icons.share_outlined,
-                                                        size: 24,
-                                                        color:
-                                                            Color(0xFFFFFFFF),
-                                                      ),
-                                                    ),
-                                                    IconButton(
-                                                      tooltip: "Copy",
-                                                      onPressed: () {
-                                                        Clipboard.setData(ClipboardData(
-                                                                text: state
-                                                                    .questionAnswerList[
-                                                                        length -
-                                                                            index -
-                                                                            1]
-                                                                    .answer))
-                                                            .then((_) {
-                                                          ScaffoldMessenger.of(
-                                                                  context)
-                                                              .showSnackBar(const SnackBar(
-                                                                  duration: Duration(
-                                                                      milliseconds:
-                                                                          500),
-                                                                  content: Text(
-                                                                      'Copied to your clipboard!')));
-                                                        });
-                                                      },
-                                                      icon: const Icon(
-                                                        Icons
-                                                            .file_copy_outlined,
-                                                        size: 24,
-                                                        color:
-                                                            Color(0xFFFFFFFF),
-                                                      ),
-                                                    ),
-                                                  ],
                                                 ),
-                                                Row(
-                                                  children: [
-                                                    IconButton(
-                                                      icon: const Icon(
-                                                        Icons.thumb_up_alt,
-                                                        color:
-                                                            Color(0xFFFAFAFA),
+                                              )
+                                            else if (questionanswer
+                                                    .isNewResponse ||
+                                                !questionanswer
+                                                    .isAnimationCompleted)
+                                              CustomAnimatedText(
+                                                key: ValueKey(answer),
+                                                text: answer,
+                                                fontSize: 16,
+                                                textColor: darktheme
+                                                    .colorScheme.secondary,
+                                                index: updateIndex,
+                                                animationContext:
+                                                    AnimationContext
+                                                        .incognitoChat,
+                                              )
+                                            else
+                                              RichText(
+                                                text: TextSpan(
+                                                  children: convertToBoldText(
+                                                      answer,
+                                                      fontSize: 16,
+                                                      color: darktheme
+                                                          .colorScheme.primary),
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: darktheme
+                                                        .colorScheme.primary,
+                                                    fontWeight: FontWeight.w400,
+                                                  ),
+                                                ),
+                                              ),
+                                            const SizedBox(height: 10),
+                                            if (questionanswer
+                                                .isAnimationCompleted)
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      IconButton(
+                                                        tooltip: "Regenerate",
+                                                        onPressed:
+                                                            questionanswer
+                                                                    .isLoading
+                                                                ? null
+                                                                : () {
+                                                                    context
+                                                                        .read<
+                                                                            IncognitoResponseBloc>()
+                                                                        .add(RegenerateIncognitoAnswer(
+                                                                            updateIndex));
+                                                                  },
+                                                        icon: const Icon(
+                                                          Icons.replay_outlined,
+                                                          size: 24,
+                                                          color:
+                                                              Color(0xFFFFFFFF),
+                                                        ),
                                                       ),
-                                                      onPressed: () {},
-                                                    ),
-                                                    IconButton(
-                                                      icon: const Icon(
-                                                          Icons.thumb_down_alt,
-                                                          color: Color(
-                                                              0xFFFAFAFA)),
-                                                      onPressed: () {},
-                                                    )
-                                                  ],
-                                                )
-                                              ],
-                                            ),
+                                                      IconButton(
+                                                        tooltip: "Share",
+                                                        onPressed: () {},
+                                                        icon: const Icon(
+                                                          Icons.share_outlined,
+                                                          size: 24,
+                                                          color:
+                                                              Color(0xFFFFFFFF),
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                        tooltip: "Copy",
+                                                        onPressed: () {
+                                                          Clipboard.setData(ClipboardData(
+                                                                  text: state
+                                                                      .questionAnswerList[
+                                                                          length -
+                                                                              index -
+                                                                              1]
+                                                                      .answer))
+                                                              .then((_) {
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(const SnackBar(
+                                                                    duration: Duration(
+                                                                        milliseconds:
+                                                                            500),
+                                                                    content: Text(
+                                                                        'Copied to your clipboard!')));
+                                                          });
+                                                        },
+                                                        icon: const Icon(
+                                                          Icons
+                                                              .file_copy_outlined,
+                                                          size: 24,
+                                                          color:
+                                                              Color(0xFFFFFFFF),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      IconButton(
+                                                        icon: const Icon(
+                                                          Icons.thumb_up_alt,
+                                                          color:
+                                                              Color(0xFFFAFAFA),
+                                                        ),
+                                                        onPressed: () {},
+                                                      ),
+                                                      IconButton(
+                                                        icon: const Icon(
+                                                            Icons
+                                                                .thumb_down_alt,
+                                                            color: Color(
+                                                                0xFFFAFAFA)),
+                                                        onPressed: () {},
+                                                      )
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
                                           ],
                                         ),
                                       ),
@@ -449,178 +422,21 @@ class _IncognitoModeState extends State<IncognitoMode> {
                 );
         },
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFE5E5E5)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (pickedFile != null)
-                    Padding(
-                        padding: const EdgeInsets.only(left: 10, top: 10),
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(right: 15),
-                              child: Stack(
-                                clipBehavior: Clip
-                                    .none, // Ensures the Positioned widget is not clipped
-                                children: [
-                                  MouseRegion(
-                                    onEnter: (event) => setState(() {
-                                      isHoveringList = true;
-                                    }),
-                                    onExit: (event) => setState(() {
-                                      isHoveringList = false;
-                                    }),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: (pickedFile?.extension == 'pdf')
-                                          ? Container(
-                                              padding: const EdgeInsets.all(10),
-                                              decoration: BoxDecoration(
-                                                color: darktheme
-                                                    .colorScheme.surface,
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                border: Border.all(
-                                                  color: darktheme
-                                                      .colorScheme.primary,
-                                                  width: 1,
-                                                ),
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.picture_as_pdf,
-                                                    size: 30,
-                                                    color: darktheme
-                                                        .colorScheme.primary,
-                                                  ),
-                                                  const SizedBox(width: 10),
-                                                  Text(
-                                                    pickedFile!.name,
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: darktheme
-                                                          .colorScheme.primary,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                          : (pickedFile?.extension == 'doc' ||
-                                                  pickedFile?.extension ==
-                                                      'docx')
-                                              ? Container(
-                                                  padding:
-                                                      const EdgeInsets.all(10),
-                                                  decoration: BoxDecoration(
-                                                    color: darktheme
-                                                        .colorScheme.surface,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    border: Border.all(
-                                                      color: darktheme
-                                                          .colorScheme.primary,
-                                                      width: 1,
-                                                    ),
-                                                  ),
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(
-                                                        Icons.description,
-                                                        size: 30,
-                                                        color: darktheme
-                                                            .colorScheme
-                                                            .secondary,
-                                                      ),
-                                                      const SizedBox(width: 10),
-                                                      Text(
-                                                        pickedFile!.name,
-                                                        style: TextStyle(
-                                                          fontSize: 14,
-                                                          color: darktheme
-                                                              .colorScheme
-                                                              .primary,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
-                                              : Image.memory(
-                                                  pickedFileBytes!,
-                                                  height: 50,
-                                                  width: 50,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    right:
-                                        -10, // Move the icon slightly outside the image
-                                    top:
-                                        -5, // Move the icon slightly outside the image
-                                    child: MouseRegion(
-                                      onEnter: (event) => setState(() {
-                                        isHoveringList = true;
-                                      }),
-                                      onExit: (event) => setState(() {
-                                        isHoveringList = false;
-                                      }),
-                                      child: AnimatedOpacity(
-                                        opacity: isHoveringList ? 1.0 : 0.0,
-                                        duration:
-                                            const Duration(milliseconds: 200),
-                                        child: InkWell(
-                                          onTap: () {
-                                            setState(() {
-                                              pickedFile = null;
-                                              pickedFileBytes = null;
-                                              isHoveringList = false;
-                                            });
-                                          },
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              border: Border.all(
-                                                color: const Color(
-                                                    0xFFFFFFFF), // Change color as needed
-                                                width: 1, // Border width
-                                              ),
-                                            ),
-                                            child: CircleAvatar(
-                                              radius:
-                                                  12, // Increase radius to make it larger
-                                              backgroundColor:
-                                                  darktheme.colorScheme.surface,
-                                              child: Icon(
-                                                Icons.close_sharp,
-                                                color: darktheme
-                                                    .colorScheme.primary,
-                                                size: 12,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        )),
-                  TextFormField(
+      bottomNavigationBar:
+          BlocBuilder<IncognitoResponseBloc, IncognitoResponseState>(
+        builder: (context, state) {
+          return Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFE5E5E5)),
+                  ),
+                  child: TextFormField(
                       controller: _inputQuestion,
                       focusNode: _textFocusNode,
                       style: TextStyle(
@@ -631,15 +447,22 @@ class _IncognitoModeState extends State<IncognitoMode> {
                       decoration: InputDecoration(
                         prefixIcon: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.attach_file,
-                              color: darktheme.colorScheme.primary,
-                            ),
-                            onPressed: () async {
-                              await uploadedFile();
-                            },
-                          ),
+                          child: (state.fileUploadStatus ==
+                                  FileUploadStatus.notStarted)
+                              ? IconButton(
+                                  icon: Icon(
+                                    Icons.attach_file,
+                                    color: darktheme.colorScheme.primary,
+                                  ),
+                                  onPressed: () async {
+                                    await uploadedFile();
+                                  },
+                                )
+                              : CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    darktheme.colorScheme.secondary,
+                                  ),
+                                ),
                         ),
                         suffixIcon: Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -656,19 +479,15 @@ class _IncognitoModeState extends State<IncognitoMode> {
                                 if (_inputQuestion.text.isNotEmpty) {
                                   context
                                       .read<IncognitoResponseBloc>()
-                                      .add(HandleQuestionType());
+                                      .add(HandleIncognitoQuestionType());
                                   context
                                       .read<IncognitoResponseBloc>()
-                                      .add(AddQuestionAnswerList(
+                                      .add(AddIncognitoQuestionAnswerList(
                                         question: _inputQuestion.text,
-                                        files: pickedFile,
                                       ));
                                   _inputQuestion.clear();
-                                  setState(() {
-                                    pickedFile = null;
-                                    pickedFileBytes = null;
-                                    isHoveringList = false;
-                                  });
+                                  FocusScope.of(context)
+                                      .requestFocus(_textFocusNode);
                                 }
                               },
                             ),
@@ -691,44 +510,38 @@ class _IncognitoModeState extends State<IncognitoMode> {
                         if (_inputQuestion.text.isNotEmpty) {
                           context
                               .read<IncognitoResponseBloc>()
-                              .add(HandleQuestionType());
+                              .add(HandleIncognitoQuestionType());
                           context
                               .read<IncognitoResponseBloc>()
-                              .add(AddQuestionAnswerList(
+                              .add(AddIncognitoQuestionAnswerList(
                                 question: _inputQuestion.text,
-                                files: pickedFile,
                               ));
                           _inputQuestion.clear();
                           FocusScope.of(context).requestFocus(_textFocusNode);
-                          setState(() {
-                            pickedFile = null;
-                            pickedFileBytes = null;
-                            isHoveringList = false;
-                          });
                         }
                       }),
-                ],
-              ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "Double-check important information as GPT can make mistakes.",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: darktheme.colorScheme.primary,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text(
-              "Double-check important information as GPT can make mistakes.",
-              style: TextStyle(
-                fontSize: 14,
-                color: darktheme.colorScheme.primary,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
   Future<void> uploadedFile() async {
-    result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: [
         'pdf',
@@ -742,14 +555,12 @@ class _IncognitoModeState extends State<IncognitoMode> {
       ],
     );
 
-    if (result != null && result!.files.isNotEmpty) {
-      setState(() {
-        for (int i = 0; i < result!.files.length; i++) {
-          pickedFile = result!.files[i];
-          pickedFileBytes = pickedFile!.bytes;
-          isHoveringList = false;
-        }
-      });
+    if (result != null && result.files.isNotEmpty) {
+      if (mounted) {
+        context
+            .read<IncognitoResponseBloc>()
+            .add(UploadFile(result.files.first));
+      }
     }
   }
 }
