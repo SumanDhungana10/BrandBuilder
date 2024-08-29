@@ -1,21 +1,17 @@
 import 'dart:async';
-import 'dart:math';
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
-import 'package:krofile_ai/bloc/responsefeedback/responsefeedback_bloc.dart';
 import 'package:krofile_ai/bloc/mylist/mylist_bloc.dart';
-import 'package:krofile_ai/services/faq_services.dart';
+import 'package:krofile_ai/helper.dart';
 import 'package:krofile_ai/utils/skeleton.dart';
 import 'package:krofile_ai/utils/text_parse.dart';
 import 'package:krofile_ai/utils/typewriter_text.dart';
 import 'package:krofile_ai/widgets/addto_mylist_alert.dart';
 import 'package:krofile_ai/widgets/viewmore_feedback_alert.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 class ResponseUI extends StatefulWidget {
   const ResponseUI({
@@ -81,34 +77,47 @@ class _ResponseUIState extends State<ResponseUI> {
                                 ),
                               ),
                             ),
-                            IconButton(
-                                icon: SvgPicture.asset(
-                                  "assets/images/arrow-up.svg",
-                                ),
-                                onPressed: (state.faq.length < 20)
-                                    ? () {
-                                        FAQ().saveQuestion(
-                                            newList[updateIndex].question);
-                                        context
-                                            .read<BusinessResponseBloc>()
-                                            .add(GetFaq());
-
-                                        // final String question =
-                                        //     newList[updateIndex].question;
-                                        // context
-                                        //     .read<BusinessResponseBloc>()
-                                        //     .add(AddFaq(question));
-                                        showDialog(
-                                          context: context,
-                                          barrierColor: const Color(0xFF000000)
-                                              .withOpacity(0.0),
-                                          barrierDismissible: true,
-                                          builder: (context) {
-                                            return const DynamicProgressDialog();
-                                          },
-                                        );
-                                      }
-                                    : null),
+                            BlocListener<BusinessResponseBloc,
+                                BusinessResponseState>(
+                              listenWhen: (previous, current) =>
+                                  previous.faqSavingStatus !=
+                                  current.faqSavingStatus,
+                              listener: (context, state) {
+                                if (state.faqSavingStatus ==
+                                    FAQSavingStatus.inProgress) {
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (BuildContext context) {
+                                      return const DynamicProgressDialog();
+                                    },
+                                  );
+                                } else if (state.faqSavingStatus ==
+                                        FAQSavingStatus.success ||
+                                    state.faqSavingStatus ==
+                                        FAQSavingStatus.error) {
+                                  Navigator.of(context)
+                                      .pop(); // Dismiss the dialog
+                                }
+                              },
+                              child: IconButton(
+                                  tooltip: "Add to FAQ",
+                                  icon: SvgPicture.asset(
+                                    "assets/images/arrow-up.svg",
+                                  ),
+                                  onPressed: (state.faq.length < 20)
+                                      ? () {
+                                          context
+                                              .read<BusinessResponseBloc>()
+                                              .add(SaveFaqQuestion(
+                                                  newList[updateIndex]
+                                                      .question));
+                                          context
+                                              .read<BusinessResponseBloc>()
+                                              .add(GetFaq());
+                                        }
+                                      : null),
+                            ),
                           ],
                         ),
                       ),
@@ -166,12 +175,12 @@ class _PromptResponseState extends State<PromptResponse>
     "More.."
   ];
 
-  Future<void> _viewMoreFeedBack(int index) {
+  Future<void> _viewMoreFeedBack(int index, String answer) {
     return showDialog(
         barrierColor: const Color(0xFF000000).withOpacity(0.8),
         context: context,
         builder: (BuildContext context) {
-          return ViewMoreFeedBack(responseIndex: index);
+          return ViewMoreFeedBack(responseIndex: index, answer: answer);
         });
   }
 
@@ -185,8 +194,9 @@ class _PromptResponseState extends State<PromptResponse>
   }
 
   void showThankYouMessage(int index) {
-    context.read<ResponsefeedbackBloc>().add(CloseDislikeFeedback(index));
-    context.read<ResponsefeedbackBloc>().add(ShowThankYouMessage(index));
+    context.read<BusinessResponseBloc>().add(CloseDislikeFeedback(index));
+    context.read<BusinessResponseBloc>().add(CloseRegenerateFeedback(index));
+    context.read<BusinessResponseBloc>().add(ShowThankYouMessage(index));
   }
 
   bool isRegenerating = false;
@@ -201,7 +211,7 @@ class _PromptResponseState extends State<PromptResponse>
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (questionAnswer.isLoading || isRegenerating)
+            if (questionAnswer.isLoading)
               for (int i = 0; i < 3; i++)
                 const Padding(
                   padding: EdgeInsets.only(bottom: 8.0),
@@ -288,14 +298,7 @@ class _PromptResponseState extends State<PromptResponse>
                           return IconButton(
                             tooltip: "Add to My List",
                             onPressed: () {
-                              if (state.categories.isEmpty) {
-                                context
-                                    .read<MylistBloc>()
-                                    .add(FetchCategories());
-                                _addToMyList(answer);
-                              } else {
-                                _addToMyList(answer);
-                              }
+                              _addToMyList(answer);
                             },
                             icon: SvgPicture.asset(
                               "assets/images/Bookmark.svg",
@@ -307,273 +310,263 @@ class _PromptResponseState extends State<PromptResponse>
                       )
                     ],
                   ),
-                  BlocBuilder<ResponsefeedbackBloc, ResponsefeedbackState>(
-                    builder: (context, state) {
-                      return Row(
-                        children: [
-                          (state.isLikedPressed[widget.index] == null)
-                              ? IconButton(
-                                  tooltip: "Like",
-                                  onPressed: (state.isDislikedPressed[
-                                              widget.index] ==
+                  Row(
+                    children: [
+                      (state.isLikedPressed[widget.index] == null)
+                          ? IconButton(
+                              tooltip: "Like",
+                              onPressed:
+                                  (state.isDislikedPressed[widget.index] ==
                                           true)
                                       ? null
                                       : () {
                                           context
-                                              .read<ResponsefeedbackBloc>()
+                                              .read<BusinessResponseBloc>()
                                               .add(LikeFeedback(widget.index));
                                         },
-                                  icon: SvgPicture.asset(
-                                    "assets/images/thumbs-up.svg",
-                                  ),
-                                )
-                              : RotatedBox(
-                                  quarterTurns: 2,
-                                  child: IconButton(
-                                    onPressed: () {},
-                                    icon: SvgPicture.asset(
-                                      "assets/images/thumbs-down.svg",
-                                    ),
-                                  ),
+                              icon: SvgPicture.asset(
+                                "assets/images/thumbs-up.svg",
+                              ),
+                            )
+                          : RotatedBox(
+                              quarterTurns: 2,
+                              child: IconButton(
+                                onPressed: () {},
+                                icon: SvgPicture.asset(
+                                  "assets/images/thumbs-down.svg",
                                 ),
-                          (state.isDislikedPressed[widget.index] == null)
-                              ? RotatedBox(
-                                  quarterTurns: 2,
-                                  child: IconButton(
-                                    tooltip: "Dislike",
-                                    onPressed: (state
-                                                .isLikedPressed[widget.index] ==
-                                            true)
-                                        ? null
-                                        : () {
-                                            context
-                                                .read<ResponsefeedbackBloc>()
-                                                .add(DislikeFeedback(
-                                                    widget.index));
-                                          },
-                                    icon: SvgPicture.asset(
-                                      "assets/images/thumbs-up.svg",
-                                    ),
-                                  ),
-                                )
-                              : IconButton(
-                                  onPressed: () {},
-                                  icon: SvgPicture.asset(
-                                    "assets/images/thumbs-down.svg",
-                                  ),
+                              ),
+                            ),
+                      (state.isDislikedPressed[widget.index] == null)
+                          ? RotatedBox(
+                              quarterTurns: 2,
+                              child: IconButton(
+                                tooltip: "Dislike",
+                                onPressed: (state
+                                            .isLikedPressed[widget.index] ==
+                                        true)
+                                    ? null
+                                    : () {
+                                        context
+                                            .read<BusinessResponseBloc>()
+                                            .add(DislikeFeedback(widget.index));
+                                      },
+                                icon: SvgPicture.asset(
+                                  "assets/images/thumbs-up.svg",
                                 ),
-                        ],
-                      );
-                    },
-                  )
+                              ),
+                            )
+                          : IconButton(
+                              onPressed: () {},
+                              icon: SvgPicture.asset(
+                                "assets/images/thumbs-down.svg",
+                              ),
+                            ),
+                    ],
+                  ),
                 ],
               ),
-            BlocBuilder<ResponsefeedbackBloc, ResponsefeedbackState>(
-              builder: (context, state) {
-                return (state.regeneratedIndex[widget.index] == true)
-                    ? Padding(
-                        padding: const EdgeInsets.only(top: 20),
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFAFAFA),
-                            border: Border.all(
-                              color: const Color(0xFFE5E5E5),
-                              width: 1,
-                            ),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text("Was the response better or worse?",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w400,
-                                      color: Color(0xFF151515))),
-                              Row(
-                                children: [
-                                  Column(
-                                    children: [
-                                      IconButton(
-                                          onPressed: () {
-                                            context
-                                                .read<ResponsefeedbackBloc>()
-                                                .add(CloseRegenerateFeedback(
-                                                    widget.index));
-                                            showThankYouMessage(widget.index);
-                                          },
-                                          icon: const Icon(
-                                            Icons.thumb_up_alt_outlined,
-                                            size: 24,
-                                          )),
-                                      const Text("Better",
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w400,
-                                              color: Color(0xFF151515)))
-                                    ],
-                                  ),
-                                  const SizedBox(width: 20),
-                                  Column(
-                                    children: [
-                                      IconButton(
-                                          onPressed: () {},
-                                          icon: const Icon(
-                                            Icons.thumb_down_alt_outlined,
-                                            size: 24,
-                                          )),
-                                      const Text("Worse",
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w400,
-                                              color: Color(0xFF151515)))
-                                    ],
-                                  ),
-                                  const SizedBox(width: 20),
-                                  Column(
-                                    children: [
-                                      IconButton(
-                                          onPressed: () {},
-                                          icon: const Icon(
-                                            Icons.thumb_up_alt_outlined,
-                                            size: 24,
-                                          )),
-                                      const Text("Same",
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w400,
-                                              color: Color(0xFF151515)))
-                                    ],
-                                  )
-                                ],
-                              ),
-                              IconButton(
-                                  onPressed: () {
-                                    context.read<ResponsefeedbackBloc>().add(
-                                        CloseRegenerateFeedback(widget.index));
-                                  },
-                                  icon: const Icon(Icons.close))
-                            ],
-                          ),
-                        ))
-                    : Container();
-              },
-            ),
-            BlocBuilder<ResponsefeedbackBloc, ResponsefeedbackState>(
-              builder: (context, state) {
-                return (state.disLikedIndex[widget.index] == true)
-                    ? Padding(
-                        padding: const EdgeInsets.only(top: 20),
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFAFAFA),
-                            border: Border.all(
-                              color: const Color(0xFFE5E5E5),
-                              width: 1,
-                            ),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 24),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text(
-                                      "Tell us more:",
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(0xFF151515)),
-                                    ),
-                                    IconButton(
-                                        onPressed: () {
-                                          context
-                                              .read<ResponsefeedbackBloc>()
-                                              .add(CloseDislikeFeedback(
-                                                  widget.index));
-                                        },
-                                        icon: const Icon(
-                                          Icons.close,
-                                          size: 24,
-                                        ))
-                                  ],
-                                ),
-                              ),
-                              Wrap(
-                                spacing: 24,
-                                runSpacing: 20,
-                                children: [
-                                  for (var item in disLikeReport)
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        if (item == "More..") {
-                                          _viewMoreFeedBack(widget.index);
-                                        } else {
-                                          showThankYouMessage(widget.index);
-                                        }
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        elevation: 0,
-                                        textStyle: const TextStyle(
-                                            fontSize: 16,
-                                            color: Color(0xFF151515),
-                                            fontWeight: FontWeight.w400),
-                                        padding: const EdgeInsets.all(24),
-                                        foregroundColor:
-                                            const Color(0xFF151515),
-                                        side: const BorderSide(
-                                            color: Color(0xFFD4D4D4), width: 1),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(14)),
-                                      ),
-                                      child: Text(item),
-                                    ),
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      )
-                    : Container();
-              },
-            ),
-            BlocBuilder<ResponsefeedbackBloc, ResponsefeedbackState>(
-              builder: (context, state) {
-                return (state.showThankYouMessage[widget.index] == true)
-                    ? Padding(
-                        padding: const EdgeInsets.only(top: 20),
-                        child: Center(
-                          child: Container(
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFAFAFA),
-                              border: Border.all(
-                                color: const Color(0xFFE5E5E5),
-                                width: 1,
-                              ),
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: const Text(
-                              'Thank you for your feedback',
-                              style: TextStyle(
+            if (isRegenerating && questionAnswer.isAnimationCompleted)
+              Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFAFAFA),
+                      border: Border.all(
+                        color: const Color(0xFFE5E5E5),
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Was the response better or worse?",
+                            style: TextStyle(
                                 fontSize: 16,
-                                color: Color(0xFF151515),
                                 fontWeight: FontWeight.w400,
-                              ),
+                                color: Color(0xFF151515))),
+                        Row(
+                          children: [
+                            Column(
+                              children: [
+                                IconButton(
+                                    onPressed: () {
+                                      context.read<BusinessResponseBloc>().add(
+                                          ResponseFeedback(
+                                              "Better", questionAnswer.answer));
+                                      showThankYouMessage(widget.index);
+                                    },
+                                    icon: const Icon(
+                                      Icons.thumb_up_alt_outlined,
+                                      size: 24,
+                                    )),
+                                const Text("Better",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF151515)))
+                              ],
                             ),
-                          ),
+                            const SizedBox(width: 20),
+                            Column(
+                              children: [
+                                IconButton(
+                                    onPressed: () {
+                                      context.read<BusinessResponseBloc>().add(
+                                          ResponseFeedback(
+                                              "Worse", questionAnswer.answer));
+                                      showThankYouMessage(widget.index);
+                                    },
+                                    icon: const Icon(
+                                      Icons.thumb_down_alt_outlined,
+                                      size: 24,
+                                    )),
+                                const Text("Worse",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF151515)))
+                              ],
+                            ),
+                            const SizedBox(width: 20),
+                            Column(
+                              children: [
+                                IconButton(
+                                    onPressed: () {
+                                      context.read<BusinessResponseBloc>().add(
+                                          CloseRegenerateFeedback(
+                                              widget.index));
+                                      showThankYouMessage(widget.index);
+                                    },
+                                    icon: const Icon(
+                                      Icons.thumb_up_alt_outlined,
+                                      size: 24,
+                                    )),
+                                const Text("Same",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF151515)))
+                              ],
+                            )
+                          ],
                         ),
+                        IconButton(
+                            onPressed: () {
+                              context
+                                  .read<BusinessResponseBloc>()
+                                  .add(CloseRegenerateFeedback(widget.index));
+                            },
+                            icon: const Icon(Icons.close))
+                      ],
+                    ),
+                  )),
+            if (state.disLikedIndex[widget.index] == true)
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFAFAFA),
+                    border: Border.all(
+                      color: const Color(0xFFE5E5E5),
+                      width: 1,
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 24),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Tell us more:",
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF151515)),
+                            ),
+                            IconButton(
+                                onPressed: () {
+                                  context
+                                      .read<BusinessResponseBloc>()
+                                      .add(CloseDislikeFeedback(widget.index));
+                                },
+                                icon: const Icon(
+                                  Icons.close,
+                                  size: 24,
+                                ))
+                          ],
+                        ),
+                      ),
+                      Wrap(
+                        spacing: 24,
+                        runSpacing: 20,
+                        children: [
+                          for (var item in disLikeReport)
+                            ElevatedButton(
+                              onPressed: () {
+                                if (item == "More..") {
+                                  _viewMoreFeedBack(
+                                      widget.index, questionAnswer.answer);
+                                } else {
+                                  context.read<BusinessResponseBloc>().add(
+                                      ResponseFeedback(
+                                          item, questionAnswer.answer));
+                                  showThankYouMessage(widget.index);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                elevation: 0,
+                                textStyle: const TextStyle(
+                                    fontSize: 16,
+                                    color: Color(0xFF151515),
+                                    fontWeight: FontWeight.w400),
+                                padding: const EdgeInsets.all(24),
+                                foregroundColor: const Color(0xFF151515),
+                                side: const BorderSide(
+                                    color: Color(0xFFD4D4D4), width: 1),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14)),
+                              ),
+                              child: Text(item),
+                            )
+                        ],
                       )
-                    : Container();
-              },
-            ),
+                    ],
+                  ),
+                ),
+              ),
+            if (state.showThankYouMessage[widget.index] == true)
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFAFAFA),
+                      border: Border.all(
+                        color: const Color(0xFFE5E5E5),
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Text(
+                      'Thank you for your feedback',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF151515),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
           ],
         );
       },
@@ -589,34 +582,6 @@ class DynamicProgressDialog extends StatefulWidget {
 }
 
 class DynamicProgressDialogState extends State<DynamicProgressDialog> {
-  double _progress = 0.0;
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _startProgress();
-  }
-
-  void _startProgress() {
-    _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-      setState(() {
-        _progress += 0.1;
-        if (_progress >= 1.0) {
-          _progress = 1.0;
-          _timer?.cancel();
-          Navigator.of(context).pop();
-        }
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -657,9 +622,8 @@ class DynamicProgressDialogState extends State<DynamicProgressDialog> {
           ),
         ],
       ),
-      content: LinearProgressIndicator(
-        value: _progress,
-        valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF18C554)),
+      content: const LinearProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF18C554)),
       ),
     );
   }

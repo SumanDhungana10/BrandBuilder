@@ -7,7 +7,9 @@ class IncognitoResponseState extends Equatable {
   final PlatformFile? file;
   final String? fileuploadedresponse;
   final FileUploadStatus fileUploadStatus;
-    final Map<int, bool> regeneratingIndices;
+   final String? fileDeleteResponse;
+  final String? historyDeleteResponse;
+  final Map<int, bool> regeneratingIndices;
 
 
   const IncognitoResponseState({
@@ -17,6 +19,8 @@ class IncognitoResponseState extends Equatable {
     this.file,
     this.fileuploadedresponse,
     this.fileUploadStatus = FileUploadStatus.notStarted,
+    this.fileDeleteResponse,
+    this.historyDeleteResponse,
     this.regeneratingIndices = const {},
   });
 
@@ -27,6 +31,8 @@ class IncognitoResponseState extends Equatable {
     PlatformFile Function()? file,
     String? fileuploadedresponse,
     FileUploadStatus? fileUploadStatus,
+    String? fileDeleteResponse,
+    String? historyDeleteResponse,
     Map<int, bool>? regeneratingIndices,
   }) {
     return IncognitoResponseState(
@@ -36,6 +42,8 @@ class IncognitoResponseState extends Equatable {
       file: file != null ? file() : this.file,
       fileuploadedresponse: fileuploadedresponse ?? this.fileuploadedresponse,
       fileUploadStatus: fileUploadStatus ?? this.fileUploadStatus,
+      fileDeleteResponse: fileDeleteResponse ?? this.fileDeleteResponse,
+      historyDeleteResponse: historyDeleteResponse ?? this.historyDeleteResponse,
       regeneratingIndices: regeneratingIndices ?? this.regeneratingIndices,
 
     );
@@ -49,6 +57,8 @@ class IncognitoResponseState extends Equatable {
         file,
         fileuploadedresponse,
         fileUploadStatus,
+        fileDeleteResponse,
+        historyDeleteResponse,
         regeneratingIndices,
       ];
 }

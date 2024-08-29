@@ -58,4 +58,6 @@ class UploadFile extends IncognitoResponseEvent {
 }
 
 class ResetFileUploaded extends IncognitoResponseEvent {}
+class DeleteFile extends IncognitoResponseEvent {}
+class DeleteHistory extends IncognitoResponseEvent {}
 

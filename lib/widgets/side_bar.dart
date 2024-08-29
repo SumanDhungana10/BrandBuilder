@@ -5,7 +5,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
 import 'package:krofile_ai/bloc/homescreen/homescreen_bloc.dart';
 import 'package:krofile_ai/data/allList.dart';
-import 'package:krofile_ai/services/showhistory_services.dart';
 
 class SideBar extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -172,65 +171,68 @@ class _SideBarState extends State<SideBar> {
                             ),
                           ],
                         ),
-                        (state.isHistoryLoading)
-                            ? const Center(
-                                child: CircularProgressIndicator(),
-                              )
-                            : (state.historyList.isEmpty)
-                                ? const Text("No history found")
-                                : Expanded(
-                                    child: ListView.builder(
-                                      itemCount: historyList.length,
-                                      itemBuilder: (context, index) {
-                                        return Container(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              0, 10, 0, 10),
-                                          decoration: const BoxDecoration(
-                                            border: Border(
-                                              bottom: BorderSide(
-                                                color: Color(0xFFE5E5E5),
-                                                width: 1,
-                                              ),
-                                            ),
+                        // (state.isHistoryLoading)
+                        //     ? const Center(
+                        //         child: CircularProgressIndicator(),
+                        //       )
+                        //     :
+                        (state.historyList.isEmpty)
+                            ? const Text("No history found")
+                            : Expanded(
+                                child: ListView.builder(
+                                  itemCount: historyList.length,
+                                  itemBuilder: (context, index) {
+                                    return Container(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          0, 10, 0, 10),
+                                      decoration: const BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: Color(0xFFE5E5E5),
+                                            width: 1,
                                           ),
-                                          child: ListTile(
-                                            title: Text(
-                                              historyList[index][
-                                                  2], // assuming 'question' is at index 2
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            subtitle: Text(
-                                              historyList[index][
-                                                  3], // assuming 'answer' is at index 3
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            trailing: const Icon(
-                                              Icons.arrow_forward_ios,
-                                              size: 16,
-                                              color: Color(0xFF73767B),
-                                            ),
-                                            onTap: () {
-                                              context
-                                                  .read<BusinessResponseBloc>()
-                                                  .add(
-                                                      ResetQuestionAnswerList());
-                                              context
-                                                  .read<BusinessResponseBloc>()
-                                                  .add(HandleQuestionType());
+                                        ),
+                                      ),
+                                      child: ListTile(
+                                        title: Text(
+                                          historyList[index][
+                                              'Question'], // Accessing the 'Question' field
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        subtitle: Text(
+                                          historyList[index][
+                                              'Answer'], // Accessing the 'Answer' field
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        trailing: const Icon(
+                                          Icons.arrow_forward_ios,
+                                          size: 16,
+                                          color: Color(0xFF73767B),
+                                        ),
+                                        onTap: () {
+                                          context
+                                              .read<BusinessResponseBloc>()
+                                              .add(ResetQuestionAnswerList());
+                                          context
+                                              .read<BusinessResponseBloc>()
+                                              .add(HandleQuestionType());
 
-                                              context
-                                                  .read<BusinessResponseBloc>()
-                                                  .add(ShowHistoryData(
-                                                      historyList[index][2]!,
-                                                      historyList[index][3]!));
-                                            },
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  )
+                                          context
+                                              .read<BusinessResponseBloc>()
+                                              .add(ShowHistoryData(
+                                                historyList[index][
+                                                    'Question']!, // Passing the question
+                                                historyList[index][
+                                                    'Answer']!, // Passing the answer
+                                              ));
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ),
+                              )
                       ],
                     ),
                   );

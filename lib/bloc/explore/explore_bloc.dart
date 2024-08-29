@@ -1,7 +1,4 @@
-import 'dart:math';
-
 import 'package:equatable/equatable.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:krofile_ai/services/explore_services.dart';
 
@@ -25,7 +22,7 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
     if (state.categories.isEmpty) {
       emit(state.copyWith(isCategoriesLoading: true));
     }
-    final categories = await fetchExploreCategories();
+    final categories = await ExploreServices().fetchExploreCategories();
 
     emit(state.copyWith(categories: categories, isCategoriesLoading: false));
   }
@@ -33,8 +30,8 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
   void _onFetchExploreSubCategories(
       FetchExploreSubCategories event, Emitter<ExploreState> emit) async {
     emit(state.copyWith(isSubCategoriesLoading: true));
-    final subCategories =
-        await fetchSubCategories(state.categories[state.activeCategoryIndex]);
+    final subCategories = await ExploreServices()
+        .fetchSubCategories(state.categories[state.activeCategoryIndex]);
 
     emit(state.copyWith(
       subCategories: subCategories,
@@ -47,7 +44,7 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
   void _onFetchQuestions(
       FetchQuestions event, Emitter<ExploreState> emit) async {
     emit(state.copyWith(isQuestionsLoading: true));
-    final questions = await fetchQuestion(
+    final questions = await ExploreServices().fetchQuestion(
         state.categories[state.activeCategoryIndex],
         state.subCategories[state.activeSubCategoryIndex]);
     emit(state.copyWith(

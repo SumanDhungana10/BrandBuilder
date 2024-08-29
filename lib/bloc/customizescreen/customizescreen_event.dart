@@ -6,29 +6,34 @@ abstract class CustomizepageEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
-class AddStarterConversation extends CustomizepageEvent {
-  final String question;
-
-  const AddStarterConversation(this.question);
-
-  @override
-  List<Object> get props => [question];
-}
-
-class RemoveStarterConversation extends CustomizepageEvent {
+class FetchStarterConversations extends CustomizepageEvent {}
+class DeleteStarterConversation extends CustomizepageEvent {
   final int index;
 
-  const RemoveStarterConversation(this.index);
+  const DeleteStarterConversation(this.index);
 
   @override
   List<Object> get props => [index];
 }
+class UpdateStarterConversations extends CustomizepageEvent {
+ final int index;
+  final String question;
+  
+    const UpdateStarterConversations(this.index, this.question);
+  
+    @override
+    List<Object> get props => [index, question];
+}
+class UploadGeneralFile extends CustomizepageEvent {
+  final PlatformFile file;
 
-class UpdateAllStarterConversations extends CustomizepageEvent {
-  final List<String> conversations;
-
-  const UpdateAllStarterConversations(this.conversations);
+  const UploadGeneralFile(this.file);
 
   @override
-  List<Object> get props => [conversations];
+  List<Object> get props => [file];
 }
+class ResetGeneralFileUploaded extends  CustomizepageEvent {}
+
+class SaveStarterConversations extends CustomizepageEvent {
+}
+class ResetUpdateConversationStatus extends CustomizepageEvent {}

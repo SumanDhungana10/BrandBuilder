@@ -7,7 +7,6 @@ abstract class MylistEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class FetchCategories extends MylistEvent {}
 
 class AddCategory extends MylistEvent {
   final String category;
@@ -18,44 +17,40 @@ class AddCategory extends MylistEvent {
   List<Object> get props => [category];
 }
 
-class AddSubCategory extends MylistEvent {
-  final int categoryIndex;
-  final String subCategoryName;
-  final String response;
+class InsertMylist extends MylistEvent {
+  final String category;
+  final String title;
+  final String content;
 
-  const AddSubCategory(this.categoryIndex, this.subCategoryName, this.response);
+  const InsertMylist(this.category, this.title, this.content);
 
   @override
-  List<Object> get props => [categoryIndex, subCategoryName, response];
+  List<Object> get props => [category, title, content];
 }
 
-class ClearCategory extends MylistEvent {
-  final int categoryIndex;
+class FetchMylist extends MylistEvent {}
 
-  const ClearCategory(this.categoryIndex);
+class DeleteMylistById extends MylistEvent {
+  final int id;
+
+  const DeleteMylistById(this.id);
 
   @override
-  List<Object> get props => [categoryIndex];
+  List<Object> get props => [id];
 }
+class DeleteMylistByTitle extends MylistEvent {
+  final String title;
 
-class DeleteSubCategory extends MylistEvent {
-  final int categoryIndex;
-  final int subCategoryIndex;
-
-  const DeleteSubCategory(this.categoryIndex, this.subCategoryIndex);
+  const DeleteMylistByTitle(this.title);
 
   @override
-  List<Object> get props => [categoryIndex, subCategoryIndex];
+  List<Object> get props => [title];
 }
+class DeleteMylistByCategory extends MylistEvent {
+  final String category;
 
-class DeleteResponse extends MylistEvent {
-  final int categoryIndex;
-  final int subCategoryIndex;
-  final int responseIndex;
-
-  const DeleteResponse(
-      this.categoryIndex, this.subCategoryIndex, this.responseIndex);
+  const DeleteMylistByCategory(this.category);
 
   @override
-  List<Object> get props => [categoryIndex, subCategoryIndex, responseIndex];
+  List<Object> get props => [category];
 }

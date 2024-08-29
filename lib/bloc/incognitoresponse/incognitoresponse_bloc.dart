@@ -3,7 +3,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:krofile_ai/helper.dart';
 import 'package:krofile_ai/services/incognito_chat_services.dart';
-import 'package:krofile_ai/services/incognito_file_services.dart';
 part 'incognitoresponse_event.dart';
 part 'incognitoresponse_state.dart';
 
@@ -16,6 +15,8 @@ class IncognitoResponseBloc
     on<UploadFile>(_onUploadFile);
     on<ResetFileUploaded>(_onResetFileUploaded);
     on<IncognitoAnimationCompleted>(_onAnimationCompleted);
+    on<DeleteFile>(_onDeleteFile);
+    on<DeleteHistory>(_onDeleteAllHistory);
   }
 
   void _onHandleIncognitoQuestionType(
@@ -62,9 +63,6 @@ class IncognitoResponseBloc
     emit(state.copyWith(
       questionAnswerList: updatedQuestionAnswerList,
     ));
-    // final historyList = await showHistory();
-
-    // emit(state.copyWith(historyList: historyList, isLoading: false));
   }
 
   Future<String> getNewAnswer(String question) async {
@@ -116,12 +114,6 @@ class IncognitoResponseBloc
       questionAnswerList: updatedQuestionAnswerList,
       regeneratingIndices: updatedRegeneratingIndices,
     ));
-
-    // Simulate the animation completion
-    // In a real scenario, this should be triggered by your UI when the animation is actually complete
-    // await Future.delayed(
-    //     const Duration(milliseconds: 500)); // Adjust this delay as needed
-    // add(IncognitoAnimationCompleted(index));
   }
 
   void _onAnimationCompleted(
@@ -141,7 +133,8 @@ class IncognitoResponseBloc
       fileUploadStatus: FileUploadStatus.uploading,
     ));
     try {
-      final String result = await uploadIncognitoFile(file);
+      final String result =
+          await IncognitoChatServices().uploadIncognitoFile(file);
       emit(state.copyWith(
         fileuploadedresponse: result,
         fileUploadStatus: FileUploadStatus.uploaded,
@@ -159,5 +152,36 @@ class IncognitoResponseBloc
     emit(state.copyWith(
       fileUploadStatus: FileUploadStatus.notStarted,
     ));
+  }
+
+  void _onDeleteFile(
+      DeleteFile event, Emitter<IncognitoResponseState> emit) async {
+    try {
+      final String result = await IncognitoChatServices().deleteIncognitoFile();
+      emit(state.copyWith(
+        fileDeleteResponse: result,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        fileDeleteResponse: "Error during file deletion: $e",
+      ));
+    }
+  }
+
+  void _onDeleteAllHistory(
+      DeleteHistory event, Emitter<IncognitoResponseState> emit) async {
+    try {
+      final String result =
+          await IncognitoChatServices().deleteallIncognitoHistory();
+      emit(state.copyWith(
+        historyDeleteResponse: result,
+        questionAnswerList: [],
+        isQuestionType: false,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        historyDeleteResponse: "Error during history deletion: $e",
+      ));
+    }
   }
 }

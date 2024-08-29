@@ -1,15 +1,15 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
-import '../bloc/responsefeedback/responsefeedback_bloc.dart';
 
 class ViewMoreFeedBack extends StatefulWidget {
   const ViewMoreFeedBack({
     super.key,
     required this.responseIndex,
+    required this.answer,
   });
   final int responseIndex;
+  final String answer;
   @override
   State<ViewMoreFeedBack> createState() => _ViewMoreFeedBackState();
 }
@@ -26,11 +26,11 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
     "Seems incomplete or lacking effort",
     "Something else",
   ];
-  int selectedFeedbackOption = -1;
+  String selectedFeedbackOption = '';
 
   void showThankYouMessage(int index) {
-    context.read<ResponsefeedbackBloc>().add(CloseDislikeFeedback(index));
-    context.read<ResponsefeedbackBloc>().add(ShowThankYouMessage(index));
+    context.read<BusinessResponseBloc>().add(CloseDislikeFeedback(index));
+    context.read<BusinessResponseBloc>().add(ShowThankYouMessage(index));
   }
 
   @override
@@ -80,7 +80,7 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
                       ElevatedButton(
                           onPressed: () {
                             setState(() {
-                              selectedFeedbackOption = i;
+                              selectedFeedbackOption = feedbackOptions[i];
                             });
                           },
                           style: ElevatedButton.styleFrom(
@@ -90,9 +90,10 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
                                 fontWeight: FontWeight.w400),
                             padding: const EdgeInsets.all(24),
                             foregroundColor: const Color(0xFF151515),
-                            backgroundColor: (selectedFeedbackOption == i)
-                                ? const Color(0xFFE5E5E5)
-                                : const Color(0xFFFAFAFA),
+                            backgroundColor:
+                                (selectedFeedbackOption == feedbackOptions[i])
+                                    ? const Color(0xFFE5E5E5)
+                                    : const Color(0xFFFAFAFA),
                             side: const BorderSide(
                                 color: Color(0xFFD4D4D4), width: 1),
                             shape: RoundedRectangleBorder(
@@ -155,15 +156,19 @@ class _ViewMoreFeedBackState extends State<ViewMoreFeedBack> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ElevatedButton(
-                        onPressed: (selectedFeedbackOption != -1)
+                        onPressed: (selectedFeedbackOption != '')
                             ? () {
+                                context.read<BusinessResponseBloc>().add(
+                                    ResponseFeedback(
+                                        selectedFeedbackOption, widget.answer));
                                 showThankYouMessage(widget.responseIndex);
                                 Navigator.of(context).pop();
                               }
                             : null,
                         style: ElevatedButton.styleFrom(
-                          disabledBackgroundColor: const Color(0xFF96D2AB),
-                          backgroundColor: const Color(0xFF18C554),
+                          disabledBackgroundColor:
+                              const Color(0xFF1E7BC8).withOpacity(0.5),
+                          backgroundColor: const Color(0xFF1E7BC8),
                           foregroundColor: const Color(0xFFFFFFFF),
                           disabledForegroundColor: const Color(0xFFFFFFFF),
                           padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),

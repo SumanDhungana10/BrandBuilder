@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
-import 'package:krofile_ai/services/faq_services.dart';
 import 'package:krofile_ai/widgets/viewfaq_alert.dart';
 import 'package:popover/popover.dart';
 
@@ -32,10 +31,10 @@ class _PrefixButtonState extends State<PrefixButton> {
         return Padding(
           padding: const EdgeInsets.all(8.0),
           child: IconButton(
+            tooltip: "View FAQ",
             icon: SvgPicture.asset("assets/images/arrow-up.svg"),
             onPressed: () {
-              if (state.faq.isNotEmpty &&
-                  state.faq.last != 'No Question Found!!!') {
+              if (state.faq.isNotEmpty) {
                 _viewFaq();
               } else {
                 showPopover(

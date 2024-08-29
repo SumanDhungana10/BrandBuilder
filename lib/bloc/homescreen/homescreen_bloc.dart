@@ -15,7 +15,5 @@ class HomeScreenBloc extends Bloc<HomeScreenEvent, HomeScreenState> {
   void _onToggleHistory(ToggleHistory event, Emitter<HomeScreenState> emit) {
     emit(state.copyWith(isHistoryOpen: !state.isHistoryOpen));
   }
-
-
 }
  

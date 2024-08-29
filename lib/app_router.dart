@@ -17,18 +17,16 @@ final GoRouter router = GoRouter(
       routes: [
         GoRoute(
           path: 'mylist',
-          builder: (context, state) => MyList(
-            selectedCategoryIndex: state
-                        .uri.queryParameters['selectedCategoryIndex'] !=
-                    null
-                ? int.parse(state.uri.queryParameters['selectedCategoryIndex']!)
-                : 0,
-            selectedSubCategoryIndex: state
-                        .uri.queryParameters['selectedSubCategoryIndex'] !=
-                    null
-                ? int.parse(state.pathParameters['selectedSubCategoryIndex']!)
-                : 0,
-          ),
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>?;
+            return MyList(
+              selectedCategoryIndex:
+                  extra?['selectedCategoryIndex'] as int? ?? 0,
+              selectedSubCategoryIndex:
+                  extra?['selectedSubCategoryIndex'] as int?,
+              newSubCategory: extra?['newSubCategory'] as String?,
+            );
+          },
         ),
         GoRoute(
           path: 'explore',

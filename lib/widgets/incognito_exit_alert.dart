@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:krofile_ai/screen/home_screen.dart';
+import 'package:krofile_ai/bloc/incognitoresponse/incognitoresponse_bloc.dart';
 
 class IncognitoExitAlert extends StatelessWidget {
   const IncognitoExitAlert({
@@ -74,11 +75,15 @@ class IncognitoExitAlert extends StatelessWidget {
                   child: TextButton(
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                        backgroundColor: const Color(0xFF21201F),
+                        backgroundColor: const Color(0xFF1E7BC8),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5)),
                       ),
                       onPressed: () {
+                        context.read<IncognitoResponseBloc>().add(DeleteFile());
+                        context
+                            .read<IncognitoResponseBloc>()
+                            .add(DeleteHistory());
                         Navigator.pop(context);
                         context.pop();
                       },

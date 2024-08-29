@@ -1,51 +1,49 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/widgets.dart';
 import 'package:krofile_ai/http.dart';
 
-// const String url =
-//     "https://kiwa57hisy.us-east-1.awsapprunner.com/show/history/";
-// const String email = 'passagetoindia@gmail.com';
-
-Future<List<List<dynamic>>> showHistory() async {
-  try {
-    Response response = await dio.post(
-      '/show/history/',
-      data: FormData.fromMap({
-        'username': username,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      Map<String, dynamic> data = response.data;
-      List<List<dynamic>> history = List<List<dynamic>>.from(
-        data['history'].map(
-          (item) => List<dynamic>.from(item),
-        ),
+class ShowhistoryServices {
+  Future<List<Map<String, dynamic>>> showHistory() async {
+    try {
+      Response response = await dio.post(
+        '/show/history/',
+        data: FormData.fromMap({
+          'username': username,
+        }),
       );
-      return history;
-    } else {
-      throw Exception('Unexpected status code: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data['history'];
+        List<Map<String, dynamic>> history = List<Map<String, dynamic>>.from(
+          data.map((item) => Map<String, dynamic>.from(item)),
+        );
+        return history;
+      } else {
+        throw Exception('Unexpected status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error during request: $e');
+      throw Exception('Error during request: $e');
     }
-  } catch (e) {
-    throw Exception('Error during request: $e');
   }
-}
 
-Future<String> deleteAllHistory() async {
-  try {
-    Response response = await dio.post(
-      "/delete/all-history",
-      data: FormData.fromMap({
-        'username': username,
-      }),
-    );
+  Future<String> deleteAllHistory() async {
+    try {
+      Response response = await dio.post(
+        "/delete/all-history",
+        data: FormData.fromMap({
+          'username': username,
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      final data = response.data;
-      return data;
-    } else {
-      return 'Unexpected status code: ${response.statusCode}';
+      if (response.statusCode == 200) {
+        final data = response.data;
+        return data;
+      } else {
+        return 'Unexpected status code: ${response.statusCode}';
+      }
+    } catch (e) {
+      return 'Error during request: $e';
     }
-  } catch (e) {
-    return 'Error during request: $e';
   }
 }

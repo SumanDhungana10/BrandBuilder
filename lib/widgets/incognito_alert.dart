@@ -56,7 +56,7 @@ class _IncognitoAlertState extends State<IncognitoAlert> {
                       fontSize: 18, fontWeight: FontWeight.w500),
                   padding: const EdgeInsets.fromLTRB(100, 20, 100, 20),
                   foregroundColor: const Color(0xFFFFFFFF),
-                  backgroundColor: const Color(0xFF18C554),
+                  backgroundColor: const Color(0xFF1E7BC8),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8)),
                 ),

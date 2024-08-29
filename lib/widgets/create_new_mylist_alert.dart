@@ -127,7 +127,6 @@ class _CreateNewMylistAlertState extends State<CreateNewMylistAlert> {
                     context
                         .read<MylistBloc>()
                         .add(AddCategory(_newListController.text));
-                    Navigator.pop(context);
                   }
                 : null,
             child: const Text(

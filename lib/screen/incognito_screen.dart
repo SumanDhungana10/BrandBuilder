@@ -1,18 +1,15 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:krofile_ai/bloc/incognitoresponse/incognitoresponse_bloc.dart';
 import 'package:krofile_ai/helper.dart';
-import 'package:krofile_ai/services/incognito_file_services.dart';
 import 'package:krofile_ai/utils/skeleton.dart';
 import 'package:krofile_ai/utils/text_parse.dart';
 import 'package:krofile_ai/utils/typewriter_text.dart';
 import 'package:krofile_ai/widgets/incognito_alert.dart';
 import 'package:krofile_ai/widgets/incognito_exit_alert.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 class IncognitoMode extends StatefulWidget {
   const IncognitoMode({super.key});
@@ -86,7 +83,9 @@ class _IncognitoModeState extends State<IncognitoMode> {
             children: [
               Row(
                 children: [
-                  Image.asset("assets/images/logo.png", width: 50, height: 50),
+                  Image.asset("assets/images/SquareLogo.png",
+                      width: 50, height: 50),
+                  const SizedBox(width: 10),
                   Text("Krofile AI",
                       style: TextStyle(
                           fontSize: 24,
@@ -97,8 +96,9 @@ class _IncognitoModeState extends State<IncognitoMode> {
               ElevatedButton.icon(
                 onPressed: () {
                   _incognitoExitAlert(context);
-                  deleteIncognitoFile();
-                  deleteallIncognitoHistory();
+                  // IncognitoFileServices().deleteIncognitoFile();
+                  // IncognitoFileServices().deleteallIncognitoHistory();
+                
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.all(20),
@@ -468,7 +468,7 @@ class _IncognitoModeState extends State<IncognitoMode> {
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
                             decoration: const BoxDecoration(
-                              color: Color(0xFF18C554),
+                              color: Color(0xFF1E7BC8),
                               shape: BoxShape.circle,
                             ),
                             child: IconButton(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:krofile_ai/bloc/bloc/explore_bloc.dart';
+import 'package:krofile_ai/bloc/explore/explore_bloc.dart';
 import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
 import 'package:krofile_ai/screen/home_screen.dart';
 
@@ -46,7 +46,7 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                                 elevation: 0,
                                 backgroundColor:
                                     (state.activeCategoryIndex == index)
-                                        ? const Color(0xFF18C554)
+                                        ? const Color(0xFF54A5EA)
                                         : const Color(0xFFFFFFFF),
                                 foregroundColor:
                                     (state.activeCategoryIndex == index)
@@ -93,7 +93,7 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                                   elevation: 0,
                                   backgroundColor:
                                       (state.activeCategoryIndex == index)
-                                          ? const Color(0xFF18C554)
+                                          ? const Color(0xFF54A5EA)
                                           : const Color(0xFFFFFFFF),
                                   foregroundColor:
                                       (state.activeCategoryIndex == index)

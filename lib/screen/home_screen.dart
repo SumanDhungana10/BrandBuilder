@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:krofile_ai/bloc/bloc/explore_bloc.dart';
+import 'package:krofile_ai/bloc/explore/explore_bloc.dart';
 import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
 import 'package:krofile_ai/bloc/mylist/mylist_bloc.dart';
 import 'package:krofile_ai/bloc/homescreen/homescreen_bloc.dart';
 import 'package:krofile_ai/responsive.dart';
-import 'package:krofile_ai/services/faq_services.dart';
 import 'package:krofile_ai/widgets/business_chat.dart';
 import 'package:krofile_ai/widgets/clear_chat_alert.dart';
 import 'package:krofile_ai/widgets/delete_all_searchhistory_alert.dart';
@@ -26,19 +25,14 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  void initState() {
-    super.initState();
-    context.read<BusinessResponseBloc>().add(GetFaq());
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
         key: _scaffoldKey,
         endDrawer: const SibeBarDrawer(),
         appBar: AppBar(
-          toolbarHeight: 80,
-          backgroundColor: const Color(0xFFFAFAFA),
+          toolbarHeight: 70,
+          // backgroundColor: const Color(0xFFFAFAFA),
+          backgroundColor: const Color(0xFFFFFFFF),
           actions: [Container()],
           scrolledUnderElevation: 0,
           shape: const Border(
@@ -111,13 +105,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 borderRadius: BorderRadius.circular(5)),
                           ),
                           onPressed: () {
-                            if (state.categories.isEmpty) {
-                              context.read<MylistBloc>().add(FetchCategories());
-                            }
                             context.go('/KrofileAI/mylist', extra: {
                               'selectedCategoryIndex': 0,
                               'selectedSubCategoryIndex': 0,
                             });
+                            context.read<MylistBloc>().add(FetchMylist());
                           },
                           icon: SvgPicture.asset(
                             "assets/images/Bookmark.svg",
@@ -171,9 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class ThreeDotMenu extends StatefulWidget {
-  const ThreeDotMenu({
-    super.key,
-  });
+  const ThreeDotMenu({super.key});
 
   @override
   State<ThreeDotMenu> createState() => _ThreeDotMenuState();
@@ -184,111 +174,107 @@ class _ThreeDotMenuState extends State<ThreeDotMenu> {
 
   Future<void> _viewFeedBackAlert() {
     return showDialog(
-        barrierColor: const Color(0xFF000000).withOpacity(0.8),
-        context: context,
-        builder: (BuildContext context) {
-          return const FeedBackAlert();
-        });
+      barrierColor: const Color(0xFF000000).withOpacity(0.8),
+      context: context,
+      builder: (BuildContext context) => const FeedBackAlert(),
+    );
   }
 
   Future<void> _viewClearAllAlert() {
     return showDialog(
-        barrierColor: const Color(0xFF000000).withOpacity(0.8),
-        context: context,
-        builder: (BuildContext context) {
-          return const ClearAllChatAlert();
-        });
+      barrierColor: const Color(0xFF000000).withOpacity(0.8),
+      context: context,
+      builder: (BuildContext context) => const ClearAllChatAlert(),
+    );
   }
 
   Future<void> _viewDeleteHistoryAlert() {
     return showDialog(
-        barrierColor: const Color(0xFF000000).withOpacity(0.8),
-        context: context,
-        builder: (BuildContext context) {
-          return const DeletAllSearchHistoryAlert();
-        });
+      barrierColor: const Color(0xFF000000).withOpacity(0.8),
+      context: context,
+      builder: (BuildContext context) => const DeletAllSearchHistoryAlert(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      child: BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
-        builder: (context, state) {
-          return MenuAnchor(
-            controller: _menuController,
-            style: const MenuStyle(
-              backgroundColor: WidgetStatePropertyAll(Color(0xFFFAFAFA)),
-              padding: WidgetStatePropertyAll(EdgeInsets.all(10)),
+    return BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
+      builder: (context, state) {
+        return MenuAnchor(
+          controller: _menuController,
+          style: MenuStyle(
+            backgroundColor: WidgetStateProperty.all(Colors.white),
+            shape: WidgetStateProperty.all(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            menuChildren: [
-              SizedBox(
-                width: 200,
-                child: Column(
-                  children: [
-                    MenuItemButton(
-                      style: const ButtonStyle(
-                        padding: WidgetStatePropertyAll(
-                          EdgeInsets.symmetric(horizontal: 6, vertical: 16),
-                        ),
-                      ),
-                      child: const Text(
-                        'History',
-                      ),
-                      onPressed: () {
-                        context.read<HomeScreenBloc>().add(ToggleHistory());
-                        if (state.historyList.isEmpty) {
-                          context
-                              .read<BusinessResponseBloc>()
-                              .add(FetchHistory());
-                        }
-                        if (Responsive.isMobile(context)) {
-                          Scaffold.of(context).openEndDrawer();
-                        }
-                      },
-                    ),
-                    MenuItemButton(
-                      onPressed: _viewClearAllAlert,
-                      child: const Text('Clear All Chat'),
-                    ),
-                    MenuItemButton(
-                      child: const Text('Customize'),
-                      onPressed: () {
-                        context.go('/KrofileAI/customize');
-                      },
-                    ),
-                    MenuItemButton(
-                      child: const Text('Incognito Mode'),
-                      onPressed: () {
-                        context.go('/KrofileAI/incognito');
-                      },
-                    ),
-                    MenuItemButton(
-                      onPressed: _viewDeleteHistoryAlert,
-                      child: const Text('Delete All Search History'),
-                    ),
-                    MenuItemButton(
-                      onPressed: _viewFeedBackAlert,
-                      child: const Text('Feedback'),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-            builder: (context, controller, child) {
-              return IconButton(
-                icon: const Icon(Icons.more_vert),
-                onPressed: () {
-                  if (controller.isOpen) {
-                    controller.close();
-                  } else {
-                    controller.open();
+            elevation: WidgetStateProperty.all(8),
+            shadowColor: WidgetStateProperty.all(Colors.black.withOpacity(1)),
+          ),
+          menuChildren: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildMenuItem('History', () {
+                  context.read<HomeScreenBloc>().add(ToggleHistory());
+                  context.read<BusinessResponseBloc>().add(FetchHistory());
+                  if (Responsive.isMobile(context)) {
+                    Scaffold.of(context).openEndDrawer();
                   }
-                },
-              );
-            },
-          );
-        },
-      ),
+                }),
+                _buildMenuItem('Clear All Chat', _viewClearAllAlert),
+                _buildMenuItem(
+                    'Customize', () => context.go('/KrofileAI/customize')),
+                _buildMenuItem(
+                    'Incognito Mode', () => context.go('/KrofileAI/incognito')),
+                _buildMenuItem(
+                    'Delete All Search History', _viewDeleteHistoryAlert),
+                _buildMenuItem('Feedback', _viewFeedBackAlert, isLast: true),
+              ],
+            ),
+          ],
+          builder: (context, controller, child) {
+            return IconButton(
+              icon: const Icon(Icons.more_vert),
+              onPressed: () {
+                if (controller.isOpen) {
+                  controller.close();
+                } else {
+                  controller.open();
+                }
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildMenuItem(String title, VoidCallback onPressed,
+      {bool isLast = false}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        InkWell(
+          onTap: () {
+            _menuController.close();
+            onPressed();
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
+        ),
+        if (!isLast)
+          const Divider(
+            height: 1,
+            thickness: 1,
+            color: Color(0xFFE0E0E0), // Light grey color for the divider
+          ),
+      ],
     );
   }
 }

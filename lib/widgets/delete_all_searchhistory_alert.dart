@@ -65,7 +65,7 @@ class DeletAllSearchHistoryAlert extends StatelessWidget {
         ElevatedButton(
             style: TextButton.styleFrom(
               padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-              backgroundColor: const Color(0xFF21201F),
+              backgroundColor: const Color(0xFF1E7BC8),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5)),
             ),

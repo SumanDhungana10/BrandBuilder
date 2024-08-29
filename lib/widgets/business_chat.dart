@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
 import 'package:krofile_ai/bloc/customizescreen/customizescreen_bloc.dart';
 import 'package:krofile_ai/bloc/homescreen/homescreen_bloc.dart';
 import 'package:krofile_ai/responsive.dart';
-import 'package:krofile_ai/screen/explore_screen.dart';
 import 'package:krofile_ai/widgets/prefixButton.dart';
 import 'package:krofile_ai/widgets/response_ui.dart';
 
@@ -41,11 +41,25 @@ class _BusinessChatState extends State<BusinessChat> {
               children: [
                 BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
                     builder: (context, state) {
-                  
+                  final starterConversation = context
+                      .watch<CustomizeScreenBloc>()
+                      .state
+                      .starterConversation;
+
+                  // If there are more than 4 items, shuffle and take 4 randomly
+                  final displayedStarterConversations =
+                      (starterConversation.length > 4)
+                          ? (starterConversation.toList()..shuffle())
+                              .take(4)
+                              .toList()
+                          : starterConversation;
+
                   return (state.isQuestionType == false)
                       ? Expanded(
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                            mainAxisAlignment: (starterConversation.isNotEmpty)
+                                ? MainAxisAlignment.end
+                                : MainAxisAlignment.center,
                             children: [
                               Image.asset(
                                 "assets/images/SquareLogo.png",
@@ -58,61 +72,64 @@ class _BusinessChatState extends State<BusinessChat> {
                                       color: Color(0xFF151515),
                                       fontWeight: FontWeight.w700)),
                               BlocBuilder<CustomizeScreenBloc,
-                                      CustomizeScreenState>(
-                                  builder: (context, state) {
-                                return GridView.builder(
-                                  shrinkWrap: true,
-                                  padding: const EdgeInsets.all(24),
-                                  gridDelegate:
-                                      const SliverGridDelegateWithMaxCrossAxisExtent(
-                                    maxCrossAxisExtent: 620,
-                                    mainAxisExtent: 90,
-                                    crossAxisSpacing: 10,
-                                    mainAxisSpacing: 10,
-                                  ),
-                                  itemCount: state.starterConversation
-                                      .length, // Replace with your actual item count
-                                  itemBuilder: (context, index) {
-                                    return InkWell(
-                                      customBorder: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      onTap: () {
-                                        String question =
-                                            state.starterConversation[index];
-                                        context
-                                            .read<BusinessResponseBloc>()
-                                            .add(HandleQuestionType());
-                                        context
-                                            .read<BusinessResponseBloc>()
-                                            .add(AddQuestionAnswerList(
-                                                question));
-                                      },
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                              color: const Color(0xFFE5E5E5)),
+                                  CustomizeScreenState>(
+                                builder: (context, state) {
+                                  return GridView.builder(
+                                    shrinkWrap: true,
+                                    padding: const EdgeInsets.all(24),
+                                    gridDelegate:
+                                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                                      maxCrossAxisExtent: 620,
+                                      mainAxisExtent: 90,
+                                      crossAxisSpacing: 10,
+                                      mainAxisSpacing: 10,
+                                    ),
+                                    itemCount:
+                                        displayedStarterConversations.length,
+                                    itemBuilder: (context, index) {
+                                      return InkWell(
+                                        customBorder: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(10),
                                         ),
-                                        padding: const EdgeInsets.all(24),
-                                        child: Text(
-                                          state.starterConversation[index],
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            color: Color(0xFF151515),
-                                            fontWeight: FontWeight.w400,
+                                        onTap: () {
+                                          String question =
+                                              displayedStarterConversations[
+                                                      index]
+                                                  .question;
+                                          context
+                                              .read<BusinessResponseBloc>()
+                                              .add(HandleQuestionType());
+                                          context
+                                              .read<BusinessResponseBloc>()
+                                              .add(AddQuestionAnswerList(
+                                                  question));
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color: const Color(0xFFE5E5E5)),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          padding: const EdgeInsets.all(24),
+                                          child: Text(
+                                            displayedStarterConversations[index]
+                                                .question,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              color: Color(0xFF151515),
+                                              fontWeight: FontWeight.w400,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                    //   }
-                                    // );
-                                  },
-                                );
-                              }),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
                             ],
                           ),
                         )
@@ -213,7 +230,7 @@ class _BusinessChatState extends State<BusinessChat> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Container(
                                   decoration: const BoxDecoration(
-                                    color: Color(0xFF18C554),
+                                    color: Color(0xFF54A5EA),
                                     shape: BoxShape.circle,
                                   ),
                                   child: IconButton(
@@ -243,7 +260,8 @@ class _BusinessChatState extends State<BusinessChat> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               filled: true,
-                              fillColor: Colors.white,
+                              fillColor: const Color(0xFFFFFFFF),
+                              hoverColor: const Color(0xFFFFFFFF),
                             ),
                             onFieldSubmitted: (value) {
                               if (_inputQuestion.text.isNotEmpty &&
@@ -269,12 +287,9 @@ class _BusinessChatState extends State<BusinessChat> {
                 ),
                 const SizedBox(width: 10),
                 IconButton(
+                  tooltip: "Explore",
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ExploreScreen()),
-                    );
+                    context.go('/KrofileAI/explore');
                   },
                   icon: SvgPicture.asset("assets/images/apps.svg"),
                 ),

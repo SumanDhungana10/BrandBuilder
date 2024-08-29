@@ -44,6 +44,14 @@ class _ViewFAQState extends State<ViewFAQ> {
         child: BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
           builder: (context, state) {
             final faq = state.faq;
+
+            // Check if faq contains "No Question Found!!!" and close the dialog
+            // if (faq.contains("No Question Found!!!")) {
+            //   WidgetsBinding.instance.addPostFrameCallback((_) {
+            //     Navigator.of(context).pop();
+            //   });
+            //   return Container(); // Return an empty container while closing
+            // }
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -57,9 +65,9 @@ class _ViewFAQState extends State<ViewFAQ> {
                         padding: const EdgeInsets.only(top: 10),
                         child: ListTile(
                           onTap: () {
-                            // context
-                            //     .read<BusinessResponseBloc>()
-                            //     .add(ToggleQuestionFromFAQ(faqItem));
+                            context
+                                .read<BusinessResponseBloc>()
+                                .add(ToggleQuestionFromFAQ(faqItem));
                             Navigator.of(context).pop();
                           },
                           title: Text(
@@ -94,7 +102,7 @@ class _ViewFAQState extends State<ViewFAQ> {
                     },
                     style: ElevatedButton.styleFrom(
                       disabledBackgroundColor: const Color(0xFF96D2AB),
-                      backgroundColor: const Color(0xFF18C554),
+                      backgroundColor: const Color(0xFF1E7BC8),
                       padding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5),

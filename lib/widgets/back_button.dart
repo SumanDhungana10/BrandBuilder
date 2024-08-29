@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:krofile_ai/responsive.dart';
-import 'package:krofile_ai/screen/home_screen.dart';
 
 class OneBackButton extends StatelessWidget {
   const OneBackButton({

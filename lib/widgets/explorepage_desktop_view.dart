@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:krofile_ai/bloc/bloc/explore_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:krofile_ai/bloc/explore/explore_bloc.dart';
 import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
-import 'package:krofile_ai/screen/home_screen.dart';
 
 class ExplorePageDeskTop extends StatefulWidget {
   const ExplorePageDeskTop({super.key});
@@ -68,6 +68,7 @@ class _ExplorePageDeskTopState extends State<ExplorePageDeskTop> {
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Stack(
                 alignment: Alignment.centerRight,
@@ -97,7 +98,7 @@ class _ExplorePageDeskTopState extends State<ExplorePageDeskTop> {
                                   style: ElevatedButton.styleFrom(
                                     elevation: 0,
                                     backgroundColor: (activeIndex == index)
-                                        ? const Color(0xFF18C554)
+                                        ? const Color(0xFF54A5EA)
                                         : const Color(0xFFFFFFFF),
                                     foregroundColor: (activeIndex == index)
                                         ? const Color(0xFFFFFFFF)
@@ -140,7 +141,7 @@ class _ExplorePageDeskTopState extends State<ExplorePageDeskTop> {
                                   style: ElevatedButton.styleFrom(
                                     elevation: 0,
                                     backgroundColor: (activeIndex == index)
-                                        ? const Color(0xFF18C554)
+                                        ? const Color(0xFF54A5EA)
                                         : const Color(0xFFFFFFFF),
                                     foregroundColor: (activeIndex == index)
                                         ? const Color(0xFFFFFFFF)
@@ -219,57 +220,61 @@ class _ExplorePageDeskTopState extends State<ExplorePageDeskTop> {
                                 ? const Center(
                                     child: Text("No subcategories"),
                                   )
-                                : ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount: state.subCategories.length,
-                                    itemBuilder: (context, index) {
-                                      return Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 12),
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            alignment: Alignment.centerLeft,
-                                            elevation: 0,
-                                            backgroundColor:
-                                                (activeSubCategoryIndex ==
-                                                        index)
-                                                    ? const Color(0xFF18C554)
-                                                    : const Color(0xFFFFFFFF),
-                                            foregroundColor:
-                                                (activeSubCategoryIndex ==
-                                                        index)
-                                                    ? const Color(0xFFFFFFFF)
-                                                    : const Color(0xFF73767B),
-                                            padding: const EdgeInsets.all(16),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(14),
-                                              side: const BorderSide(
-                                                  color: Colors.grey,
-                                                  width: 1.0),
+                                : SizedBox(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.58,
+                                    child: ListView.builder(
+                                      itemCount: state.subCategories.length,
+                                      itemBuilder: (context, index) {
+                                        return Padding(
+                                          padding:
+                                              const EdgeInsets.only(bottom: 12),
+                                          child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              alignment: Alignment.centerLeft,
+                                              elevation: 0,
+                                              backgroundColor:
+                                                  (activeSubCategoryIndex ==
+                                                          index)
+                                                      ? const Color(0xFF54A5EA)
+                                                      : const Color(0xFFFFFFFF),
+                                              foregroundColor:
+                                                  (activeSubCategoryIndex ==
+                                                          index)
+                                                      ? const Color(0xFFFFFFFF)
+                                                      : const Color(0xFF73767B),
+                                              padding: const EdgeInsets.all(16),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(14),
+                                                side: const BorderSide(
+                                                    color: Colors.grey,
+                                                    width: 1.0),
+                                              ),
                                             ),
+                                            onPressed: () {
+                                              context.read<ExploreBloc>().add(
+                                                  HandelSubCategoryButton(
+                                                      index));
+                                              context
+                                                  .read<ExploreBloc>()
+                                                  .add(FetchQuestions());
+                                            },
+                                            child: Text(
+                                                state.subCategories[index],
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
+                                                )),
                                           ),
-                                          onPressed: () {
-                                            context.read<ExploreBloc>().add(
-                                                HandelSubCategoryButton(index));
-                                            context
-                                                .read<ExploreBloc>()
-                                                .add(FetchQuestions());
-                                          },
-                                          child: Text(
-                                              state.subCategories[index],
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                              )),
-                                        ),
-                                      );
-                                    },
+                                        );
+                                      },
+                                    ),
                                   ),
                           ),
                           const SizedBox(width: 34),
-                          Flexible(
+                          Expanded(
                             flex: 4,
                             child: (state.isQuestionsLoading)
                                 ? const Center(
@@ -279,61 +284,65 @@ class _ExplorePageDeskTopState extends State<ExplorePageDeskTop> {
                                     ? const Center(
                                         child: Text("No items"),
                                       )
-                                    : ListView.builder(
-                                        shrinkWrap: true,
-                                        itemCount: state.questions.length,
-                                        itemBuilder: (context, index) {
-                                          return Container(
-                                            margin: const EdgeInsets.only(
-                                                bottom: 24),
-                                            decoration: const BoxDecoration(
-                                                border: Border(
-                                                    bottom: BorderSide(
-                                                        color:
-                                                            Color(0xFFE5E5E5),
-                                                        width: 1.0))),
-                                            padding: const EdgeInsets.only(
-                                              bottom: 24,
-                                            ),
-                                            child: ListTile(
-                                              title: Text(
-                                                state.questions[index],
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w400,
-                                                    color: Color(0xFF151515)),
+                                    : SizedBox(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.58,
+                                        child: ListView.builder(
+                                          itemCount: state.questions.length,
+                                          itemBuilder: (context, index) {
+                                            return Container(
+                                              margin: const EdgeInsets.only(
+                                                  bottom: 24),
+                                              decoration: const BoxDecoration(
+                                                  border: Border(
+                                                      bottom: BorderSide(
+                                                          color:
+                                                              Color(0xFFE5E5E5),
+                                                          width: 1.0))),
+                                              padding: const EdgeInsets.only(
+                                                bottom: 24,
                                               ),
-                                              trailing: IconButton(
-                                                icon: const Icon(
-                                                  Icons.arrow_forward_ios,
-                                                  color: Color(
-                                                    0xFF151515,
-                                                  ),
-                                                  size: 16,
+                                              child: ListTile(
+                                                title: Text(
+                                                  state.questions[index],
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: Color(0xFF151515)),
                                                 ),
-                                                onPressed: () {},
+                                                trailing: IconButton(
+                                                  icon: const Icon(
+                                                    Icons.arrow_forward_ios,
+                                                    color: Color(
+                                                      0xFF151515,
+                                                    ),
+                                                    size: 16,
+                                                  ),
+                                                  onPressed: () {},
+                                                ),
+                                                onTap: () {
+                                                  context.pop();
+                                                  BlocProvider.of<
+                                                              BusinessResponseBloc>(
+                                                          context)
+                                                      .add(
+                                                          HandleQuestionType());
+                                                  BlocProvider.of<
+                                                              BusinessResponseBloc>(
+                                                          context)
+                                                      .add(
+                                                          AddQuestionAnswerList(
+                                                              state.questions[
+                                                                  index]));
+                                                },
                                               ),
-                                              onTap: () {
-                                                Navigator.pushReplacement(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const HomeScreen()));
-                                                BlocProvider.of<
-                                                            BusinessResponseBloc>(
-                                                        context)
-                                                    .add(HandleQuestionType());
-                                                BlocProvider.of<
-                                                            BusinessResponseBloc>(
-                                                        context)
-                                                    .add(AddQuestionAnswerList(
-                                                        state
-                                                            .questions[index]));
-                                              },
-                                            ),
-                                          );
-                                        },
+                                            );
+                                          },
+                                        ),
                                       ),
                           ),
                         ],

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:krofile_ai/app_router.dart';
-import 'package:krofile_ai/bloc/bloc/explore_bloc.dart';
+import 'package:krofile_ai/bloc/explore/explore_bloc.dart';
 import 'package:krofile_ai/bloc/incognitoresponse/incognitoresponse_bloc.dart';
 import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
 import 'package:krofile_ai/bloc/mylist/mylist_bloc.dart';
 import 'package:krofile_ai/bloc/customizescreen/customizescreen_bloc.dart';
 import 'package:krofile_ai/bloc/homescreen/homescreen_bloc.dart';
-import 'bloc/responsefeedback/responsefeedback_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,16 +23,27 @@ class MyApp extends StatelessWidget {
           create: (context) => HomeScreenBloc(),
         ),
         BlocProvider<BusinessResponseBloc>(
-          create: (context) => BusinessResponseBloc(),
-        ),
-        BlocProvider<ResponsefeedbackBloc>(
-          create: (context) => ResponsefeedbackBloc(),
+          create: (context) {
+            final bloc = BusinessResponseBloc();
+            bloc.add(GetFaq());
+            bloc.add(FetchHistory());
+
+            return bloc;
+          },
         ),
         BlocProvider<MylistBloc>(
-          create: (context) => MylistBloc(),
+          create: (context) {
+            final bloc = MylistBloc();
+            bloc.add(FetchMylist());
+            return bloc;
+          },
         ),
         BlocProvider<CustomizeScreenBloc>(
-          create: (context) => CustomizeScreenBloc(),
+          create: (context) {
+            final bloc = CustomizeScreenBloc();
+            bloc.add(FetchStarterConversations());
+            return bloc;
+          }
         ),
         BlocProvider<IncognitoResponseBloc>(
           create: (context) => IncognitoResponseBloc(),
@@ -43,7 +53,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         title: 'Krofile AI',
-        theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFFAFAFA)),
+        theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFFFFFFF)),
         routerConfig: router,
       ),
     );

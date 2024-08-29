@@ -1,19 +1,15 @@
 import 'package:dio/dio.dart';
+import 'package:krofile_ai/http.dart';
 import 'package:krofile_ai/model/response_model.dart';
 
 class ChatService {
-  final String url =
-      "https://kiwa57hisy.us-east-1.awsapprunner.com/businesschat";
-  final String email = 'passagetoindia@gmail.com';
-  final Dio dio = Dio();
-
   Future<String> sendQuery(String query) async {
     try {
       Response response = await dio.post(
-        url,
+        '/businesschat',
         data: FormData.fromMap({
           'question': query,
-          'username': email,
+          'username': username,
         }),
         options: Options(
           contentType: Headers.formUrlEncodedContentType,
