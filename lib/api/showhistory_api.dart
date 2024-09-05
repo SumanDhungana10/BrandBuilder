@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:krofile_ai/http.dart';
 
-class ShowhistoryServices {
+class ShowHistoryApi {
   Future<List<Map<String, dynamic>>> showHistory() async {
     try {
       Response response = await dio.post(

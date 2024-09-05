@@ -1,630 +1,635 @@
-import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
-import 'package:krofile_ai/bloc/mylist/mylist_bloc.dart';
-import 'package:krofile_ai/helper.dart';
-import 'package:krofile_ai/utils/skeleton.dart';
-import 'package:krofile_ai/utils/text_parse.dart';
-import 'package:krofile_ai/utils/typewriter_text.dart';
-import 'package:krofile_ai/widgets/addto_mylist_alert.dart';
-import 'package:krofile_ai/widgets/viewmore_feedback_alert.dart';
-import 'package:share_plus/share_plus.dart';
+// import 'dart:async';
+// import 'package:flutter/material.dart';
+// import 'package:flutter/services.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:flutter_svg/svg.dart';
+// import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
+// import 'package:krofile_ai/bloc/mylist/mylist_bloc.dart';
+// import 'package:krofile_ai/utils/skeleton.dart';
+// import 'package:krofile_ai/utils/text_parse.dart';
+// import 'package:krofile_ai/utils/typewriter_text.dart';
+// import 'package:krofile_ai/widgets/addto_mylist_alert.dart';
+// import 'package:krofile_ai/widgets/viewmore_feedback_alert.dart';
+// import 'package:share_plus/share_plus.dart';
 
-class ResponseUI extends StatefulWidget {
-  const ResponseUI({
-    super.key,
-  });
+// class ResponseUI extends StatefulWidget {
+//   const ResponseUI({
+//     super.key,
+//   });
 
-  @override
-  State<ResponseUI> createState() => _ResponseUIState();
-}
+//   @override
+//   State<ResponseUI> createState() => _ResponseUIState();
+// }
 
-class _ResponseUIState extends State<ResponseUI> {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
-          buildWhen: (previous, current) =>
-              previous.questionAnswerList != current.questionAnswerList,
-          builder: (context, state) {
-            final newList = state.questionAnswerList.toList();
+// class _ResponseUIState extends State<ResponseUI> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.all(24),
+//       child: BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
+//           buildWhen: (previous, current) =>
+//               previous.questionAnswerList != current.questionAnswerList,
+//           builder: (context, state) {
+//             final newList = state.questionAnswerList.toList();
 
-            return ListView.builder(
-                reverse: true,
-                shrinkWrap: true,
-                itemCount: newList.length,
-                itemBuilder: (context, index) {
-                  final updateIndex = newList.length - index - 1;
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                        decoration: const BoxDecoration(
-                          border: Border(
-                              bottom: BorderSide(
-                                  color: Color(0xFFE5E5E5), width: 1)),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              height: 40,
-                              width: 40,
-                              // padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: const Color(0xFFD4D4D4),
-                                    width: 1,
-                                  )),
-                              child: const Icon(
-                                Icons.person,
-                                color: Color(0xFF603CFF),
-                              ),
-                            ), // Replace with your icon (if any
-                            const SizedBox(width: 20),
-                            Flexible(
-                              child: Text(
-                                newList[updateIndex].question,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  color: Color(0xFF151515),
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                            BlocListener<BusinessResponseBloc,
-                                BusinessResponseState>(
-                              listenWhen: (previous, current) =>
-                                  previous.faqSavingStatus !=
-                                  current.faqSavingStatus,
-                              listener: (context, state) {
-                                if (state.faqSavingStatus ==
-                                    FAQSavingStatus.inProgress) {
-                                  showDialog(
-                                    context: context,
-                                    barrierDismissible: false,
-                                    builder: (BuildContext context) {
-                                      return const DynamicProgressDialog();
-                                    },
-                                  );
-                                } else if (state.faqSavingStatus ==
-                                        FAQSavingStatus.success ||
-                                    state.faqSavingStatus ==
-                                        FAQSavingStatus.error) {
-                                  Navigator.of(context)
-                                      .pop(); // Dismiss the dialog
-                                }
-                              },
-                              child: IconButton(
-                                  tooltip: "Add to FAQ",
-                                  icon: SvgPicture.asset(
-                                    "assets/images/arrow-up.svg",
-                                  ),
-                                  onPressed: (state.faq.length < 20)
-                                      ? () {
-                                          context
-                                              .read<BusinessResponseBloc>()
-                                              .add(SaveFaqQuestion(
-                                                  newList[updateIndex]
-                                                      .question));
-                                          context
-                                              .read<BusinessResponseBloc>()
-                                              .add(GetFaq());
-                                        }
-                                      : null),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
-                        decoration: const BoxDecoration(
-                          border: Border(
-                            bottom:
-                                BorderSide(color: Color(0xFFE5E5E5), width: 1),
-                          ),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset(
-                              "assets/images/SquareLogo.png",
-                              height: 40,
-                              width: 40,
-                            ),
-                            const SizedBox(width: 20),
-                            Expanded(
-                              child: PromptResponse(
-                                index: newList.length - index - 1,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                });
-          }),
-    );
-  }
-}
+//             return ListView.builder(
+//                 reverse: true,
+//                 shrinkWrap: true,
+//                 itemCount: newList.length,
+//                 itemBuilder: (context, index) {
+//                   final updateIndex = newList.length - index - 1;
+//                   return Column(
+//                     mainAxisAlignment: MainAxisAlignment.end,
+//                     children: [
+//                       Container(
+//                         padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+//                         decoration: const BoxDecoration(
+//                           border: Border(
+//                               bottom: BorderSide(
+//                                   color: Color(0xFFE5E5E5), width: 1)),
+//                         ),
+//                         child: Row(
+//                           children: [
+//                             Container(
+//                               height: 40,
+//                               width: 40,
+//                               // padding: const EdgeInsets.all(10),
+//                               decoration: BoxDecoration(
+//                                   shape: BoxShape.circle,
+//                                   border: Border.all(
+//                                     color: const Color(0xFFD4D4D4),
+//                                     width: 1,
+//                                   )),
+//                               child: const Icon(
+//                                 Icons.person,
+//                                 color: Color(0xFF603CFF),
+//                               ),
+//                             ), // Replace with your icon (if any
+//                             const SizedBox(width: 20),
+//                             Flexible(
+//                               child: Text(
+//                                 newList[updateIndex].question,
+//                                 style: const TextStyle(
+//                                   fontSize: 16,
+//                                   color: Color(0xFF151515),
+//                                   fontWeight: FontWeight.w400,
+//                                 ),
+//                               ),
+//                             ),
+//                             BlocListener<BusinessResponseBloc,
+//                                 BusinessResponseState>(
+//                               listenWhen: (previous, current) =>
+//                                   previous.faqSavingStatus !=
+//                                   current.faqSavingStatus,
+//                               listener: (context, state) {
+//                                 if (state.faqSavingStatus ==
+//                                     FAQSavingStatus.inProgress) {
+//                                   showDialog(
+//                                     context: context,
+//                                     barrierDismissible: false,
+//                                     builder: (BuildContext context) {
+//                                       return const DynamicProgressDialog();
+//                                     },
+//                                   );
+//                                 } else if (state.faqSavingStatus ==
+//                                         FAQSavingStatus.success ||
+//                                     state.faqSavingStatus ==
+//                                         FAQSavingStatus.error) {
+//                                   Navigator.of(context)
+//                                       .pop(); // Dismiss the dialog
+//                                 }
+//                               },
+//                               child: IconButton(
+//                                   tooltip: "Add to FAQ",
+//                                   icon: SvgPicture.asset(
+//                                     "assets/images/arrow-up.svg",
+//                                   ),
+//                                   onPressed: (state.faq.length < 20)
+//                                       ? () {
+//                                           context
+//                                               .read<BusinessResponseBloc>()
+//                                               .add(SaveFaqQuestion(
+//                                                   newList[updateIndex]
+//                                                       .question));
+//                                           context
+//                                               .read<BusinessResponseBloc>()
+//                                               .add(GetFaq());
+//                                         }
+//                                       : null),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                       Container(
+//                         padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
+//                         decoration: const BoxDecoration(
+//                           border: Border(
+//                             bottom:
+//                                 BorderSide(color: Color(0xFFE5E5E5), width: 1),
+//                           ),
+//                         ),
+//                         child: Row(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           mainAxisSize: MainAxisSize.min,
+//                           children: [
+//                             Image.asset(
+//                               "assets/images/SquareLogo.png",
+//                               height: 40,
+//                               width: 40,
+//                             ),
+//                             const SizedBox(width: 20),
+//                             Expanded(
+//                               child: PromptResponse(
+//                                 index: newList.length - index - 1,
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                     ],
+//                   );
+//                 });
+//           }),
+//     );
+//   }
+// }
 
-class PromptResponse extends StatefulWidget {
-  final int index;
+// class PromptResponse extends StatefulWidget {
+//   final int index;
 
-  const PromptResponse({super.key, required this.index});
+//   const PromptResponse({super.key, required this.index});
 
-  @override
-  State<PromptResponse> createState() => _PromptResponseState();
-}
+//   @override
+//   State<PromptResponse> createState() => _PromptResponseState();
+// }
 
-class _PromptResponseState extends State<PromptResponse>
-    with TickerProviderStateMixin {
-  final List<String> disLikeReport = [
-    "Doesn't seem correct",
-    "Wasn't useful to me",
-    "This is inappropriate or upsetting",
-    "Prefer a different approach",
-    "Had trouble with my file",
-    "More.."
-  ];
+// class _PromptResponseState extends State<PromptResponse>
+//     with TickerProviderStateMixin {
+//   final List<String> disLikeReport = [
+//     "Doesn't seem correct",
+//     "Wasn't useful to me",
+//     "This is inappropriate or upsetting",
+//     "Prefer a different approach",
+//     "Had trouble with my file",
+//     "More.."
+//   ];
 
-  Future<void> _viewMoreFeedBack(int index, String answer) {
-    return showDialog(
-        barrierColor: const Color(0xFF000000).withOpacity(0.8),
-        context: context,
-        builder: (BuildContext context) {
-          return ViewMoreFeedBack(responseIndex: index, answer: answer);
-        });
-  }
+//   Future<void> _viewMoreFeedBack(int index, String answer) {
+//     return showDialog(
+//         barrierColor: const Color(0xFF000000).withOpacity(0.8),
+//         context: context,
+//         builder: (BuildContext context) {
+//           return ViewMoreFeedBack(responseIndex: index, answer: answer);
+//         });
+//   }
 
-  Future<void> _addToMyList(String answer) {
-    return showDialog(
-        barrierColor: const Color(0xFF000000).withOpacity(0.8),
-        context: context,
-        builder: (BuildContext context) {
-          return AddToMyList(answer: answer);
-        });
-  }
+//   Future<void> _addToMyList(String answer) {
+//     return showDialog(
+//         barrierColor: const Color(0xFF000000).withOpacity(0.8),
+//         context: context,
+//         builder: (BuildContext context) {
+//           return AddToMyList(answer: answer);
+//         });
+//   }
 
-  void showThankYouMessage(int index) {
-    context.read<BusinessResponseBloc>().add(CloseDislikeFeedback(index));
-    context.read<BusinessResponseBloc>().add(CloseRegenerateFeedback(index));
-    context.read<BusinessResponseBloc>().add(ShowThankYouMessage(index));
-  }
+//   void showThankYouMessage(int index) {
+//     context.read<BusinessResponseBloc>().add(CloseDislikeFeedback(index));
+//     context.read<BusinessResponseBloc>().add(CloseRegenerateFeedback(index));
+//     context.read<BusinessResponseBloc>().add(ShowThankYouMessage(index));
+//   }
 
-  bool isRegenerating = false;
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
-      builder: (context, state) {
-        final questionAnswer = state.questionAnswerList[widget.index];
-        final answer = questionAnswer.answer;
-        final isRegenerating = state.regeneratingIndices[widget.index] ?? false;
+//   bool isRegenerating = false;
+//   @override
+//   Widget build(BuildContext context) {
+//     return BlocBuilder<BusinessResponseBloc, BusinessResponseState>(
+//       builder: (context, state) {
+//         final questionAnswer = state.questionAnswerList[widget.index];
+//         final answer = questionAnswer.answer;
+//         final isRegenerating = state.regeneratingIndices[widget.index] ?? false;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (questionAnswer.isLoading)
-              for (int i = 0; i < 3; i++)
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 8.0),
-                  child: Skeletal(
-                    height: 16,
-                    width: double.infinity,
-                  ),
-                )
-            else if (questionAnswer.isNewResponse ||
-                !questionAnswer.isAnimationCompleted)
-              CustomAnimatedText(
-                key: ValueKey(answer),
-                text: answer,
-                fontSize: 16,
-                textColor: const Color(0xFF151515),
-                index: widget.index,
-                animationContext: AnimationContext.businessResponse,
-              )
-            else
-              RichText(
-                text: TextSpan(
-                  children: convertToBoldText(answer,
-                      fontSize: 16, color: const Color(0xFF151515)),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-            const SizedBox(
-              height: 10,
-            ),
-            if (state.questionAnswerList[widget.index].isAnimationCompleted)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      IconButton(
-                          tooltip: "Regenerate",
-                          onPressed: questionAnswer.isLoading
-                              ? null
-                              : () {
-                                  context
-                                      .read<BusinessResponseBloc>()
-                                      .add(HandleRegenerate(widget.index));
-                                },
-                          icon: const Icon(
-                            Icons.replay_outlined,
-                            size: 24,
-                            color: Color(0xFF151515),
-                          )),
-                      IconButton(
-                          tooltip: "Share",
-                          onPressed: () {
-                            Share.share(
-                                state.questionAnswerList[widget.index].answer);
-                          },
-                          icon: const Icon(
-                            Icons.share_outlined,
-                            size: 24,
-                            color: Color(0xFF151515),
-                          )),
-                      IconButton(
-                          tooltip: "Copy",
-                          onPressed: () {
-                            Clipboard.setData(ClipboardData(
-                                    text: state.questionAnswerList[widget.index]
-                                        .answer))
-                                .then((_) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      duration: Duration(milliseconds: 500),
-                                      content:
-                                          Text('Copied to your clipboard!')));
-                            });
-                          },
-                          icon: const Icon(
-                            Icons.file_copy_outlined,
-                            size: 24,
-                            color: Color(0xFF151515),
-                          )),
-                      BlocBuilder<MylistBloc, MylistState>(
-                        builder: (context, state) {
-                          return IconButton(
-                            tooltip: "Add to My List",
-                            onPressed: () {
-                              _addToMyList(answer);
-                            },
-                            icon: SvgPicture.asset(
-                              "assets/images/Bookmark.svg",
-                              height: 24,
-                              width: 24,
-                            ),
-                          );
-                        },
-                      )
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      (state.isLikedPressed[widget.index] == null)
-                          ? IconButton(
-                              tooltip: "Like",
-                              onPressed:
-                                  (state.isDislikedPressed[widget.index] ==
-                                          true)
-                                      ? null
-                                      : () {
-                                          context
-                                              .read<BusinessResponseBloc>()
-                                              .add(LikeFeedback(widget.index));
-                                        },
-                              icon: SvgPicture.asset(
-                                "assets/images/thumbs-up.svg",
-                              ),
-                            )
-                          : RotatedBox(
-                              quarterTurns: 2,
-                              child: IconButton(
-                                onPressed: () {},
-                                icon: SvgPicture.asset(
-                                  "assets/images/thumbs-down.svg",
-                                ),
-                              ),
-                            ),
-                      (state.isDislikedPressed[widget.index] == null)
-                          ? RotatedBox(
-                              quarterTurns: 2,
-                              child: IconButton(
-                                tooltip: "Dislike",
-                                onPressed: (state
-                                            .isLikedPressed[widget.index] ==
-                                        true)
-                                    ? null
-                                    : () {
-                                        context
-                                            .read<BusinessResponseBloc>()
-                                            .add(DislikeFeedback(widget.index));
-                                      },
-                                icon: SvgPicture.asset(
-                                  "assets/images/thumbs-up.svg",
-                                ),
-                              ),
-                            )
-                          : IconButton(
-                              onPressed: () {},
-                              icon: SvgPicture.asset(
-                                "assets/images/thumbs-down.svg",
-                              ),
-                            ),
-                    ],
-                  ),
-                ],
-              ),
-            if (isRegenerating && questionAnswer.isAnimationCompleted)
-              Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFAFAFA),
-                      border: Border.all(
-                        color: const Color(0xFFE5E5E5),
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text("Was the response better or worse?",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFF151515))),
-                        Row(
-                          children: [
-                            Column(
-                              children: [
-                                IconButton(
-                                    onPressed: () {
-                                      context.read<BusinessResponseBloc>().add(
-                                          ResponseFeedback(
-                                              "Better", questionAnswer.answer));
-                                      showThankYouMessage(widget.index);
-                                    },
-                                    icon: const Icon(
-                                      Icons.thumb_up_alt_outlined,
-                                      size: 24,
-                                    )),
-                                const Text("Better",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xFF151515)))
-                              ],
-                            ),
-                            const SizedBox(width: 20),
-                            Column(
-                              children: [
-                                IconButton(
-                                    onPressed: () {
-                                      context.read<BusinessResponseBloc>().add(
-                                          ResponseFeedback(
-                                              "Worse", questionAnswer.answer));
-                                      showThankYouMessage(widget.index);
-                                    },
-                                    icon: const Icon(
-                                      Icons.thumb_down_alt_outlined,
-                                      size: 24,
-                                    )),
-                                const Text("Worse",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xFF151515)))
-                              ],
-                            ),
-                            const SizedBox(width: 20),
-                            Column(
-                              children: [
-                                IconButton(
-                                    onPressed: () {
-                                      context.read<BusinessResponseBloc>().add(
-                                          CloseRegenerateFeedback(
-                                              widget.index));
-                                      showThankYouMessage(widget.index);
-                                    },
-                                    icon: const Icon(
-                                      Icons.thumb_up_alt_outlined,
-                                      size: 24,
-                                    )),
-                                const Text("Same",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xFF151515)))
-                              ],
-                            )
-                          ],
-                        ),
-                        IconButton(
-                            onPressed: () {
-                              context
-                                  .read<BusinessResponseBloc>()
-                                  .add(CloseRegenerateFeedback(widget.index));
-                            },
-                            icon: const Icon(Icons.close))
-                      ],
-                    ),
-                  )),
-            if (state.disLikedIndex[widget.index] == true)
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFAFAFA),
-                    border: Border.all(
-                      color: const Color(0xFFE5E5E5),
-                      width: 1,
-                    ),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 24),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Tell us more:",
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF151515)),
-                            ),
-                            IconButton(
-                                onPressed: () {
-                                  context
-                                      .read<BusinessResponseBloc>()
-                                      .add(CloseDislikeFeedback(widget.index));
-                                },
-                                icon: const Icon(
-                                  Icons.close,
-                                  size: 24,
-                                ))
-                          ],
-                        ),
-                      ),
-                      Wrap(
-                        spacing: 24,
-                        runSpacing: 20,
-                        children: [
-                          for (var item in disLikeReport)
-                            ElevatedButton(
-                              onPressed: () {
-                                if (item == "More..") {
-                                  _viewMoreFeedBack(
-                                      widget.index, questionAnswer.answer);
-                                } else {
-                                  context.read<BusinessResponseBloc>().add(
-                                      ResponseFeedback(
-                                          item, questionAnswer.answer));
-                                  showThankYouMessage(widget.index);
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                elevation: 0,
-                                textStyle: const TextStyle(
-                                    fontSize: 16,
-                                    color: Color(0xFF151515),
-                                    fontWeight: FontWeight.w400),
-                                padding: const EdgeInsets.all(24),
-                                foregroundColor: const Color(0xFF151515),
-                                side: const BorderSide(
-                                    color: Color(0xFFD4D4D4), width: 1),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14)),
-                              ),
-                              child: Text(item),
-                            )
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            if (state.showThankYouMessage[widget.index] == true)
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFAFAFA),
-                      border: Border.all(
-                        color: const Color(0xFFE5E5E5),
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: const Text(
-                      'Thank you for your feedback',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Color(0xFF151515),
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        );
-      },
-    );
-  }
-}
+//         return Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             if (questionAnswer.isLoading)
+//               for (int i = 0; i < 3; i++)
+//                 const Padding(
+//                   padding: EdgeInsets.only(bottom: 8.0),
+//                   child: Skeletal(
+//                     height: 16,
+//                     width: double.infinity,
+//                   ),
+//                 )
+//             else if (questionAnswer.isNewResponse ||
+//                 !questionAnswer.isAnimationCompleted)
+//               CustomAnimatedText(
+//                 key: ValueKey(answer),
+//                 text: answer,
+//                 fontSize: 16,
+//                 textColor: const Color(0xFF151515),
+//                 index: widget.index,
+//                 animationContext: AnimationContext.businessResponse,
+//               )
+//             else
+//               RichText(
+//                 text: TextSpan(
+//                   children: convertToBoldText(answer,
+//                       fontSize: 16, color: const Color(0xFF151515)),
+//                   style: const TextStyle(
+//                     fontWeight: FontWeight.w400,
+//                   ),
+//                 ),
+//               ),
+//             const SizedBox(
+//               height: 10,
+//             ),
+//             if (state.questionAnswerList[widget.index].isAnimationCompleted)
+//               Row(
+//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                 children: [
+//                   Row(
+//                     children: [
+//                       IconButton(
+//                           tooltip: "Regenerate",
+//                           onPressed: questionAnswer.isLoading
+//                               ? null
+//                               : () {
+//                                   context
+//                                       .read<BusinessResponseBloc>()
+//                                       .add(HandleRegenerate(widget.index));
+//                                 },
+//                           icon: const Icon(
+//                             Icons.replay_outlined,
+//                             size: 24,
+//                             color: Color(0xFF151515),
+//                           )),
+//                       IconButton(
+//                           tooltip: "Share",
+//                           onPressed: () {
+//                             Share.share(
+//                                 state.questionAnswerList[widget.index].answer);
+//                           },
+//                           icon: const Icon(
+//                             Icons.share_outlined,
+//                             size: 24,
+//                             color: Color(0xFF151515),
+//                           )),
+//                       IconButton(
+//                           tooltip: "Copy",
+//                           onPressed: () {
+//                             Clipboard.setData(ClipboardData(
+//                                     text: state.questionAnswerList[widget.index]
+//                                         .answer))
+//                                 .then((_) {
+//                               ScaffoldMessenger.of(context).showSnackBar(
+//                                   const SnackBar(
+//                                       duration: Duration(milliseconds: 500),
+//                                       content:
+//                                           Text('Copied to your clipboard!')));
+//                             });
+//                           },
+//                           icon: const Icon(
+//                             Icons.file_copy_outlined,
+//                             size: 24,
+//                             color: Color(0xFF151515),
+//                           )),
+//                       BlocBuilder<MylistBloc, MylistState>(
+//                         builder: (context, state) {
+//                           return IconButton(
+//                             tooltip: "Add to My List",
+//                             onPressed: () {
+//                               _addToMyList(answer);
+//                             },
+//                             icon: SvgPicture.asset(
+//                               "assets/images/Bookmark.svg",
+//                               height: 24,
+//                               width: 24,
+//                             ),
+//                           );
+//                         },
+//                       )
+//                     ],
+//                   ),
+//                   Row(
+//                     children: [
+//                       (state.isLikedPressed[widget.index] == null)
+//                           ? IconButton(
+//                               tooltip: "Like",
+//                               onPressed: (state
+//                                           .isDislikedPressed[widget.index] ==
+//                                       true)
+//                                   ? null
+//                                   : () {
+//                                       context.read<BusinessResponseBloc>().add(
+//                                           ResponseFeedback(
+//                                               "Like", questionAnswer.answer));
+//                                       showThankYouMessage(widget.index);
+//                                       context
+//                                           .read<BusinessResponseBloc>()
+//                                           .add(LikeFeedback(widget.index));
+//                                     },
+//                               icon: SvgPicture.asset(
+//                                 "assets/images/thumbs-up.svg",
+//                               ),
+//                             )
+//                           : RotatedBox(
+//                               quarterTurns: 2,
+//                               child: IconButton(
+//                                 tooltip: "Like",
+//                                 onPressed: () {},
+//                                 icon: SvgPicture.asset(
+//                                   "assets/images/thumbs-down.svg",
+//                                 ),
+//                               ),
+//                             ),
+//                       (state.isDislikedPressed[widget.index] == null)
+//                           ? RotatedBox(
+//                               quarterTurns: 2,
+//                               child: IconButton(
+//                                 tooltip: "Dislike",
+//                                 onPressed: (state
+//                                             .isLikedPressed[widget.index] ==
+//                                         true)
+//                                     ? null
+//                                     : () {
+//                                         context
+//                                             .read<BusinessResponseBloc>()
+//                                             .add(DislikeFeedback(widget.index));
+//                                       },
+//                                 icon: SvgPicture.asset(
+//                                   "assets/images/thumbs-up.svg",
+//                                 ),
+//                               ),
+//                             )
+//                           : IconButton(
+//                               tooltip: "Dislike",
+//                               onPressed: () {},
+//                               icon: SvgPicture.asset(
+//                                 "assets/images/thumbs-down.svg",
+//                               ),
+//                             ),
+//                     ],
+//                   ),
+//                 ],
+//               ),
+//             if (isRegenerating && questionAnswer.isAnimationCompleted)
+//               Padding(
+//                   padding: const EdgeInsets.only(top: 20),
+//                   child: Container(
+//                     padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+//                     decoration: BoxDecoration(
+//                       color: const Color(0xFFFAFAFA),
+//                       border: Border.all(
+//                         color: const Color(0xFFE5E5E5),
+//                         width: 1,
+//                       ),
+//                       borderRadius: BorderRadius.circular(14),
+//                     ),
+//                     child: Row(
+//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                       children: [
+//                         const Text("Was the response better or worse?",
+//                             style: TextStyle(
+//                                 fontSize: 16,
+//                                 fontWeight: FontWeight.w400,
+//                                 color: Color(0xFF151515))),
+//                         Row(
+//                           children: [
+//                             Column(
+//                               children: [
+//                                 IconButton(
+//                                     onPressed: () {
+//                                       context.read<BusinessResponseBloc>().add(
+//                                           ResponseFeedback(
+//                                               "Better", questionAnswer.answer));
+//                                       showThankYouMessage(widget.index);
+//                                     },
+//                                     icon: const Icon(
+//                                       Icons.thumb_up_alt_outlined,
+//                                       size: 24,
+//                                     )),
+//                                 const Text("Better",
+//                                     style: TextStyle(
+//                                         fontSize: 16,
+//                                         fontWeight: FontWeight.w400,
+//                                         color: Color(0xFF151515)))
+//                               ],
+//                             ),
+//                             const SizedBox(width: 20),
+//                             Column(
+//                               children: [
+//                                 IconButton(
+//                                     onPressed: () {
+//                                       context.read<BusinessResponseBloc>().add(
+//                                           ResponseFeedback(
+//                                               "Worse", questionAnswer.answer));
+//                                       showThankYouMessage(widget.index);
+//                                     },
+//                                     icon: const Icon(
+//                                       Icons.thumb_down_alt_outlined,
+//                                       size: 24,
+//                                     )),
+//                                 const Text("Worse",
+//                                     style: TextStyle(
+//                                         fontSize: 16,
+//                                         fontWeight: FontWeight.w400,
+//                                         color: Color(0xFF151515)))
+//                               ],
+//                             ),
+//                             const SizedBox(width: 20),
+//                             Column(
+//                               children: [
+//                                 IconButton(
+//                                     onPressed: () {
+//                                       context.read<BusinessResponseBloc>().add(
+//                                           CloseRegenerateFeedback(
+//                                               widget.index));
+//                                       showThankYouMessage(widget.index);
+//                                     },
+//                                     icon: const Icon(
+//                                       Icons.thumb_up_alt_outlined,
+//                                       size: 24,
+//                                     )),
+//                                 const Text("Same",
+//                                     style: TextStyle(
+//                                         fontSize: 16,
+//                                         fontWeight: FontWeight.w400,
+//                                         color: Color(0xFF151515)))
+//                               ],
+//                             )
+//                           ],
+//                         ),
+//                         IconButton(
+//                             onPressed: () {
+//                               context
+//                                   .read<BusinessResponseBloc>()
+//                                   .add(CloseRegenerateFeedback(widget.index));
+//                             },
+//                             icon: const Icon(Icons.close))
+//                       ],
+//                     ),
+//                   )),
+//             if (state.disLikedIndex[widget.index] == true)
+//               Padding(
+//                 padding: const EdgeInsets.only(top: 20),
+//                 child: Container(
+//                   padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+//                   decoration: BoxDecoration(
+//                     color: const Color(0xFFFAFAFA),
+//                     border: Border.all(
+//                       color: const Color(0xFFE5E5E5),
+//                       width: 1,
+//                     ),
+//                     borderRadius: BorderRadius.circular(14),
+//                   ),
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       Padding(
+//                         padding: const EdgeInsets.only(bottom: 24),
+//                         child: Row(
+//                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                           children: [
+//                             const Text(
+//                               "Tell us more:",
+//                               style: TextStyle(
+//                                   fontSize: 18,
+//                                   fontWeight: FontWeight.w500,
+//                                   color: Color(0xFF151515)),
+//                             ),
+//                             IconButton(
+//                                 onPressed: () {
+//                                   context
+//                                       .read<BusinessResponseBloc>()
+//                                       .add(CloseDislikeFeedback(widget.index));
+//                                 },
+//                                 icon: const Icon(
+//                                   Icons.close,
+//                                   size: 24,
+//                                 ))
+//                           ],
+//                         ),
+//                       ),
+//                       Wrap(
+//                         spacing: 24,
+//                         runSpacing: 20,
+//                         children: [
+//                           for (var item in disLikeReport)
+//                             ElevatedButton(
+//                               onPressed: () {
+//                                 if (item == "More..") {
+//                                   _viewMoreFeedBack(
+//                                       widget.index, questionAnswer.answer);
+//                                 } else {
+//                                   context.read<BusinessResponseBloc>().add(
+//                                       ResponseFeedback(
+//                                           item, questionAnswer.answer));
+//                                   showThankYouMessage(widget.index);
+//                                 }
+//                               },
+//                               style: ElevatedButton.styleFrom(
+//                                 elevation: 0,
+//                                 textStyle: const TextStyle(
+//                                     fontSize: 16,
+//                                     color: Color(0xFF151515),
+//                                     fontWeight: FontWeight.w400),
+//                                 padding: const EdgeInsets.all(24),
+//                                 foregroundColor: const Color(0xFF151515),
+//                                 side: const BorderSide(
+//                                     color: Color(0xFFD4D4D4), width: 1),
+//                                 shape: RoundedRectangleBorder(
+//                                     borderRadius: BorderRadius.circular(14)),
+//                               ),
+//                               child: Text(item),
+//                             )
+//                         ],
+//                       )
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             if (state.showThankYouMessage[widget.index] == true)
+//               Padding(
+//                 padding: const EdgeInsets.only(top: 20),
+//                 child: Center(
+//                   child: Container(
+//                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+//                     decoration: BoxDecoration(
+//                       color: const Color(0xFFFAFAFA),
+//                       border: Border.all(
+//                         color: const Color(0xFFE5E5E5),
+//                         width: 1,
+//                       ),
+//                       borderRadius: BorderRadius.circular(14),
+//                     ),
+//                     child: const Text(
+//                       'Thank you for your feedback',
+//                       style: TextStyle(
+//                         fontSize: 16,
+//                         color: Color(0xFF151515),
+//                         fontWeight: FontWeight.w400,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//           ],
+//         );
+//       },
+//     );
+//   }
+// }
 
-class DynamicProgressDialog extends StatefulWidget {
-  const DynamicProgressDialog({super.key});
+// class DynamicProgressDialog extends StatefulWidget {
+//   const DynamicProgressDialog({super.key});
 
-  @override
-  DynamicProgressDialogState createState() => DynamicProgressDialogState();
-}
+//   @override
+//   DynamicProgressDialogState createState() => DynamicProgressDialogState();
+// }
 
-class DynamicProgressDialogState extends State<DynamicProgressDialog> {
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      shadowColor: const Color(0xFF000000).withOpacity(0.2),
-      backgroundColor: const Color(0xFFFAFAFA),
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(4))),
-      contentPadding: const EdgeInsets.only(bottom: 0),
-      titlePadding: const EdgeInsets.all(10),
-      alignment: Alignment.topCenter,
-      insetPadding: const EdgeInsets.only(top: 20),
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Padding(
-            padding: EdgeInsets.only(right: 5),
-            child: Icon(
-              Icons.check_circle_rounded,
-              color: Color(0xFF18C554),
-              size: 16,
-            ),
-          ),
-          const Text(
-            "Question has been added to FAQs successfully",
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                color: Color(0xFF151515)),
-          ),
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: const Icon(
-              Icons.close,
-              size: 16,
-            ),
-          ),
-        ],
-      ),
-      content: const LinearProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF18C554)),
-      ),
-    );
-  }
-}
+// class DynamicProgressDialogState extends State<DynamicProgressDialog> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return AlertDialog(
+//       shadowColor: const Color(0xFF000000).withOpacity(0.2),
+//       backgroundColor: const Color(0xFFFAFAFA),
+//       shape: const RoundedRectangleBorder(
+//           borderRadius: BorderRadius.all(Radius.circular(4))),
+//       contentPadding: const EdgeInsets.only(bottom: 0),
+//       titlePadding: const EdgeInsets.all(10),
+//       alignment: Alignment.topCenter,
+//       insetPadding: const EdgeInsets.only(top: 20),
+//       title: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//         children: [
+//           const Padding(
+//             padding: EdgeInsets.only(right: 5),
+//             child: Icon(
+//               Icons.check_circle_rounded,
+//               color: Color(0xFF18C554),
+//               size: 16,
+//             ),
+//           ),
+//           const Text(
+//             "Question has been added to FAQs successfully",
+//             style: TextStyle(
+//                 fontSize: 16,
+//                 fontWeight: FontWeight.w400,
+//                 color: Color(0xFF151515)),
+//           ),
+//           IconButton(
+//             onPressed: () {
+//               Navigator.of(context).pop();
+//             },
+//             icon: const Icon(
+//               Icons.close,
+//               size: 16,
+//             ),
+//           ),
+//         ],
+//       ),
+//       content: const LinearProgressIndicator(
+//         valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1E7BC8)),
+//       ),
+//     );
+//   }
+// }

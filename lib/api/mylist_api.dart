@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:krofile_ai/http.dart';
-import 'package:krofile_ai/model/mylist_model.dart';
+import 'package:krofile_ai/model/mylist.dart';
 
-class MylistServices {
+class MylistApi {
   Future<String> insertMyList(
       String category, String title, String content) async {
     try {
@@ -16,7 +16,7 @@ class MylistServices {
         }),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         String data = response.data['message'];
 
         return data;
@@ -35,11 +35,20 @@ class MylistServices {
         data: FormData.fromMap({
           'username': username,
         }),
+        options: Options(
+          validateStatus: (status) {
+            // Accept all status codes and let us handle them
+            return status != null && status >= 200 && status < 500;
+          },
+        ),
       );
 
       if (response.statusCode == 200) {
         MyListResponse myListResponse = MyListResponse.fromJson(response.data);
         return myListResponse.data;
+      } else if (response.statusCode == 404) {
+        // Handle no data found case
+        return []; // Returning an empty list for a 404 response
       } else {
         throw Exception('Unexpected status code: ${response.statusCode}');
       }

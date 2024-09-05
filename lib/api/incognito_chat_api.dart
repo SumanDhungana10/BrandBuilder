@@ -1,12 +1,38 @@
 import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:krofile_ai/http.dart';
-import 'package:krofile_ai/model/quick_question_model.dart';
+import 'package:krofile_ai/model/response_model.dart';
 
-class CustomizeService {
-  Future<String> uploadGeneralFile(PlatformFile file) async {
+class IncognitoChatApi {
+ 
+
+  Future<String> fetchIncognitoResponse(String query) async {
+    try {
+      Response response = await dio.post(
+        '/incognitochat',
+        data: FormData.fromMap({
+          'question': query,
+          'username': username,
+        }),
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = response.data;
+        return ResponseModel.fromJson(data).response;
+      } else {
+        return 'Unexpected status code: ${response.statusCode}';
+      }
+    } catch (e) {
+      return 'Error during request: $e';
+    }
+  }
+  Future<String> uploadIncognitoFile(PlatformFile file) async {
     try {
       Uint8List? fileBytes = file.bytes;
       if (fileBytes == null) {
@@ -38,40 +64,20 @@ class CustomizeService {
     }
   }
 
-  Future<List<QuickQuestionModel>> fetchStarterConversations() async {
+  Future<String> deleteIncognitoFile() async {
     try {
       Response response = await dio.post(
-        '/get/quick-questions/by-username',
+        '/delete-file-incognito',
         data: FormData.fromMap({
           'username': username,
         }),
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+        ),
       );
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = response.data;
-        return data.map((json) => QuickQuestionModel.fromJson(json)).toList();
-      } else if (response.statusCode == 404) {
-        return [];
-      } else {
-        throw Exception('Unexpected status code: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Error during request: $e');
-    }
-  }
-
-  Future<String> saveStarterConversations(String question) async {
-    try {
-      Response response = await dio.post(
-        '/save/quick-question',
-        data: FormData.fromMap({
-          'username': username,
-          'question': question,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        String data = response.data['message'];
+        String data = response.data['response'];
         return data;
       } else {
         throw Exception('Unexpected status code: ${response.statusCode}');
@@ -81,17 +87,20 @@ class CustomizeService {
     }
   }
 
-  Future<String> deleteStarterConversation(int id) async {
+  Future<String> deleteallIncognitoHistory() async {
     try {
       Response response = await dio.post(
-        '/delete/quick-questions/by-id',
+        '/delete/all-history-incognito',
         data: FormData.fromMap({
-          'id': id,
+          'username': username,
         }),
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+        ),
       );
 
       if (response.statusCode == 200) {
-        String data = response.data['response'];
+        String data = response.data['message'];
         return data;
       } else {
         throw Exception('Unexpected status code: ${response.statusCode}');

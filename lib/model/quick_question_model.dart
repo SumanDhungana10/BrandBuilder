@@ -3,7 +3,6 @@ class QuickQuestionModel {
   final String username;
   final String question;
   final DateTime createdAt;
-  
 
   QuickQuestionModel({
     required this.id,

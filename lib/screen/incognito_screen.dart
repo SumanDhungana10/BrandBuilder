@@ -4,12 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:krofile_ai/bloc/incognitoresponse/incognitoresponse_bloc.dart';
-import 'package:krofile_ai/helper.dart';
 import 'package:krofile_ai/utils/skeleton.dart';
 import 'package:krofile_ai/utils/text_parse.dart';
 import 'package:krofile_ai/utils/typewriter_text.dart';
 import 'package:krofile_ai/widgets/incognito_alert.dart';
 import 'package:krofile_ai/widgets/incognito_exit_alert.dart';
+import 'package:krofile_ai/widgets/viewmore_feedback_alert.dart';
 
 class IncognitoMode extends StatefulWidget {
   const IncognitoMode({super.key});
@@ -65,6 +65,35 @@ class _IncognitoModeState extends State<IncognitoMode> {
     );
   }
 
+  void showThankYouMessage(int index) {
+    context
+        .read<IncognitoResponseBloc>()
+        .add(CloseIncognitoRegenerateFeedback(index));
+    context
+        .read<IncognitoResponseBloc>()
+        .add(CloseIncognitoDislikeFeedback(index));
+    context
+        .read<IncognitoResponseBloc>()
+        .add(ShowIncognitoThankYouMessage(index));
+  }
+
+  final List<String> disLikeReport = [
+    "Doesn't seem correct",
+    "Wasn't useful to me",
+    "This is inappropriate or upsetting",
+    "Prefer a different approach",
+    "Had trouble with my file",
+    "More.."
+  ];
+  Future<void> _viewMoreFeedBack(int index, String answer) {
+    return showDialog(
+        barrierColor: const Color(0xFF000000).withOpacity(0.8),
+        context: context,
+        builder: (BuildContext context) {
+          return ViewMoreFeedBack(responseIndex: index, answer: answer);
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,7 +127,6 @@ class _IncognitoModeState extends State<IncognitoMode> {
                   _incognitoExitAlert(context);
                   // IncognitoFileServices().deleteIncognitoFile();
                   // IncognitoFileServices().deleteallIncognitoHistory();
-                
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.all(20),
@@ -254,7 +282,7 @@ class _IncognitoModeState extends State<IncognitoMode> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Image.asset(
-                                        "assets/images/logo.png",
+                                        "assets/images/SquareLogo.png",
                                         height: 40,
                                         width: 40,
                                       ),
@@ -264,8 +292,7 @@ class _IncognitoModeState extends State<IncognitoMode> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            if (questionanswer.isLoading ||
-                                                isRegenerating)
+                                            if (questionanswer.isLoading)
                                               Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
@@ -386,25 +413,401 @@ class _IncognitoModeState extends State<IncognitoMode> {
                                                   ),
                                                   Row(
                                                     children: [
-                                                      IconButton(
-                                                        icon: const Icon(
-                                                          Icons.thumb_up_alt,
-                                                          color:
-                                                              Color(0xFFFAFAFA),
-                                                        ),
-                                                        onPressed: () {},
-                                                      ),
-                                                      IconButton(
-                                                        icon: const Icon(
-                                                            Icons
-                                                                .thumb_down_alt,
-                                                            color: Color(
-                                                                0xFFFAFAFA)),
-                                                        onPressed: () {},
-                                                      )
+                                                      (state.isLikedPressed[
+                                                                  updateIndex] ==
+                                                              true)
+                                                          ? const Icon(
+                                                              Icons
+                                                                  .thumb_up_alt,
+                                                              color: Color(
+                                                                  0xFF1E7BC8),
+                                                            )
+                                                          : IconButton(
+                                                              color: const Color(
+                                                                  0xFFFAFAFA),
+                                                              icon: const Icon(
+                                                                Icons
+                                                                    .thumb_up_alt,
+                                                              ),
+                                                              onPressed:
+                                                                  (state.isDislikedPressed[
+                                                                              updateIndex] ==
+                                                                          true)
+                                                                      ? null
+                                                                      : () {
+                                                                          context
+                                                                              .read<IncognitoResponseBloc>()
+                                                                              .add(IncognitoLikeFeedback(updateIndex));
+                                                                          showThankYouMessage(
+                                                                              updateIndex);
+                                                                        },
+                                                            ),
+                                                      (state.isDislikedPressed[
+                                                                  updateIndex] ==
+                                                              true)
+                                                          ? const Icon(
+                                                              Icons
+                                                                  .thumb_down_alt,
+                    
+                                                              color: Color(
+                                                                  0xFF1E7BC8),
+                                                              
+                                                            )
+                                                          : IconButton(
+                                                              icon: const Icon(
+                                                                Icons
+                                                                    .thumb_down_alt,
+                                                                color: Color(
+                                                                    0xFFFAFAFA),
+                                                              ),
+                                                              onPressed:
+                                                                  (state.isLikedPressed[
+                                                                              updateIndex] ==
+                                                                          true)
+                                                                      ? null
+                                                                      : () {
+                                                                          context
+                                                                              .read<IncognitoResponseBloc>()
+                                                                              .add(IncognitoDislikeFeedback(updateIndex));
+                                                                        },
+                                                            )
                                                     ],
                                                   )
                                                 ],
+                                              ),
+                                            if (isRegenerating &&
+                                                questionanswer
+                                                    .isAnimationCompleted)
+                                              Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 20),
+                                                  child: Container(
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(
+                                                        16, 24, 16, 24),
+                                                    decoration: BoxDecoration(
+                                                      color: darktheme
+                                                          .colorScheme.surface,
+                                                      border: Border.all(
+                                                        color: const Color(
+                                                            0xFFE5E5E5),
+                                                        width: 1,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              14),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                            "Was the response better or worse?",
+                                                            style: TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                color: darktheme
+                                                                    .colorScheme
+                                                                    .primary)),
+                                                        Row(
+                                                          children: [
+                                                            Column(
+                                                              children: [
+                                                                IconButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      // context
+                                                                      //     .read<
+                                                                      //         BusinessResponseBloc>()
+                                                                      //     .add(ResponseFeedback(
+                                                                      //         "Better",
+                                                                      //         questionAnswer.answer));
+                                                                      showThankYouMessage(
+                                                                          updateIndex);
+                                                                    },
+                                                                    icon: Icon(
+                                                                      Icons
+                                                                          .thumb_up_alt_outlined,
+                                                                      size: 24,
+                                                                      color: darktheme
+                                                                          .colorScheme
+                                                                          .primary,
+                                                                    )),
+                                                                Text("Better",
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w400,
+                                                                        color: darktheme
+                                                                            .colorScheme
+                                                                            .primary))
+                                                              ],
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 20),
+                                                            Column(
+                                                              children: [
+                                                                IconButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      // context
+                                                                      //     .read<
+                                                                      //         BusinessResponseBloc>()
+                                                                      //     .add(ResponseFeedback(
+                                                                      //         "Worse",
+                                                                      //         questionAnswer.answer));
+                                                                      showThankYouMessage(
+                                                                          updateIndex);
+                                                                    },
+                                                                    icon: Icon(
+                                                                      Icons
+                                                                          .thumb_down_alt_outlined,
+                                                                      size: 24,
+                                                                      color: darktheme
+                                                                          .colorScheme
+                                                                          .primary,
+                                                                    )),
+                                                                Text("Worse",
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w400,
+                                                                        color: darktheme
+                                                                            .colorScheme
+                                                                            .primary))
+                                                              ],
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 20),
+                                                            Column(
+                                                              children: [
+                                                                IconButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      // context
+                                                                      //     .read<
+                                                                      //         BusinessResponseBloc>()
+                                                                      //     .add(CloseRegenerateFeedback(
+                                                                      //         widget.index));
+                                                                      showThankYouMessage(
+                                                                          updateIndex);
+                                                                    },
+                                                                    icon: Icon(
+                                                                        Icons
+                                                                            .thumb_up_alt_outlined,
+                                                                        size:
+                                                                            24,
+                                                                        color: darktheme
+                                                                            .colorScheme
+                                                                            .primary)),
+                                                                Text("Same",
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w400,
+                                                                        color: darktheme
+                                                                            .colorScheme
+                                                                            .primary))
+                                                              ],
+                                                            )
+                                                          ],
+                                                        ),
+                                                        IconButton(
+                                                            onPressed: () {
+                                                              context
+                                                                  .read<
+                                                                      IncognitoResponseBloc>()
+                                                                  .add(CloseIncognitoRegenerateFeedback(
+                                                                      updateIndex));
+                                                            },
+                                                            icon: Icon(
+                                                              Icons.close,
+                                                              color: darktheme
+                                                                  .colorScheme
+                                                                  .secondary,
+                                                            ))
+                                                      ],
+                                                    ),
+                                                  )),
+                                            if (state.disLikedIndex[
+                                                    updateIndex] ==
+                                                true)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 20),
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          16, 24, 16, 24),
+                                                  decoration: BoxDecoration(
+                                                    color: darktheme
+                                                        .colorScheme.surface,
+                                                    border: Border.all(
+                                                      color: const Color(
+                                                          0xFFE5E5E5),
+                                                      width: 1,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            14),
+                                                  ),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                bottom: 24),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Text(
+                                                              "Tell us more:",
+                                                              style: TextStyle(
+                                                                  fontSize: 18,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  color: darktheme
+                                                                      .colorScheme
+                                                                      .primary),
+                                                            ),
+                                                            IconButton(
+                                                                onPressed: () {
+                                                                  context
+                                                                      .read<
+                                                                          IncognitoResponseBloc>()
+                                                                      .add(CloseIncognitoDislikeFeedback(
+                                                                          updateIndex));
+                                                                },
+                                                                icon: Icon(
+                                                                  Icons.close,
+                                                                  color: darktheme
+                                                                      .colorScheme
+                                                                      .secondary,
+                                                                  size: 24,
+                                                                ))
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      Wrap(
+                                                        spacing: 24,
+                                                        runSpacing: 20,
+                                                        children: [
+                                                          for (var item
+                                                              in disLikeReport)
+                                                            ElevatedButton(
+                                                              onPressed: () {
+                                                                if (item ==
+                                                                    "More..") {
+                                                                  _viewMoreFeedBack(
+                                                                      updateIndex,
+                                                                      questionanswer
+                                                                          .answer);
+                                                                } else {
+                                                                  // context
+                                                                  //     .read<
+                                                                  //         BusinessResponseBloc>()
+                                                                  //     .add(ResponseFeedback(
+                                                                  //         item,
+                                                                  //         questionAnswer
+                                                                  //             .answer));
+                                                                  showThankYouMessage(
+                                                                      updateIndex);
+                                                                }
+                                                              },
+                                                              style:
+                                                                  ElevatedButton
+                                                                      .styleFrom(
+                                                                elevation: 0,
+                                                                textStyle: const TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400),
+                                                                foregroundColor:
+                                                                    darktheme
+                                                                        .colorScheme
+                                                                        .primary,
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        24),
+                                                                backgroundColor:
+                                                                    darktheme
+                                                                        .colorScheme
+                                                                        .surface,
+                                                                side: const BorderSide(
+                                                                    color: Color(
+                                                                        0xFFD4D4D4),
+                                                                    width: 1),
+                                                                shape: RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            14)),
+                                                              ),
+                                                              child: Text(
+                                                                item,
+                                                              ),
+                                                            )
+                                                        ],
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            if (state.showThankYouMessage[
+                                                    updateIndex] ==
+                                                true)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 20),
+                                                child: Center(
+                                                  child: Container(
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(
+                                                        16, 16, 16, 16),
+                                                    decoration: BoxDecoration(
+                                                      color: darktheme
+                                                          .colorScheme.surface,
+                                                      border: Border.all(
+                                                        color: const Color(
+                                                            0xFFE5E5E5),
+                                                        width: 1,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              14),
+                                                    ),
+                                                    child: Text(
+                                                      'Thank you for your feedback',
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        color: darktheme
+                                                            .colorScheme
+                                                            .primary,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
                                               ),
                                           ],
                                         ),

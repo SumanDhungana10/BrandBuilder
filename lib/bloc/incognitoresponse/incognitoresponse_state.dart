@@ -1,4 +1,6 @@
 part of 'incognitoresponse_bloc.dart';
+enum FileUploadStatus { notStarted, uploading, uploaded, failed }
+enum FeedbackSavingStatus { saving, isSaved, error }
 
 class IncognitoResponseState extends Equatable {
   final bool isQuestionType;
@@ -10,6 +12,12 @@ class IncognitoResponseState extends Equatable {
    final String? fileDeleteResponse;
   final String? historyDeleteResponse;
   final Map<int, bool> regeneratingIndices;
+   final String feedbackResponse;
+  final FeedbackSavingStatus feedbackSavingStatus;
+  final Map<int, bool> showThankYouMessage;
+  final Map<int, bool> isLikedPressed;
+  final Map<int, bool> isDislikedPressed;
+  final Map<int, bool> disLikedIndex;
 
 
   const IncognitoResponseState({
@@ -22,6 +30,13 @@ class IncognitoResponseState extends Equatable {
     this.fileDeleteResponse,
     this.historyDeleteResponse,
     this.regeneratingIndices = const {},
+    this.feedbackResponse = "",
+    this.feedbackSavingStatus = FeedbackSavingStatus.saving,
+    this.showThankYouMessage = const {},
+    this.isLikedPressed = const {},
+    this.isDislikedPressed = const {},
+    this.disLikedIndex = const {},
+
   });
 
   IncognitoResponseState copyWith({
@@ -34,6 +49,13 @@ class IncognitoResponseState extends Equatable {
     String? fileDeleteResponse,
     String? historyDeleteResponse,
     Map<int, bool>? regeneratingIndices,
+    String? feedbackResponse,
+    FeedbackSavingStatus? feedbackSavingStatus,
+    Map<int, bool>? showThankYouMessage,
+    Map<int, bool>? isLikedPressed,
+    Map<int, bool>? isDislikedPressed,
+    Map<int, bool>? disLikedIndex,
+
   }) {
     return IncognitoResponseState(
       isQuestionType: isQuestionType ?? this.isQuestionType,
@@ -45,6 +67,13 @@ class IncognitoResponseState extends Equatable {
       fileDeleteResponse: fileDeleteResponse ?? this.fileDeleteResponse,
       historyDeleteResponse: historyDeleteResponse ?? this.historyDeleteResponse,
       regeneratingIndices: regeneratingIndices ?? this.regeneratingIndices,
+      feedbackResponse: feedbackResponse ?? this.feedbackResponse,
+      feedbackSavingStatus: feedbackSavingStatus ?? this.feedbackSavingStatus,
+      showThankYouMessage: showThankYouMessage ?? this.showThankYouMessage,
+      isLikedPressed: isLikedPressed ?? this.isLikedPressed,
+      isDislikedPressed: isDislikedPressed ?? this.isDislikedPressed,
+      disLikedIndex: disLikedIndex ?? this.disLikedIndex,
+
 
     );
   }
@@ -60,6 +89,12 @@ class IncognitoResponseState extends Equatable {
         fileDeleteResponse,
         historyDeleteResponse,
         regeneratingIndices,
+        feedbackResponse,
+        feedbackSavingStatus,
+        showThankYouMessage,
+        isLikedPressed,
+        isDislikedPressed,
+        disLikedIndex,
       ];
 }
 

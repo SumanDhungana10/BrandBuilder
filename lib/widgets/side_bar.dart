@@ -150,8 +150,6 @@ class _SideBarState extends State<SideBar> {
                       ),
                     ),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -177,7 +175,7 @@ class _SideBarState extends State<SideBar> {
                         //       )
                         //     :
                         (state.historyList.isEmpty)
-                            ? const Text("No history found")
+                            ? const Center(child: Text("No history found"))
                             : Expanded(
                                 child: ListView.builder(
                                   itemCount: historyList.length,
@@ -227,6 +225,9 @@ class _SideBarState extends State<SideBar> {
                                                 historyList[index][
                                                     'Answer']!, // Passing the answer
                                               ));
+                                          context
+                                              .read<BusinessResponseBloc>()
+                                              .add(ClearLikedDisliked());
                                         },
                                       ),
                                     );

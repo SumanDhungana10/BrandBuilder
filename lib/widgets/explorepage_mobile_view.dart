@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:krofile_ai/bloc/explore/explore_bloc.dart';
 import 'package:krofile_ai/bloc/businessresponse/business_response_bloc.dart';
-import 'package:krofile_ai/screen/home_screen.dart';
 
 class ExplorePgaeMobileView extends StatefulWidget {
   const ExplorePgaeMobileView({super.key});
@@ -35,9 +35,6 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                             padding: const EdgeInsets.only(left: 12),
                             child: ElevatedButton(
                               onPressed: () {
-                                // context
-                                //     .read<ExploreScreenBloc>()
-                                //     .add(HandleCategoryButton(index));
                                 context
                                     .read<ExploreBloc>()
                                     .add(HandelCategoryButton(index));
@@ -82,9 +79,6 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                               padding: const EdgeInsets.only(left: 12),
                               child: ElevatedButton(
                                 onPressed: () {
-                                  // context
-                                  //     .read<ExploreScreenBloc>()
-                                  //     .add(HandleCategoryButton(index));
                                   context
                                       .read<ExploreBloc>()
                                       .add(HandelCategoryButton(index));
@@ -165,55 +159,53 @@ class _ExplorePgaeMobileViewState extends State<ExplorePgaeMobileView> {
                   ),
             (state.subCategories.isEmpty || state.questions.isEmpty)
                 ? Container()
-                : Container(
-                    margin: const EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      bottom: 16,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: const Color(0xFFD4D4D4),
+                : Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: 16,
                       ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: state.questions.length,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          decoration: const BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                color: Color(0xFFD4D4D4),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: const Color(0xFFD4D4D4),
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: state.questions.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            decoration: const BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: Color(0xFFD4D4D4),
+                                ),
                               ),
                             ),
-                          ),
-                          child: ListTile(
-                            title: Text(
-                              state.questions[index],
-                              style: const TextStyle(fontSize: 12),
-                              overflow: TextOverflow.ellipsis,
+                            child: ListTile(
+                              title: Text(
+                                state.questions[index],
+                                style: const TextStyle(fontSize: 12),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              trailing: const Icon(
+                                Icons.arrow_forward_ios,
+                                size: 12,
+                              ),
+                              onTap: () {
+                                context.pop();
+                                BlocProvider.of<BusinessResponseBloc>(context)
+                                    .add(HandleQuestionType());
+                                BlocProvider.of<BusinessResponseBloc>(context)
+                                    .add(AddQuestionAnswerList(
+                                        state.questions[index]));
+                              },
                             ),
-                            trailing: const Icon(
-                              Icons.arrow_forward_ios,
-                              size: 12,
-                            ),
-                            onTap: () {
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const HomeScreen()));
-                              BlocProvider.of<BusinessResponseBloc>(context)
-                                  .add(HandleQuestionType());
-                              BlocProvider.of<BusinessResponseBloc>(context)
-                                  .add(AddQuestionAnswerList(
-                                      state.questions[index]));
-                            },
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
                   )
           ],

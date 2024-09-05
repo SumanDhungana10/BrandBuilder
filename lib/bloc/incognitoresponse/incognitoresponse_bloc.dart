@@ -1,8 +1,9 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:krofile_ai/helper.dart';
-import 'package:krofile_ai/services/incognito_chat_services.dart';
+import 'package:krofile_ai/api/incognito_chat_api.dart';
 part 'incognitoresponse_event.dart';
 part 'incognitoresponse_state.dart';
 
@@ -17,6 +18,13 @@ class IncognitoResponseBloc
     on<IncognitoAnimationCompleted>(_onAnimationCompleted);
     on<DeleteFile>(_onDeleteFile);
     on<DeleteHistory>(_onDeleteAllHistory);
+    on<CloseIncognitoRegenerateFeedback>(_onCloseRegenerateFeedback);
+    on<ShowIncognitoThankYouMessage>(_onShowThankYouMessage);
+    on<CloseThankYouMessage>(_onCloseThankYouMessage);
+    on<IncognitoDislikeFeedback>(_onDislikeFeedback);
+    on<IncognitoLikeFeedback>(_onLikeFeedback);
+    on<CloseIncognitoDislikeFeedback>(_onCloseDislikeFeedback);
+    on<ClearLikeDislikeFeedback>(_onClearLikeDislikeFeedback);
   }
 
   void _onHandleIncognitoQuestionType(
@@ -48,7 +56,7 @@ class IncognitoResponseBloc
     emit(state.copyWith(questionAnswerList: newQuestionAnswerList));
 
     final result =
-        await IncognitoChatServices().fetchIncognitoResponse(event.question);
+        await IncognitoChatApi().fetchIncognitoResponse(event.question);
     // final result = "This is a response for: ${event.question}";
 
     final updatedQuestionAnswerList =
@@ -67,7 +75,7 @@ class IncognitoResponseBloc
 
   Future<String> getNewAnswer(String question) async {
     final result =
-        await IncognitoChatServices().fetchIncognitoResponse(question);
+        await IncognitoChatApi().fetchIncognitoResponse(question);
     return result;
   }
 
@@ -107,12 +115,12 @@ class IncognitoResponseBloc
     );
 
     // Reset the regenerating state for this index
-    updatedRegeneratingIndices.remove(event.index);
+    // updatedRegeneratingIndices.remove(event.index);
 
     // Emit the updated state
     emit(state.copyWith(
       questionAnswerList: updatedQuestionAnswerList,
-      regeneratingIndices: updatedRegeneratingIndices,
+      // regeneratingIndices: updatedRegeneratingIndices,
     ));
   }
 
@@ -134,7 +142,7 @@ class IncognitoResponseBloc
     ));
     try {
       final String result =
-          await IncognitoChatServices().uploadIncognitoFile(file);
+          await IncognitoChatApi().uploadIncognitoFile(file);
       emit(state.copyWith(
         fileuploadedresponse: result,
         fileUploadStatus: FileUploadStatus.uploaded,
@@ -157,7 +165,7 @@ class IncognitoResponseBloc
   void _onDeleteFile(
       DeleteFile event, Emitter<IncognitoResponseState> emit) async {
     try {
-      final String result = await IncognitoChatServices().deleteIncognitoFile();
+      final String result = await IncognitoChatApi().deleteIncognitoFile();
       emit(state.copyWith(
         fileDeleteResponse: result,
       ));
@@ -172,7 +180,7 @@ class IncognitoResponseBloc
       DeleteHistory event, Emitter<IncognitoResponseState> emit) async {
     try {
       final String result =
-          await IncognitoChatServices().deleteallIncognitoHistory();
+          await IncognitoChatApi().deleteallIncognitoHistory();
       emit(state.copyWith(
         historyDeleteResponse: result,
         questionAnswerList: [],
@@ -183,5 +191,65 @@ class IncognitoResponseBloc
         historyDeleteResponse: "Error during history deletion: $e",
       ));
     }
+  }
+
+  void _onCloseRegenerateFeedback(
+      CloseIncognitoRegenerateFeedback event, Emitter<IncognitoResponseState> emit) {
+    final newRegeneratingIndices =
+        Map<int, bool>.from(state.regeneratingIndices)..remove(event.index);
+    emit(state.copyWith(regeneratingIndices: newRegeneratingIndices));
+  }
+
+  void _onShowThankYouMessage(
+      ShowIncognitoThankYouMessage event, Emitter<IncognitoResponseState> emit) {
+    final newShowThankYouMessage = {...state.showThankYouMessage};
+    newShowThankYouMessage[event.index] = true;
+    emit(state.copyWith(showThankYouMessage: newShowThankYouMessage));
+
+    Timer(const Duration(milliseconds: 2000), () {
+      add(CloseThankYouMessage(event.index));
+    });
+  }
+
+  void _onCloseThankYouMessage(
+      CloseThankYouMessage event, Emitter<IncognitoResponseState> emit) {
+    final newShowThankYouMessage = {...state.showThankYouMessage};
+    newShowThankYouMessage[event.index] = false;
+    emit(state.copyWith(showThankYouMessage: newShowThankYouMessage));
+  }
+
+  void _onDislikeFeedback(
+      IncognitoDislikeFeedback event, Emitter<IncognitoResponseState> emit) {
+    final newDisLikedIndex = {...state.disLikedIndex};
+    final newDisLikedPressed = {...state.isDislikedPressed};
+    newDisLikedIndex[event.index] = true;
+    newDisLikedPressed[event.index] = true;
+    emit(state.copyWith(
+        disLikedIndex: newDisLikedIndex,
+        isDislikedPressed: newDisLikedPressed));
+  }
+
+  void _onCloseDislikeFeedback(
+      CloseIncognitoDislikeFeedback event, Emitter<IncognitoResponseState> emit) {
+    final newDisLikedIndex = {...state.disLikedIndex};
+    newDisLikedIndex[event.index] = false;
+    emit(state.copyWith(
+      disLikedIndex: newDisLikedIndex,
+    ));
+  }
+
+  void _onClearLikeDislikeFeedback(
+      ClearLikeDislikeFeedback event, Emitter<IncognitoResponseState> emit) {
+    emit(state.copyWith(
+        isLikedPressed: {},
+        isDislikedPressed: {},
+        disLikedIndex: {},
+        showThankYouMessage: {}));
+  }
+   void _onLikeFeedback(
+      IncognitoLikeFeedback event, Emitter<IncognitoResponseState> emit) {
+    final newLikedIndex = {...state.isLikedPressed};
+    newLikedIndex[event.index] = true;
+    emit(state.copyWith(isLikedPressed: newLikedIndex));
   }
 }

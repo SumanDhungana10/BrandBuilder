@@ -44,145 +44,159 @@ class _MyListState extends State<MyList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Padding(
-      padding: const EdgeInsets.fromLTRB(
-        32,
-        24,
-        32,
-        24,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const OneBackButton(),
-          const SizedBox(height: 8),
-          const Text(
-            "Mylist",
-            style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF151515)),
-          ),
-          const Padding(
-            padding: EdgeInsets.only(top: 12, bottom: 24),
-            child: Divider(
-              height: 1,
-              color: Color(0xFF73767B),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(
+          32,
+          24,
+          32,
+          24,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const OneBackButton(),
+            const SizedBox(height: 8),
+            const Text(
+              "Mylist",
+              style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF151515)),
             ),
-          ),
-          Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: BlocBuilder<MylistBloc, MylistState>(
-                    builder: (context, state) {
-                      if (state.isLoading) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (state.errorMessage != null) {
-                        return Center(child: Text(state.errorMessage!));
-                      } else {
-                        final stateCategories = state.mylist
-                            .map((item) => item.category.trim())
-                            .toSet()
-                            .toList()
-                          ..sort();
-                        final predefinedCategories = state.predefinedCategories;
-                        final uniqueCategories = <dynamic>{
-                          ...predefinedCategories,
-                          ...stateCategories.where((category) =>
-                              !predefinedCategories.contains(category))
-                        }.toList()
-                          ..sort(); //Sort alphabetically
+            const Padding(
+              padding: EdgeInsets.only(top: 12, bottom: 24),
+              child: Divider(
+                height: 1,
+                color: Color(0xFF73767B),
+              ),
+            ),
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: BlocBuilder<MylistBloc, MylistState>(
+                      builder: (context, state) {
+                        if (state.isLoading) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        } else if (state.errorMessage != null) {
+                          return Center(child: Text(state.errorMessage!));
+                        } else {
+                          final stateCategories = state.mylist
+                              .map((item) => item.category.trim())
+                              .toSet()
+                              .toList()
+                            ..sort();
+                          final predefinedCategories =
+                              state.predefinedCategories;
+                          final uniqueCategories = <dynamic>{
+                            ...predefinedCategories,
+                            ...stateCategories.where((category) =>
+                                !predefinedCategories.contains(category))
+                          }.toList()
+                            ..sort(); //Sort alphabetically
 
-                        return Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xFFD4D4D4)),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Collection",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF15141A),
+                          return Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              border:
+                                  Border.all(color: const Color(0xFFD4D4D4)),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Collection",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF15141A),
+                                  ),
                                 ),
-                              ),
-                              for (int i = 0; i < uniqueCategories.length; i++)
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: TextButton(
+                                for (int i = 0;
+                                    i < uniqueCategories.length;
+                                    i++)
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: TextButton(
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: buttonindex == i
+                                            ? const Color(0xFFFAFAFA)
+                                            : const Color(0xFFFFFFFF),
+                                        alignment: Alignment.centerLeft,
+                                        padding: const EdgeInsets.fromLTRB(
+                                            16, 12, 16, 12),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(0),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          buttonindex = i;
+                                        });
+                                      },
+                                      child: Text(
+                                        uniqueCategories[i],
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w400,
+                                          color: Color(0xFF15141A),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                TextButton(
+                                  
                                     style: TextButton.styleFrom(
-                                      backgroundColor: buttonindex == i
-                                          ? const Color(0xFFFAFAFA)
-                                          : const Color(0xFFFFFFFF),
-                                      alignment: Alignment.centerLeft,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          16, 12, 16, 12),
+                                      alignment: Alignment.topCenter,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(0),
                                       ),
+                                      padding: const EdgeInsets.fromLTRB(
+                                          16, 12, 16, 12),
                                     ),
                                     onPressed: () {
-                                      setState(() {
-                                        buttonindex = i;
-                                      });
+                                      createNewMylist(context);
                                     },
-                                    child: Text(
-                                      uniqueCategories[i],
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xFF15141A),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              TextButton(
-                                style: TextButton.styleFrom(
-                                  alignment: Alignment.topCenter,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(0),
-                                  ),
-                                  padding:
-                                      const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                                ),
-                                onPressed: () {
-                                  createNewMylist(context);
-                                },
-                                child: const Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      "Create new",
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color(0xFF15141A),
-                                      ),
-                                    ),
-                                    Icon(Icons.add)
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-                    },
+                                    child: const Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            "Create new",
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w400,
+                                              color: Color(0xFF15141A),
+                                            ),
+                                            overflow: TextOverflow
+                                                .ellipsis, // Handles overflow gracefully
+                                          ),
+                                        ),
+                                        SizedBox(
+                                            width:
+                                                8), // Adds spacing between text and icon
+                                        Icon(Icons.add),
+                                      ],
+                                    )),
+                              ],
+                            ),
+                          );
+                        }
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(
-                  width: 32,
-                ),
-                Expanded(
+                  const SizedBox(
+                    width: 32,
+                  ),
+                  Expanded(
                     flex: 4,
                     child: BlocBuilder<MylistBloc, MylistState>(
                       builder: (context, state) {
@@ -487,31 +501,31 @@ class _MyListState extends State<MyList> {
                                             padding: const EdgeInsets.only(
                                                 bottom: 10),
                                             child: TextButton.icon(
-                                                style: ElevatedButton.styleFrom(
-                                                  elevation: 0,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                  ),
+                                              style: ElevatedButton.styleFrom(
+                                                elevation: 0,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
                                                 ),
-                                                onPressed: () {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (context) =>
-                                                        DeletTitleAlert(
-                                                            title: subcategory),
-                                                  );
-                                                },
-                                                icon: const Icon(
-                                                  Icons.delete_outlined,
-                                                  color: Color(0xFFCD1F18),
-                                                ),
-                                                label: const Text(
-                                                  "Delete",
-                                                  style: TextStyle(
-                                                      color: Color(0xFFCD1F18)),
-                                                )),
+                                              ),
+                                              onPressed: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) =>
+                                                      DeletTitleAlert(
+                                                          title: subcategory),
+                                                );
+                                              },
+                                              icon: const Icon(
+                                                Icons.delete_outlined,
+                                                color: Color(0xFFCD1F18),
+                                              ),
+                                              label: const Text(
+                                                "Delete",
+                                                style: TextStyle(
+                                                    color: Color(0xFFCD1F18)),
+                                              ),
+                                            ),
                                           )
                                       ],
                                     );
@@ -522,13 +536,15 @@ class _MyListState extends State<MyList> {
                           );
                         }
                       },
-                    )),
-              ],
-            ),
-          )
-        ],
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
-    ));
+    );
   }
 }
 

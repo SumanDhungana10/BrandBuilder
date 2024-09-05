@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:krofile_ai/http.dart';
 
-class ExploreServices {
+class ExploreApi {
   Future<List<String>> fetchExploreCategories() async {
     try {
       Response response = await dio.post('/get_categories');

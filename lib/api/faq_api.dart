@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:krofile_ai/http.dart';
 
-class FAQ {
+class FaqApi {
   Future<String> saveQuestion(String question) async {
     try {
       Response response = await dio.post(

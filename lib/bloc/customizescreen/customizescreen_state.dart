@@ -2,6 +2,7 @@ part of 'customizescreen_bloc.dart';
 
 enum ConversationDeleteStatus { notStarted, deleting, deleted, error }
 enum ConversationUpdateStatus { notStarted, updating, updated, error }
+enum CustomizeFileUploadStatus { notStarted, uploading, uploaded, failed }
 
 class CustomizeScreenState extends Equatable {
   final List<QuickQuestionModel> starterConversation;

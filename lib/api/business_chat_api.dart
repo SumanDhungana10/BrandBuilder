@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:krofile_ai/http.dart';
 import 'package:krofile_ai/model/response_model.dart';
 
-class ChatService {
-  Future<String> sendQuery(String query) async {
+class BusinessChatApi {
+  Future<String> sendQuestion(String query) async {
     try {
       Response response = await dio.post(
         '/businesschat',

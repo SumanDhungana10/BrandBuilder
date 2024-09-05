@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
         key: _scaffoldKey,
         endDrawer: const SibeBarDrawer(),
         appBar: AppBar(
-          toolbarHeight: 70,
+          toolbarHeight: 64,
           // backgroundColor: const Color(0xFFFAFAFA),
           backgroundColor: const Color(0xFFFFFFFF),
           actions: [Container()],
@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
             bottom: BorderSide(color: Color(0xFFE5E5E5), width: 1),
           ),
           title: Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20),
+            padding: const EdgeInsets.only(left: 32, right: 32),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -73,10 +73,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             borderRadius: BorderRadius.circular(5)),
                       ),
                       onPressed: () {
-                        // context
-                        //     .read<ExploreScreenBloc>()
-                        //     .add(FetchExploreCategories());
-                        context.read<ExploreBloc>().add(ExploreCategories());
+                        context
+                            .read<ExploreBloc>()
+                            .add(FetchExploreCategories());
                         context.go('/KrofileAI/explore');
                       },
                       icon: SvgPicture.asset(
@@ -147,14 +146,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       scaffoldKey: _scaffoldKey,
                     ),
                   )
-                // if (Responsive.isDesktop(context))
-                //   if (state.isSideBarOpen)
-                //     Expanded(
-                //       flex: 3,
-                //       child: SideBar(
-                //         scaffoldKey: _scaffoldKey,
-                //       ),
-                //     ),
               ],
             );
           },

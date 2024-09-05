@@ -156,4 +156,5 @@ class CloseDislikeFeedback extends  BusinessResponseEvent {
   @override
   List<Object> get props => [index];
 }
+class ClearLikedDisliked extends BusinessResponseEvent {}
 

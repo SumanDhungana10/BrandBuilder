@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:krofile_ai/bloc/customizescreen/customizescreen_bloc.dart';
-import 'package:krofile_ai/helper.dart';
 import 'package:krofile_ai/widgets/back_button.dart';
 
 class CustomizeScreen extends StatefulWidget {
@@ -38,6 +37,7 @@ class _CustomizeScreenState extends State<CustomizeScreen> {
   @override
   void initState() {
     super.initState();
+    context.read<CustomizeScreenBloc>().add(FetchStarterConversations());
     final state = context.read<CustomizeScreenBloc>().state;
     final starterConversations = state.starterConversation;
 

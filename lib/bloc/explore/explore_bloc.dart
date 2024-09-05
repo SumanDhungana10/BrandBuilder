@@ -1,13 +1,13 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:krofile_ai/services/explore_services.dart';
+import 'package:krofile_ai/api/explore_api.dart';
 
 part 'explore_event.dart';
 part 'explore_state.dart';
 
 class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
   ExploreBloc() : super(const ExploreState()) {
-    on<ExploreCategories>(_onFetchExploreCategories);
+    on<FetchExploreCategories>(_onFetchExploreCategories);
     on<HandelCategoryButton>(_onHandleCategoryButton);
     on<FetchExploreSubCategories>(_onFetchExploreSubCategories);
     on<FetchQuestions>(_onFetchQuestions);
@@ -18,11 +18,11 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
   }
 
   void _onFetchExploreCategories(
-      ExploreCategories event, Emitter<ExploreState> emit) async {
+      FetchExploreCategories event, Emitter<ExploreState> emit) async {
     if (state.categories.isEmpty) {
       emit(state.copyWith(isCategoriesLoading: true));
     }
-    final categories = await ExploreServices().fetchExploreCategories();
+    final categories = await ExploreApi().fetchExploreCategories();
 
     emit(state.copyWith(categories: categories, isCategoriesLoading: false));
   }
@@ -30,7 +30,7 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
   void _onFetchExploreSubCategories(
       FetchExploreSubCategories event, Emitter<ExploreState> emit) async {
     emit(state.copyWith(isSubCategoriesLoading: true));
-    final subCategories = await ExploreServices()
+    final subCategories = await ExploreApi()
         .fetchSubCategories(state.categories[state.activeCategoryIndex]);
 
     emit(state.copyWith(
@@ -44,7 +44,7 @@ class ExploreBloc extends Bloc<ExploreEvent, ExploreState> {
   void _onFetchQuestions(
       FetchQuestions event, Emitter<ExploreState> emit) async {
     emit(state.copyWith(isQuestionsLoading: true));
-    final questions = await ExploreServices().fetchQuestion(
+    final questions = await ExploreApi().fetchQuestion(
         state.categories[state.activeCategoryIndex],
         state.subCategories[state.activeSubCategoryIndex]);
     emit(state.copyWith(

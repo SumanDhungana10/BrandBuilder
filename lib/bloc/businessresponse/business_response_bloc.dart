@@ -2,11 +2,10 @@ import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:krofile_ai/helper.dart';
-import 'package:krofile_ai/services/business_chat_services.dart';
-import 'package:krofile_ai/services/faq_services.dart';
-import 'package:krofile_ai/services/feedback_services.dart';
-import 'package:krofile_ai/services/showhistory_services.dart';
+import 'package:krofile_ai/api/business_chat_api.dart';
+import 'package:krofile_ai/api/faq_api.dart';
+import 'package:krofile_ai/api/feedback_api.dart';
+import 'package:krofile_ai/api/showhistory_api.dart';
 
 part 'business_response_event.dart';
 part 'business_response_state.dart';
@@ -35,12 +34,13 @@ class BusinessResponseBloc
     on<LikeFeedback>(_onLikeFeedback);
     on<DislikeFeedback>(_onDislikeFeedback);
     on<CloseDislikeFeedback>(_onCloseDislikeFeedback);
+    on<ClearLikedDisliked>(_onClearLikedDisliked);
   }
 
   void _onHandleQuestionType(
       HandleQuestionType event, Emitter<BusinessResponseState> emit) {
-    if (!state.isQuestionType) {
-      emit(state.copyWith(isQuestionType: true));
+    if (!state.isQuestionProvided) {
+      emit(state.copyWith(isQuestionProvided: true));
     }
   }
 
@@ -64,7 +64,7 @@ class BusinessResponseBloc
 
     emit(state.copyWith(questionAnswerList: newQuestionAnswerList));
 
-    final result = await ChatService().sendQuery(event.question);
+    final result = await BusinessChatApi().sendQuestion(event.question);
 
     final updatedQuestionAnswerList =
         List<QuestionAnswer>.from(newQuestionAnswerList)
@@ -83,7 +83,6 @@ class BusinessResponseBloc
 
   Future<void> _onHandleRegenerate(
       HandleRegenerate event, Emitter<BusinessResponseState> emit) async {
-    // Set the regenerating state for this index
     final updatedRegeneratingIndices =
         Map<int, bool>.from(state.regeneratingIndices)..[event.index] = true;
     final updatedQuestionAnswerList =
@@ -100,7 +99,7 @@ class BusinessResponseBloc
     try {
       // Fetch new answer
       final question = state.questionAnswerList[event.index].question;
-      final newAnswer = await ChatService().sendQuery(question);
+      final newAnswer = await BusinessChatApi().sendQuestion(question);
 
       // Update the answer in questionAnswerList
       final updatedQuestionAnswerList =
@@ -113,19 +112,11 @@ class BusinessResponseBloc
         isAnimationCompleted: false,
       );
 
-      // Clear the regenerating state for this index
-      // updatedRegeneratingIndices.remove(event.index);
-      // final updatedRegeneratingIndices =
-      //     Map<int, bool>.from(state.regeneratingIndices)..[event.index] = false;
-      // Emit the updated state
       emit(state.copyWith(
         questionAnswerList: updatedQuestionAnswerList,
-        // regeneratingIndices: updatedRegeneratingIndices,
       ));
     } catch (e) {
-      // Handle error if needed
 
-      // Clear the regenerating state for this index in case of error
       updatedRegeneratingIndices.remove(event.index);
       emit(state.copyWith(regeneratingIndices: updatedRegeneratingIndices));
     }
@@ -136,7 +127,7 @@ class BusinessResponseBloc
     emit(state.copyWith(faqSavingStatus: FAQSavingStatus.inProgress));
 
     try {
-      final response = await FAQ().saveQuestion(event.question);
+      final response = await FaqApi().saveQuestion(event.question);
 
       if (response == '${event.question} saved successfully!!!') {
         final updatedFaq = List<String>.from(state.faq)..add(event.question);
@@ -151,14 +142,14 @@ class BusinessResponseBloc
   }
 
   void _onGetFAQ(GetFaq event, Emitter<BusinessResponseState> emit) async {
-    final newFaq = await FAQ().getFAQ();
+    final newFaq = await FaqApi().getFAQ();
     emit(state.copyWith(faq: newFaq));
   }
 
   void _onRemoveFaq(
       RemoveFaq event, Emitter<BusinessResponseState> emit) async {
-    FAQ().deleteFAQ(event.question);
-    final newFaq = await FAQ().getFAQ();
+    FaqApi().deleteFAQ(event.question);
+    final newFaq = await FaqApi().getFAQ();
     emit(state.copyWith(faq: newFaq));
   }
 
@@ -187,21 +178,21 @@ class BusinessResponseBloc
 
   void _onResetQuestionAnswerList(
       ResetQuestionAnswerList event, Emitter<BusinessResponseState> emit) {
-    emit(state.copyWith(questionAnswerList: [], isQuestionType: false));
+    emit(state.copyWith(questionAnswerList: [], isQuestionProvided: false));
   }
 
   void _onFetchHistory(
       FetchHistory event, Emitter<BusinessResponseState> emit) async {
     emit(state.copyWith(isHistoryLoading: true));
-    final historyList = await ShowhistoryServices().showHistory();
+    final historyList = await ShowHistoryApi().showHistory();
 
     emit(state.copyWith(historyList: historyList, isHistoryLoading: false));
   }
 
   void _onDeleteAllHistory(
       DeleteAllHistory event, Emitter<BusinessResponseState> emit) async {
-    await ShowhistoryServices().deleteAllHistory();
-    final newHistoryList = await ShowhistoryServices().showHistory();
+    await ShowHistoryApi().deleteAllHistory();
+    final newHistoryList = await ShowHistoryApi().showHistory();
     emit(state.copyWith(historyList: newHistoryList));
   }
 
@@ -225,7 +216,7 @@ class BusinessResponseBloc
   void _onResponseFeedback(
       ResponseFeedback event, Emitter<BusinessResponseState> emit) async {
     try {
-      final response = await FeedbackServices()
+      final response = await FeedbackApi()
           .responseFeedbcak(event.feedback, event.content);
       emit(state.copyWith(feedbackResponse: response));
     } catch (e) {
@@ -237,7 +228,7 @@ class BusinessResponseBloc
       SaveFeedback event, Emitter<BusinessResponseState> emit) async {
     emit(state.copyWith(feedbackSavingStatus: FeedbackSavingStatus.saving));
     try {
-      final response = await FeedbackServices().sendFeedback(event.replayRating,
+      final response = await FeedbackApi().sendFeedback(event.replayRating,
           event.uxRating, event.satisfactionrating, event.addtionalFeedback);
       emit(state.copyWith(
           feedbackResponse: response,
@@ -290,5 +281,14 @@ class BusinessResponseBloc
     final newDisLikedIndex = {...state.disLikedIndex};
     newDisLikedIndex.remove(event.index);
     emit(state.copyWith(disLikedIndex: newDisLikedIndex));
+  }
+
+  void _onClearLikedDisliked(
+      ClearLikedDisliked event, Emitter<BusinessResponseState> emit) {
+    emit(state.copyWith(
+        isLikedPressed: {},
+        isDislikedPressed: {},
+        disLikedIndex: {},
+        showThankYouMessage: {}));
   }
 }

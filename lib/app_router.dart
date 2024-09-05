@@ -21,7 +21,7 @@ final GoRouter router = GoRouter(
             final extra = state.extra as Map<String, dynamic>?;
             return MyList(
               selectedCategoryIndex:
-                  extra?['selectedCategoryIndex'] as int? ?? 0,
+                  extra?['selectedCategoryIndex'] as int? ?? 1,
               selectedSubCategoryIndex:
                   extra?['selectedSubCategoryIndex'] as int?,
               newSubCategory: extra?['newSubCategory'] as String?,

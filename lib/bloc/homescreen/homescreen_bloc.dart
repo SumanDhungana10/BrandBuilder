@@ -9,11 +9,11 @@ class HomeScreenBloc extends Bloc<HomeScreenEvent, HomeScreenState> {
     on<ToggleSideBar>(_onToggleSideBar);
     on<ToggleHistory>(_onToggleHistory);
   }
-   void _onToggleSideBar(ToggleSideBar event, Emitter<HomeScreenState> emit) {
+  void _onToggleSideBar(ToggleSideBar event, Emitter<HomeScreenState> emit) {
     emit(state.copyWith(isSideBarOpen: !state.isSideBarOpen));
   }
+
   void _onToggleHistory(ToggleHistory event, Emitter<HomeScreenState> emit) {
     emit(state.copyWith(isHistoryOpen: !state.isHistoryOpen));
   }
 }
- 

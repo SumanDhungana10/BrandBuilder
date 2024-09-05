@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:krofile_ai/bloc/mylist/mylist_bloc.dart';
 
 class CreateNewMylistAlert extends StatefulWidget {
@@ -115,8 +116,8 @@ class _CreateNewMylistAlertState extends State<CreateNewMylistAlert> {
           padding: const EdgeInsets.only(left: 10),
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              disabledBackgroundColor: const Color(0xFF96D2AB),
-              backgroundColor: const Color(0xFF18C554),
+              disabledBackgroundColor: const Color(0xFF1E7BC8).withOpacity(0.5),
+              backgroundColor: const Color(0xFF1E7BC8),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(5),
@@ -127,6 +128,7 @@ class _CreateNewMylistAlertState extends State<CreateNewMylistAlert> {
                     context
                         .read<MylistBloc>()
                         .add(AddCategory(_newListController.text));
+                    context.pop();
                   }
                 : null,
             child: const Text(

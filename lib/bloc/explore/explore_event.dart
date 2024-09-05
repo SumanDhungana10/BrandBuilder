@@ -7,7 +7,7 @@ abstract class ExploreEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class ExploreCategories extends ExploreEvent {}
+class FetchExploreCategories extends ExploreEvent {}
 
 class HandelCategoryButton extends ExploreEvent {
   final int index;

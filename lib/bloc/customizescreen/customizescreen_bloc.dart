@@ -2,9 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:krofile_ai/helper.dart';
 import 'package:krofile_ai/model/quick_question_model.dart';
-import 'package:krofile_ai/services/customize_service.dart';
+import 'package:krofile_ai/api/customize_api.dart';
 
 part 'customizescreen_event.dart';
 part 'customizescreen_state.dart';
@@ -32,7 +31,7 @@ class CustomizeScreenBloc
     if (newStarterConversation.isNotEmpty) {
       for (int i = 0; i < newStarterConversation.length; i++) {
         if (newStarterConversation[i].isNotEmpty) {
-          final response = await CustomizeService()
+          final response = await CustomizeApi()
               .saveStarterConversations(newStarterConversation[i]);
           emit(state.copyWith(
             starterConversationDeleteResponse: response,
@@ -59,7 +58,7 @@ class CustomizeScreenBloc
       Emitter<CustomizeScreenState> emit) async {
     try {
       final starterConversation =
-          await CustomizeService().fetchStarterConversations();
+          await CustomizeApi().fetchStarterConversations();
       emit(state.copyWith(starterConversation: starterConversation));
     } catch (e) {
       emit(state.copyWith(
@@ -73,7 +72,7 @@ class CustomizeScreenBloc
     try {
       debugPrint('Deleting index: ${event.index}');
       final starterConversationDeleteResponse =
-          await CustomizeService().deleteStarterConversation(event.index);
+          await CustomizeApi().deleteStarterConversation(event.index);
 
       emit(state.copyWith(
         starterConversationDeleteResponse: starterConversationDeleteResponse,
@@ -133,7 +132,7 @@ class CustomizeScreenBloc
       fileUploadStatus: CustomizeFileUploadStatus.uploading,
     ));
     try {
-      final String result = await CustomizeService().uploadGeneralFile(file);
+      final String result = await CustomizeApi().uploadGeneralFile(file);
       emit(state.copyWith(
         fileuploadedresponse: result,
         fileUploadStatus: CustomizeFileUploadStatus.uploaded,

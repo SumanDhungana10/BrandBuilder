@@ -2,7 +2,7 @@
 import 'package:dio/dio.dart';
 import 'package:krofile_ai/http.dart';
 
-class FeedbackServices {
+class FeedbackApi {
 
   Future<String> sendFeedback(String replayRating, String uxRating, String satisfactionrating,String addtionalFeedback) async {
     try {

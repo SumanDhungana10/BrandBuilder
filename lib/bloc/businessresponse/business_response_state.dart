@@ -1,7 +1,9 @@
 part of 'business_response_bloc.dart';
+enum FeedbackSavingStatus { saving, isSaved, error }
+enum FAQSavingStatus { initial, inProgress, success, error }
 
 class BusinessResponseState extends Equatable {
-  final bool isQuestionType;
+  final bool isQuestionProvided;
   final List<String> questionList;
   final List<QuestionAnswer> questionAnswerList;
   final List<Map<String, dynamic>> historyList;
@@ -17,8 +19,9 @@ class BusinessResponseState extends Equatable {
   final Map<int, bool> isDislikedPressed;
   final Map<int, bool> disLikedIndex;
 
+
   const BusinessResponseState({
-    this.isQuestionType = false,
+    this.isQuestionProvided = false,
     this.questionList = const [],
     this.questionAnswerList = const [],
     this.historyList = const [],
@@ -36,7 +39,7 @@ class BusinessResponseState extends Equatable {
   });
 
   BusinessResponseState copyWith({
-    bool? isQuestionType,
+    bool? isQuestionProvided,
     List<String>? questionList,
     List<QuestionAnswer>? questionAnswerList,
     List<Map<String, dynamic>>? historyList,
@@ -53,7 +56,7 @@ class BusinessResponseState extends Equatable {
     Map<int, bool>? disLikedIndex,
   }) {
     return BusinessResponseState(
-      isQuestionType: isQuestionType ?? this.isQuestionType,
+      isQuestionProvided: isQuestionProvided ?? this.isQuestionProvided,
       questionList: questionList ?? this.questionList,
       questionAnswerList: questionAnswerList ?? this.questionAnswerList,
       historyList: historyList ?? this.historyList,
@@ -73,7 +76,7 @@ class BusinessResponseState extends Equatable {
 
   @override
   List<Object> get props => [
-        isQuestionType,
+        isQuestionProvided,
         questionList,
         questionAnswerList,
         historyList,
